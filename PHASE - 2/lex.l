@@ -16,7 +16,13 @@ SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#")
 /* Constants */
 
 /* Integer Constant */
-INTEGERLIT [0-9]+
+INTEGERLIT -?[0-9]+
+
+/* Boolean Constant */
+BOOLIT ("true"|"false")
+
+/* Float Constant */
+FLOATLIT [0-9]+.[0-9]+
 
 /* Character Constant */
 CHARACTERLIT '(\\.|[^\\'])+'
@@ -74,6 +80,17 @@ INVALIDID [a-zA-Z0-9_]*
   fprintf(fp,"Constant: %s\n",yytext);
   return STRINGLITERAL;
 }
+
+{FLOATLIT} {
+  fprintf(fp,"Constant: %s\n",yytext);
+  return FLOATLITERAL;
+}
+
+{BOOLIT} {
+  fprintf(fp,"Constant: %s\n",yytext);
+  return BOOLEANLITERAL;
+}
+
 
 {INVALIDID} {
   fprintf(fp,"Lex Error in line: %d\n Invalid Identifier: %s\n",yylineno,yytext);
