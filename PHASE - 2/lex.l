@@ -31,6 +31,7 @@ PUNCTUATIONS [,;:]
 
 /*CONSTANTS*/
 /* Integer Constant */
+DIGIT                      [0-9]
 INTEGERLIT -?[0-9]+
 
 /* Boolean Constant */
@@ -59,7 +60,6 @@ OPERATOR                {ARITHMETIC_OP}|{ASSGN_OP}|{ACCESS_OP}|{LOGICAL_OP}|{REL
 
 /*IDENTIFIERS*/
 /*Numbers*/
-DIGIT                      [0-9]
 
 /*Alphabets from English*/
 ALPHABET                   [a-zA-Z]
@@ -222,6 +222,10 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*CONSTANTS*/
 {INTEGERLIT} {
+  fprintf(fp,"Constant: %s\n",yytext);
+  return INTEGERLITERAL;
+}
+{DIGIT} {
   fprintf(fp,"Constant: %s\n",yytext);
   return INTEGERLITERAL;
 }
