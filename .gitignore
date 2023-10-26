@@ -1,1 +1,11 @@
 .vscode/
+bash.sh
+lex_test.l
+testcases/
+token_output/
+parsed_output/
+ex.o
+lex.yy.c
+y.output
+y.tab.c
+y.tab.h

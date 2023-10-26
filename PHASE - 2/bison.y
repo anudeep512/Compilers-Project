@@ -9,8 +9,16 @@
 %token SPECIALSYMBOL
 %token INTEGERLITERAL
 %token STRINGLITERAL
-%token CHARLITERAL
+%token CHARACTERLITERAL
 %token BOOLLITERAL
+%token SCOPEOPEN
+%token SCOPECLOSE
+%token ROUNDOPEN
+%token ROUNDCLOSE
+%token SQUAREOPEN
+%token SQUARECLOSE
+%token HASH
+%token LEXERROR
 
 %start begin
 %%
