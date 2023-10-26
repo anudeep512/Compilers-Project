@@ -19,15 +19,10 @@ SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#")
 INTEGERLIT [0-9]+
 
 /* Character Constant */
-ESCAPE_SEQUENCE				[\\n\\t]
-C_CHAR 						{ESCAPE_SEQUENCE}|[^("\'"|"\\"|"\n")]
-C_CHAR_SEQUENCE				{C_CHAR}+
-CHARACTERLIT			'{C_CHAR_SEQUENCE}'
+CHARACTERLIT '(\\.|[^\\'])+'
 
 /* String Constant */
-S_CHAR  					[^("\\""|"\\"|"\n")]|{ESCAPE_SEQUENCE}
-S_CHAR_SEQUENCE				{S_CHAR}+
-STRINGLIT				\"({S_CHAR_SEQUENCE}?)\"
+STRINGLIT	\"(\\.|[^\\"])*\"
 
 /* Whitespaces */
 WHITESPACES [ \t]+
