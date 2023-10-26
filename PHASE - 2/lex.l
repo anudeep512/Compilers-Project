@@ -1,11 +1,13 @@
 %{
   #include <iostream>
+  #include <map>
   #include <string>
   #include "y.tab.h"
 
   extern FILE* fp;
 
   int chkType = 0; // to track if the encountered token is type or not
+  std::map<std::string, int> userdefined;
 %}
 
 %option yylineno
@@ -15,7 +17,7 @@
 /*RESERVED KEYWORDS*/
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
-KEYWORD_3               "start"|"return"|"type"|"in"|"func"|"invoke"|"ip"|"op" 
+KEYWORD_3               "start"|"return"|"type"|"atomic type"|"in"|"func"|"invoke"|"ip"|"op" 
 KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
@@ -69,7 +71,7 @@ UNDERSCORE "_"
 
 /*Identifier*/
 IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
-IDENTIFIER                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET|DIGIT)*
+IDENTIFIER                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET|DIGIT})*
 /*NOT_ID                     ({IDENTIFIER_ALPHABET|digit)*/
 
 
@@ -99,9 +101,9 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 {KEYWORD}		{
 
 	fprintf(fp, "reserved keyword: %s\n", yytext);
-    fprintf(yyout, "%s", yytext);
+  fprintf(yyout, "%s", yytext);
 
-    if(strcmp(yytext,"when") == 0) { return WHEN; }
+  if(strcmp(yytext,"when") == 0) { return WHEN; }
 	if(strcmp(yytext,"repeat") == 0) { return REPEAT; }
 	if(strcmp(yytext,"else when") == 0) { return ELSE_WHEN; }
 	if(strcmp(yytext,"default") == 0) { return DEFAULT; }
@@ -121,6 +123,10 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 	if(strcmp(yytext,"type") == 0) { 
         chkType = 1;
         return TYPE; 
+    }
+	if(strcmp(yytext,"atomic type") == 0) { 
+        chkType = 2;
+        return ATYPE; 
     }
 	if(strcmp(yytext,"in") == 0) { return IN; }
 	if(strcmp(yytext,"func") == 0) { return FUNC; }
@@ -255,7 +261,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 {OPERATOR} 		{
 
 	fprintf(fp, "operator: %s\n", yytext);
-    fprintf(yyout, "%s", yytext);
+  fprintf(yyout, "%s", yytext);
 
 	if(strcmp(yytext,"/") == 0) { return DIV; }
 	if(strcmp(yytext,"*") == 0) { return MUL; }
@@ -286,8 +292,46 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
  
  /*IDENTIFIERS*/
 {IDENTIFIER} {/*echo;*/ 
-   fprintf(fp,"IDENTIFIER: %s\n",yytext);
-   return IDENTIFIER;}
+  
+  char *x = strdup(yytext);
+  std::string y = std::string(x);
+
+  if(chkType == 1)
+  {
+    fprintf(fp, "Userdefined Datatype: %s\n", x);
+    userdefined[y] = 1;
+    chkType = 0;
+    return UDATATYPE;
+  }
+
+  if(chkType == 2)
+  {
+    fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
+    userdefined[y] = 2;
+    chkType = 0;
+    return AUDATATYPE;
+  }
+
+  else if(userdefined.find(y) == userdefined.end())
+  {
+    return IDENTIFIER;
+  }
+
+  else
+  {
+    if(userdefined[y] == 1)
+    {
+      fprintf(fp, "Userdefined Datatype: %s\n", x);
+      return UDATATYPE;
+    }
+
+    else if(userdefined[y] == 2)
+    {
+      fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
+      return AUDATATYPE;
+    }
+  }
+}
 
 
  /*WRONG IDENTIFIERS*/
