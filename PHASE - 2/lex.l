@@ -27,7 +27,7 @@ ATOMIC_ARRAY "atomic array number"|"atomic array decimal"|"atomic array letter"|
 
 
 /*PUNCTUATION*/
-
+PUNCTUATIONS [,;:]
 
 /*CONSTANTS*/
 /* Integer Constant */
@@ -58,7 +58,19 @@ OPERATOR                {ARITHMETIC_OP}|{ASSGN_OP}|{ACCESS_OP}|{LOGICAL_OP}|{REL
 
 
 /*IDENTIFIERS*/
+/*Numbers*/
+DIGIT                      [0-9]
 
+/*Alphabets from English*/
+ALPHABET                   [a-zA-Z]
+
+/*A special symbol underscore*/
+UNDERSCORE "_"
+
+/*Identifier*/
+IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
+IDENTIFIER                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET|DIGIT)*
+/*NOT_ID                     ({IDENTIFIER_ALPHABET|digit)*/
 
 
 /* INVALID IDENTIFIERS */
@@ -77,7 +89,10 @@ WHITESPACES [ \t]+
 /*NEWLINE*/
 NEWLINE [\n]
 
-
+/*Comments*/
+SINGLE_LINE_COMMENT        "$$".*
+MULTI_LINE_COMMENT         "$*"(.|NEWLINE)*"*$"
+COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
 %%
 
@@ -197,7 +212,13 @@ NEWLINE [\n]
 
 
  /*PUNCTUATION*/
-
+{PUNCTUATIONS} {
+/*echo;*/
+fprintf(fp,"PUNCTUATION: %s\n",yytext);
+if(strcmp(yytext,",") ==0){ return COMMA;}
+else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
+else if(strcmp(yytext,":") ==0){ return COLON;}
+}
 
  /*CONSTANTS*/
 {INTEGERLIT} {
@@ -260,7 +281,10 @@ NEWLINE [\n]
 
  
  /*IDENTIFIERS*/
- 
+{IDENTIFIER} {/*echo;*/ 
+   fprintf(fp,"IDENTIFIER: %s\n",yytext);
+   return IDENTIFIER;}
+
 
  /*WRONG IDENTIFIERS*/
 {INVALIDID} {
@@ -302,6 +326,8 @@ NEWLINE [\n]
  /*NEWLINE*/
 {NEWLINE} ;
 
+ /*COMMENTS*/
+{COMMENTS};
 
  /*OTHER TOKENS*/
 . {
