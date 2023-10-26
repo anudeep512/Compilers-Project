@@ -2,26 +2,34 @@
   #include <iostream>
   #include <string>
   #include "y.tab.h"
-  extern FILE * fp;
+
+  extern FILE* fp;
+
+  int chkType = 0; // to track if the encountered token is type or not
 %}
 
 %option yylineno
 
-/* Regular Expressions and Definations*/
+/* REGULAR EXPRESSIONS AND DEFINITIONS*/
 
-/* Datatypes*/
+/*RESERVED KEYWORDS*/
+KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
+KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
+KEYWORD_3               "start"|"return"|"type"|"in"|"func"|"invoke"|"ip"|"op" 
+KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
+
+/*DATATYPES*/
 PRIMITIVE "void"|"number"|"decimal"|"letter"|"text"|"bool"
 ATOMIC_PRIMITIVE "atomic number"|"atomic decimal"|"atomic letter"|"atomic text"|"atomic bool"
 ARRAY "array "{PRIMITIVE}
 ATOMIC_ARRAY "atomic array number"|"atomic array decimal"|"atomic array letter"|"atomic array text"|"atomic array bool"
 
-/* Special Symbols */
 
-SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#") 
+/*PUNCTUATION*/
 
-/* Constants */
 
+/*CONSTANTS*/
 /* Integer Constant */
 INTEGERLIT -?[0-9]+
 
@@ -37,17 +45,77 @@ CHARACTERLIT '(\\.|[^\\'])+'
 /* String Constant */
 STRINGLIT	\"(\\.|[^\\"])*\"
 
-/* Whitespaces */
+
+
+/*OPERATORS*/
+ARITHMETIC_OP           "/"|"*"|"+"|"-"|"^"|"%"
+ACCESS_OP               "->"
+ASSGN_OP                "+="|"-="|"^="|"*="|"/="|"%="|"="
+LOGICAL_OP              "&&"|"||"
+RELATIONAL_OP           "<"|">"|"<="|">="|"=="|"!="|"~"
+OPERATOR                {ARITHMETIC_OP}|{ASSGN_OP}|{ACCESS_OP}|{LOGICAL_OP}|{RELATIONAL_OP}
+
+
+
+/*IDENTIFIERS*/
+
+
+
+/* INVALID IDENTIFIERS */
+INVALIDID [a-zA-Z0-9_]*
+
+
+/*SPECIAL SYMBOLS*/
+SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#") 
+
+
+
+/*WHITESPACES*/
 WHITESPACES [ \t]+
 
-/* Newline */
+
+/*NEWLINE*/
 NEWLINE [\n]
 
-/* Invalid Identifier */
-INVALIDID [a-zA-Z0-9_]*
+
 
 %%
 
+{KEYWORD}		{
+
+	fprintf(fp, "reserved keyword: %s\n", yytext);
+    fprintf(yyout, "%s", yytext);
+
+    if(strcmp(yytext,"when") == 0) { return WHEN; }
+	if(strcmp(yytext,"repeat") == 0) { return REPEAT; }
+	if(strcmp(yytext,"else when") == 0) { return ELSE_WHEN; }
+	if(strcmp(yytext,"default") == 0) { return DEFAULT; }
+	if(strcmp(yytext,"for") == 0) { return FOR; }
+	if(strcmp(yytext,"break") == 0) { return BREAK; }
+	if(strcmp(yytext,"continue") == 0) { return CONTINUE; }
+	if(strcmp(yytext,"task") == 0) { return TASK; }
+	if(strcmp(yytext,"make parallel") == 0) { return MAKE_PARALLEL; }
+	if(strcmp(yytext,"null") == 0) { return NULL_ARGS; }
+	if(strcmp(yytext,"tid") == 0) { return TID; }
+	if(strcmp(yytext,"analyze") == 0) { return ANALYZE; }
+	if(strcmp(yytext,"get") == 0) { return GET; }
+	if(strcmp(yytext,"sleep") == 0) { return SLEEP; }
+	if(strcmp(yytext,"time") == 0) { return TIME; }
+	if(strcmp(yytext,"start") == 0) { return START; }
+	if(strcmp(yytext,"return") == 0) { return RETURN; }
+	if(strcmp(yytext,"type") == 0) { 
+        chkType = 1;
+        return TYPE; 
+    }
+	if(strcmp(yytext,"in") == 0) { return IN; }
+	if(strcmp(yytext,"func") == 0) { return FUNC; }
+	if(strcmp(yytext,"invoke") == 0) { return INVOKE; }
+	if(strcmp(yytext,"ip") == 0) { return IP; }
+	if(strcmp(yytext,"op") == 0) { return OP; }
+}
+
+
+ /*DATATYPES*/
 {PRIMITIVE} {
     if(!strcmp(yytext, "number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
@@ -126,31 +194,12 @@ INVALIDID [a-zA-Z0-9_]*
     }
 }
 
-{SPECIALSYMBOL} {
-  fprintf(fp,"Special Symbol: %s\n",yytext);
-  if(!strcmp("<<",yytext)){
-    return SCOPEOPEN;
-  }
-  if(!strcmp(">>",yytext)){
-    return SCOPECLOSE;
-  }
-  if(!strcmp("(",yytext)){
-    return ROUNDOPEN;
-  }
-  if(!strcmp(")",yytext)){
-    return ROUNDCLOSE;
-  }
-  if(!strcmp("[",yytext)){
-    return SQUAREOPEN;
-  }
-  if(!strcmp("]",yytext)){
-    return SQUARECLOSE;
-  }
-  if(!strcmp("#",yytext)){
-    return HASH;
-  }
-}
 
+
+ /*PUNCTUATION*/
+
+
+ /*CONSTANTS*/
 {INTEGERLIT} {
   fprintf(fp,"Constant: %s\n",yytext);
   return INTEGERLITERAL;
@@ -177,29 +226,91 @@ INVALIDID [a-zA-Z0-9_]*
 }
 
 
+ /* OPERATORS */
+{OPERATOR} 		{
+
+	fprintf(fp, "operator: %s\n", yytext);
+    fprintf(yyout, "%s", yytext);
+
+	if(strcmp(yytext,"/") == 0) { return DIV; }
+	if(strcmp(yytext,"*") == 0) { return MUL; }
+	if(strcmp(yytext,"+") == 0) { return ADD; }
+	if(strcmp(yytext,"-") == 0) { return SUB; }
+	if(strcmp(yytext,"^") == 0) { return EXPONENT; }
+	if(strcmp(yytext,"%%") == 0) { return MODULO; }
+	if(strcmp(yytext,"->") == 0) { return ARROW; }
+	if(strcmp(yytext,"+=") == 0) { return INCR; }
+	if(strcmp(yytext,"-=") == 0) { return DECR; }
+	if(strcmp(yytext,"*=") == 0) { return ASSN_MUL; }
+	if(strcmp(yytext,"^=") == 0) { return ASSN_EXPONENT; }
+	if(strcmp(yytext,"/=") == 0) { return ASSN_DIV; }
+	if(strcmp(yytext,"=") == 0) { return EQ; }
+	if(strcmp(yytext,"%%=") == 0) { return ASSN_MODULO; }
+	if(strcmp(yytext,"&&") == 0) { return AND; }
+	if(strcmp(yytext,"||") == 0) { return OR; }
+	if(strcmp(yytext,"<") == 0) { return LT; }
+	if(strcmp(yytext,">") == 0) { return GT; }
+	if(strcmp(yytext,">=") == 0) { return GTEQ; }
+	if(strcmp(yytext,"<=") == 0) { return LTEQ; }
+	if(strcmp(yytext,"==") == 0) { return EQUAL_TWO; }
+	if(strcmp(yytext,"!=") == 0) { return NOT_EQ; }
+	if(strcmp(yytext,"~") == 0) { return NEG; }
+}
+
+
+ 
+ /*IDENTIFIERS*/
+ 
+
+ /*WRONG IDENTIFIERS*/
 {INVALIDID} {
   fprintf(fp,"Lex Error in line: %d\n Invalid Identifier: %s\n",yylineno,yytext);
   return LEXERROR;
 }
 
+
+ /*SPECIAL SYMBOLS*/
+{SPECIALSYMBOL} {
+  fprintf(fp,"Special Symbol: %s\n",yytext);
+  if(!strcmp("<<",yytext)){
+    return SCOPEOPEN;
+  }
+  if(!strcmp(">>",yytext)){
+    return SCOPECLOSE;
+  }
+  if(!strcmp("(",yytext)){
+    return ROUNDOPEN;
+  }
+  if(!strcmp(")",yytext)){
+    return ROUNDCLOSE;
+  }
+  if(!strcmp("[",yytext)){
+    return SQUAREOPEN;
+  }
+  if(!strcmp("]",yytext)){
+    return SQUARECLOSE;
+  }
+  if(!strcmp("#",yytext)){
+    return HASH;
+  }
+}
+
+
+ /*WHITESPACES*/
 {WHITESPACES} ;
 
+ /*NEWLINE*/
 {NEWLINE} ;
 
+
+ /*OTHER TOKENS*/
 . {
-  fprintf(fp,"Lex Error in line: %d\n Error is: %s\n",yylineno,yytext);
-  return LEXERROR;
+	fprintf(fp,"Lex Error in line: %d\n Error is: %s\n",yylineno,yytext);
+  	return LEXERROR;
 }
 
 %%
 
-int yywrap(void){
+int yywrap(){
 	return 1;
 }
-
-
-
-
-
-
-
