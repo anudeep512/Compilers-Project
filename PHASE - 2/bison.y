@@ -21,6 +21,19 @@
 %token HASH
 %token LEXERROR
 
+%token NNUM
+%token NDEC
+%token NBOOL
+%token NLET
+%token NTEXT
+%token NVOID
+
+%token ANUM
+%token ADEC
+%token ABOOL
+%token ALET
+%token ATEXT
+
 %start begin
 %%
 begin : ;

@@ -9,6 +9,12 @@
 
 /* Regular Expressions and Definations*/
 
+/* Datatypes*/
+PRIMITIVE "void"|"number"|"decimal"|"letter"|"text"|"bool"
+ATOMIC_PRIMITIVE "atomic number"|"atomic decimal"|"atomic letter"|"atomic text"|"atomic bool"
+ARRAY "array "{PRIMITIVE}
+ATOMIC_ARRAY "atomic array number"|"atomic array decimal"|"atomic array letter"|"atomic array text"|"atomic array bool"
+
 /* Special Symbols */
 
 SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#") 
@@ -40,6 +46,40 @@ NEWLINE [\n]
 INVALIDID [a-zA-Z0-9_]*
 
 %%
+
+{PRIMITIVE} {
+    if(strcmp(yytext, "number") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;}
+    if(strcmp(yytext, "decimal") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NDEC;}
+    if(strcmp(yytext, "boolean") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NBOOL;}
+    if(strcmp(yytext, "letter") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NLET;}
+    if(strcmp(yytext, "text") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NTEXT;}
+    if(strcmp(yytext, "void") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NVOID;}
+}
+
+{ATOMIC_PRIMITIVE} {
+    if(strcmp(yytext, "atomic number") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;}
+    if(strcmp(yytext, "atomic decimal") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;}
+    if(strcmp(yytext, "atomic boolean") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;}
+    if(strcmp(yytext, "atomic letter") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;}
+    if(strcmp(yytext, "atomic text") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;}
+}
+
+{ARRAY} {
+    if(strcmp(yytext, "array void") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;}
+    if(strcmp(yytext, "array number") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;}
+    if(strcmp(yytext, "array decimal") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NDEC;}
+    if(strcmp(yytext, "array boolean") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NBOOL;}
+    if(strcmp(yytext, "array letter") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NLET;}
+    if(strcmp(yytext, "array text") == 0) {fprintf(fp,"inbuilt datatype: %s\n", yytext); return NTEXT;}
+}
+
+{ATOMIC_ARRAY} {
+    if(strcmp(yytext, "atomic array number") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;}
+    if(strcmp(yytext, "atomic array decimal") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;}
+    if(strcmp(yytext, "atomic array boolean") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;}
+    if(strcmp(yytext, "atomic array letter") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;}
+    if(strcmp(yytext, "atomic array text") == 0) {fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;}
+}
 
 {SPECIALSYMBOL} {
   fprintf(fp,"Special Symbol: %s\n",yytext);
