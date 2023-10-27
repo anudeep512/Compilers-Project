@@ -1,7 +1,7 @@
 .vscode/
 bash.sh
 lex_test.l
-testcases/
+testcases_temp/
 token_output/
 parsed_output/
 ex.o
