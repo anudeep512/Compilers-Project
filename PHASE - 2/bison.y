@@ -114,6 +114,15 @@ analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON arr
 
 analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement"); }
 
+/*calls*/
+
+/*Function calls using Invoke*/
+invoke_syntax: INVOKE IDENTIFIER COLON arguments SEMICOLON
+
+arguments    : IDENTIFIER
+             | arguments COMMA IDENTIFIER
+
+
 
 
 array : ;
