@@ -76,6 +76,23 @@ assignment_statement: IDENTIFIER EQ RHS;
 expression_statement: IDENTIFIER expression_op RHS ;
 
 
+/*statements*/
+statements: ;
+
+
+
+ /*LOOPS*/
+loop: for_loop | while_loop
+
+ /*FOR LOOP*/
+for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON predicate SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+
+ /*WHILE LOOP*/
+while_loop: REPEAT SQUAREOPEN predicate SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+
+
+
+
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
           | ARROW IDENTIFIER
