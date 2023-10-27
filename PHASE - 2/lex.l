@@ -71,9 +71,7 @@ UNDERSCORE "_"
 
 /*Identifier*/
 IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
-IDENTIFIER                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET|DIGIT})*
-/*NOT_ID                     ({IDENTIFIER_ALPHABET|digit)*/
-
+ID                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
 
 /* INVALID IDENTIFIERS */
 INVALIDID [a-zA-Z0-9_]*
@@ -230,10 +228,6 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   fprintf(fp,"Constant: %s\n",yytext);
   return INTEGERLITERAL;
 }
-{DIGIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
-  return INTEGERLITERAL;
-}
 
 {CHARACTERLIT} {
   fprintf(fp,"Constant: %s\n",yytext);
@@ -287,11 +281,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 	if(strcmp(yytext,"~") == 0) { return NEG; }
 }
 
-
- 
  /*IDENTIFIERS*/
-{IDENTIFIER} {/*echo;*/ 
-  
+{ID} {
   char *x = strdup(yytext);
   std::string y = std::string(x);
 

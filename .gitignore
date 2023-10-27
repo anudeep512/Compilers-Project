@@ -1,6 +1,7 @@
 .vscode/
 bash.sh
 lex_test.l
+bison_test.y
 testcases_temp/
 token_output/
 parsed_output/
@@ -9,3 +10,5 @@ lex.yy.c
 y.output
 y.tab.c
 y.tab.h
+main.o
+testcases/

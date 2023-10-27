@@ -4,9 +4,8 @@
 
   extern int yylex();
   extern int yylineno;
-  void yyerror(string s);
+  void yyerror(std::string s);
 %}
-
 
 %token WHEN REPEAT ELSE_WHEN DEFAULT FOR BREAK CONTINUE 
 %token TASK MAKE_PARALLEL NULL_ARGS TID ANALYZE GET SLEEP TIME
@@ -36,18 +35,17 @@
 %token ALET
 %token ATEXT
 
-%token UDATAYPE AUDATAYPE
+%token UDATATYPE AUDATATYPE
 
 %start begin
 
 %%
 
-begin : ;
-
-
+begin : 
+      ;
 
 %%
 
-void yyerror(string s){
-  cout << "Syntax Error: " << s << endl;
+void yyerror(std::string s){
+  std::cout << "Syntax Error: " << s << std::endl;
 }
