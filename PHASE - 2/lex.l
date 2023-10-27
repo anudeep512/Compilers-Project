@@ -160,58 +160,58 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
 {ATOMIC_PRIMITIVE} {
     if(!strcmp(yytext, "atomic number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ANUM;
     }
     if(!strcmp(yytext, "atomic decimal")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ADEC;
     }
     if(!strcmp(yytext, "atomic boolean")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ABOOL;
     }
     if(!strcmp(yytext, "atomic letter")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ALET;
     }
     if(!strcmp(yytext, "atomic text")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ATEXT;
     }
 }
 
 {ARRAY} {
     if(!strcmp(yytext, "array void")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRVOID;
     }
     if(!strcmp(yytext, "array number")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRNUM;
     }
     if(!strcmp(yytext, "array decimal")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRDEC;
     }
     if(!strcmp(yytext, "array boolean")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRBOOL;
     }
     if(!strcmp(yytext, "array letter")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRLET;
     }
     if(!strcmp(yytext, "array text")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRTEXT;
     }
 }
 
 {ATOMIC_ARRAY} {
     if(!strcmp(yytext, "atomic array number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRNUM;
     }
     if(!strcmp(yytext, "atomic array decimal")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRDEC;
     }
     if(!strcmp(yytext, "atomic array boolean")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRBOOL;
     }
     if(!strcmp(yytext, "atomic array letter")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRLET;
     }
     if(!strcmp(yytext, "atomic array text")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRTEXT;
     }
 }
 
