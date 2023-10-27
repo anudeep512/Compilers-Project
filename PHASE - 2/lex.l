@@ -33,7 +33,7 @@ PUNCTUATIONS [,;:]
 
 /*CONSTANTS*/
 /* Integer Constant */
-DIGIT                      [0-9]
+DIGIT [0-9]
 INTEGERLIT -?[0-9]+
 
 /* Boolean Constant */
@@ -219,7 +219,6 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
  /*PUNCTUATION*/
 {PUNCTUATIONS} {
-/*echo;*/
 fprintf(fp,"PUNCTUATION: %s\n",yytext);
 if(strcmp(yytext,",") ==0){ return COMMA;}
 else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
