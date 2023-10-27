@@ -117,7 +117,10 @@ analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statem
 /*calls*/
 
 /*Function calls using Invoke*/
-invoke_syntax: INVOKE IDENTIFIER COLON arguments SEMICOLON
+func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
+
+/*Task call using Make Parallel*/
+task_invoke : MAKE PARALLEL IDENTIFIER COLON INTEGERLIT COLON INTEGERLIT COLON arguments SEMICOLON
 
 arguments    : IDENTIFIER
              | arguments COMMA IDENTIFIER
