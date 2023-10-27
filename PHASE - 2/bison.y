@@ -125,7 +125,8 @@ task_invoke : MAKE PARALLEL IDENTIFIER COLON INTEGERLIT COLON INTEGERLIT COLON a
 arguments    : IDENTIFIER
              | arguments COMMA IDENTIFIER
 
-
+/*get statement*/
+get_invoke : GET ARROW TIME
 
 
 array : ;
