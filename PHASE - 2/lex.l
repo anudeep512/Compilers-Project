@@ -18,7 +18,7 @@
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
 KEYWORD_3               "start"|"return"|"type"|"atomic type"|"in"|"func"|"invoke"|"ip"|"op" 
-KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
+KEYWORD 			          {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
 /*DATATYPES*/
@@ -71,7 +71,7 @@ UNDERSCORE "_"
 
 /*Identifier*/
 IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
-ID                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
+ID                          {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
 
 /* INVALID IDENTIFIERS */
 INVALIDID [a-zA-Z0-9_]*
@@ -92,7 +92,7 @@ NEWLINE [\n]
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
 MULTI_LINE_COMMENT         "$*"(.|NEWLINE)*"*$"
-COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
+COMMENTS                   {SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT}
 
 %%
 

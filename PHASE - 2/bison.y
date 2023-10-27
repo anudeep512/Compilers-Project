@@ -56,8 +56,18 @@
 
 %%
 
+all_datatypes: UDATAYPE | AUDATAYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
+expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ; //didn't include EQ (=)
+comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ; //didn't add '~' negation operator
+arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
+operators: EQ | expression_op | comparison_op | NEG | AND | OR | ARROW | arithmetic_op ;
+
+
 begin : 
       ;
+
+RHS: ;
+
 
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
@@ -91,6 +101,11 @@ opstring : stringvalues nextop
 nextop : HASH stringvalues nextop
        |
        ;
+
+
+
+
+
 
 %%
 
