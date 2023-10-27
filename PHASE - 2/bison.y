@@ -106,6 +106,18 @@ when_default: DEFAULT SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOP
 
 
 
+ /*ANALYSIS STATEMENT*/
+
+analyze_label : STRINGLITERAL | IDENTIFIER ; 
+
+analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array | analyze_syntax COLON array 
+
+analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement"); }
+
+
+
+array : ;
+
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
           | ARROW IDENTIFIER
