@@ -1,0 +1,33 @@
+atomic number counter = 0; $$ global int
+
+type myType <<
+
+    void printMsg(text &(?)msg) << 
+        text str = "Message from myType: " + msg + "\n";
+        op: str;
+    >>
+
+>>;
+
+void incrCounter : number N
+<<
+    number i = 0;
+    while [ i < N ] <<
+        counter += 1;
+        i += 1;
+    >>
+>>
+
+
+start<<
+    myType obj; 
+
+    number thrs; 
+    ip : thrs;
+
+    make parallel incrCounter : thrs : 4 : thrs;  
+
+    obj.printMsg("Hello from the main thread");
+
+    op : counter;
+>>

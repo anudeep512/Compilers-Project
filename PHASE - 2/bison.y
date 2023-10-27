@@ -22,6 +22,7 @@
 %token SQUAREOPEN SQUARECLOSE
 %token HASH
 %token LEXERROR
+
 %token NNUM
 %token NDEC
 %token NBOOL
@@ -29,11 +30,25 @@
 %token NTEXT
 %token NVOID
 
+%token NARRNUM
+%token NARRDEC
+%token NARRBOOL
+%token NARRLET
+%token NARRTEXT
+%token NARRVOID
+
+
 %token ANUM
 %token ADEC
 %token ABOOL
 %token ALET
 %token ATEXT
+
+%token AARRNUM
+%token AARRDEC
+%token AARRBOOL
+%token AARRLET
+%token AARRTEXT
 
 %token UDATATYPE AUDATATYPE
 
