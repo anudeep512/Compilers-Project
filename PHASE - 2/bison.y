@@ -59,6 +59,39 @@
 begin : 
       ;
 
+/* Grammar Rules for Input and Output*/
+file_name : ARROW STRINGLITERAL
+          | ARROW IDENTIFIER
+          |
+          ;
+
+input : IP file_name COLON IDENTIFIER nextip
+      ;
+
+nextip : COMMA IDENTIFIER nextip
+     | SEMICOLON
+     { 
+      std::cout << " : Input"<<std::endl;
+     }
+    ;
+
+stringvalues : STRINGLITERAL 
+             | IDENTIFIER
+            ;
+
+output : OP COLON opstring file_name SEMICOLON
+       { 
+        std::cout << " : Output"<<std::endl;
+       }
+      ;
+
+opstring : stringvalues nextop 
+         ;
+
+nextop : HASH stringvalues nextop
+       |
+       ;
+
 %%
 
 void yyerror(std::string s){
