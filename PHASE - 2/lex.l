@@ -1,11 +1,13 @@
 %{
   #include <iostream>
+  #include <map>
   #include <string>
   #include "y.tab.h"
 
   extern FILE* fp;
 
   int chkType = 0; // to track if the encountered token is type or not
+  std::map<std::string, int> userdefined;
 %}
 
 %option yylineno
@@ -15,8 +17,8 @@
 /*RESERVED KEYWORDS*/
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
-KEYWORD_3               "start"|"return"|"type"|"in"|"func"|"invoke"|"ip"|"op" 
-KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
+KEYWORD_3               "start"|"return"|"type"|"atomic type"|"in"|"func"|"invoke"|"ip"|"op" 
+KEYWORD 			          {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
 /*DATATYPES*/
@@ -31,7 +33,7 @@ PUNCTUATIONS [,;:]
 
 /*CONSTANTS*/
 /* Integer Constant */
-DIGIT                      [0-9]
+DIGIT [0-9]
 INTEGERLIT -?[0-9]+
 
 /* Boolean Constant */
@@ -69,9 +71,7 @@ UNDERSCORE "_"
 
 /*Identifier*/
 IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
-IDENTIFIER                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET|DIGIT)*
-/*NOT_ID                     ({IDENTIFIER_ALPHABET|digit)*/
-
+ID                          {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
 
 /* INVALID IDENTIFIERS */
 INVALIDID [a-zA-Z0-9_]*
@@ -94,14 +94,15 @@ SINGLE_LINE_COMMENT        "$$".*
 MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
 COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
+
 %%
 
 {KEYWORD}		{
 
 	fprintf(fp, "reserved keyword: %s\n", yytext);
-    fprintf(yyout, "%s", yytext);
+  fprintf(yyout, "%s", yytext);
 
-    if(strcmp(yytext,"when") == 0) { return WHEN; }
+  if(strcmp(yytext,"when") == 0) { return WHEN; }
 	if(strcmp(yytext,"repeat") == 0) { return REPEAT; }
 	if(strcmp(yytext,"else when") == 0) { return ELSE_WHEN; }
 	if(strcmp(yytext,"default") == 0) { return DEFAULT; }
@@ -121,6 +122,10 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 	if(strcmp(yytext,"type") == 0) { 
         chkType = 1;
         return TYPE; 
+    }
+	if(strcmp(yytext,"atomic type") == 0) { 
+        chkType = 2;
+        return ATYPE; 
     }
 	if(strcmp(yytext,"in") == 0) { return IN; }
 	if(strcmp(yytext,"func") == 0) { return FUNC; }
@@ -154,58 +159,58 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
 {ATOMIC_PRIMITIVE} {
     if(!strcmp(yytext, "atomic number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ANUM;
     }
     if(!strcmp(yytext, "atomic decimal")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ADEC;
     }
     if(!strcmp(yytext, "atomic boolean")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ABOOL;
     }
     if(!strcmp(yytext, "atomic letter")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ALET;
     }
     if(!strcmp(yytext, "atomic text")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ATEXT;
     }
 }
 
 {ARRAY} {
     if(!strcmp(yytext, "array void")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRVOID;
     }
     if(!strcmp(yytext, "array number")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRNUM;
     }
     if(!strcmp(yytext, "array decimal")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRDEC;
     }
     if(!strcmp(yytext, "array boolean")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRBOOL;
     }
     if(!strcmp(yytext, "array letter")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRLET;
     }
     if(!strcmp(yytext, "array text")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRTEXT;
     }
 }
 
 {ATOMIC_ARRAY} {
     if(!strcmp(yytext, "atomic array number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRNUM;
     }
     if(!strcmp(yytext, "atomic array decimal")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRDEC;
     }
     if(!strcmp(yytext, "atomic array boolean")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRBOOL;
     }
     if(!strcmp(yytext, "atomic array letter")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRLET;
     }
     if(!strcmp(yytext, "atomic array text")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRTEXT;
     }
 }
 
@@ -213,7 +218,6 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
  /*PUNCTUATION*/
 {PUNCTUATIONS} {
-/*echo;*/
 fprintf(fp,"PUNCTUATION: %s\n",yytext);
 if(strcmp(yytext,",") ==0){ return COMMA;}
 else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
@@ -222,10 +226,6 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*CONSTANTS*/
 {INTEGERLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
-  return INTEGERLITERAL;
-}
-{DIGIT} {
   fprintf(fp,"Constant: %s\n",yytext);
   return INTEGERLITERAL;
 }
@@ -255,7 +255,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 {OPERATOR} 		{
 
 	fprintf(fp, "operator: %s\n", yytext);
-    fprintf(yyout, "%s", yytext);
+  fprintf(yyout, "%s", yytext);
 
 	if(strcmp(yytext,"/") == 0) { return DIV; }
 	if(strcmp(yytext,"*") == 0) { return MUL; }
@@ -282,12 +282,47 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 	if(strcmp(yytext,"~") == 0) { return NEG; }
 }
 
-
- 
  /*IDENTIFIERS*/
-{IDENTIFIER} {/*echo;*/ 
-   fprintf(fp,"IDENTIFIER: %s\n",yytext);
-   return IDENTIFIER;}
+{ID} {
+  char *x = strdup(yytext);
+  std::string y = std::string(x);
+
+  if(chkType == 1)
+  {
+    fprintf(fp, "Userdefined Datatype: %s\n", x);
+    userdefined[y] = 1;
+    chkType = 0;
+    return UDATATYPE;
+  }
+
+  if(chkType == 2)
+  {
+    fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
+    userdefined[y] = 2;
+    chkType = 0;
+    return AUDATATYPE;
+  }
+
+  else if(userdefined.find(y) == userdefined.end())
+  {
+    return IDENTIFIER;
+  }
+
+  else
+  {
+    if(userdefined[y] == 1)
+    {
+      fprintf(fp, "Userdefined Datatype: %s\n", x);
+      return UDATATYPE;
+    }
+
+    else if(userdefined[y] == 2)
+    {
+      fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
+      return AUDATATYPE;
+    }
+  }
+}
 
 
  /*WRONG IDENTIFIERS*/
