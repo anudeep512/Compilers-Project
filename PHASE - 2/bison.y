@@ -120,7 +120,7 @@ analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statem
 func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE PARALLEL IDENTIFIER COLON INTEGERLIT COLON INTEGERLIT COLON arguments SEMICOLON
+task_invoke : MAKE PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON
 
 arguments    : IDENTIFIER
              | arguments COMMA IDENTIFIER
@@ -128,6 +128,8 @@ arguments    : IDENTIFIER
 /*get statement*/
 get_invoke : GET ARROW TIME
 
+/*Sleep*/
+sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE
 
 array : ;
 
