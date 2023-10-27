@@ -69,6 +69,13 @@ begin :
 RHS: ;
 
 
+ /*ASSIGNMENT STATEMENT*/
+assignment_statement: IDENTIFIER EQ RHS;
+
+ /*EXPRESSION STATEMENT*/
+expression_statement: IDENTIFIER expression_op RHS ;
+
+
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
           | ARROW IDENTIFIER
