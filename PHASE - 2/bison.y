@@ -92,6 +92,19 @@ while_loop: REPEAT SQUAREOPEN predicate SQUARECLOSE  {fprintf(yyout, " : loop st
 
 
 
+/*CONDITIONAL STATEMENT*/
+conditional: when_statement when_default;
+
+/*WHEN STATEMENT*/
+when_statement: WHEN SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+              | when_statement ELSE_WHEN SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+              ;
+
+ /*DEFAULT STATEMENT (occurs only once)*/
+when_default: DEFAULT SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE 
+              | {} ;  
+
+
 
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
