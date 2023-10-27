@@ -52,6 +52,18 @@
 
 %token UDATATYPE AUDATATYPE
 
+%left ROUNDOPEN ROUNDCLOSE ARROW
+%right EXPONENT
+%left MUL DIV MODULO
+%left ADD SUB
+%left GTEQ GT LTEQ LT
+%left EQUAL_TWO NOT_EQ
+%right NEG
+%left AND
+%left OR
+%right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
+%left COMMA
+
 %start begin
 
 %%
