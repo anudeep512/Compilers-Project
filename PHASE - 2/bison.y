@@ -157,7 +157,7 @@ input : IP file_name COLON IDENTIFIER nextip
 nextip : COMMA IDENTIFIER nextip
      | SEMICOLON
      { 
-      std::cout << " : Input"<<std::endl;
+      fprintf(yyout, " : analyze statement");
      }
     ;
 
@@ -167,7 +167,7 @@ stringvalues : STRINGLITERAL
 
 output : OP COLON opstring file_name SEMICOLON
        { 
-        std::cout << " : Output"<<std::endl;
+        fprintf(yyout, " : analyze statement");
        }
       ;
 
