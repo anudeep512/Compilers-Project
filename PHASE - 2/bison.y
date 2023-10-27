@@ -56,7 +56,7 @@
 
 %%
 
-all_datatypes: UDATAYPE | AUDATAYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
+all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ; //didn't include EQ (=)
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ; //didn't add '~' negation operator
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -120,7 +120,7 @@ analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statem
 func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON
 
 arguments    : IDENTIFIER
              | arguments COMMA IDENTIFIER
