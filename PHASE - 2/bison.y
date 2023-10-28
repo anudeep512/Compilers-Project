@@ -103,6 +103,9 @@ atomicSimple : ANUM|ADEC|ABOOL|ALET|ATEXT;
 nonAtomicArray : NARRNUM|NARRDEC|NARRBOOL|NARRLET|NARRTEXT;
 atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 
+
+/* DECLARATION STATEMENT : Only Declaration + Assignment */
+
 declaration : declarationList
             ;
 
@@ -119,17 +122,19 @@ declarationStmt : simpleDatatype simpleList
 
 simpleList: IDENTIFIER
           | simpleList COMMA IDENTIFIER
+          | IDENTIFIER EQ RHS
+          | simpleList COMMA IDENTIFIER EQ RHS
           ;
 
 arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
           ;
 
 dimlist : dimlist COMMA INTEGERLITERAL
         | INTEGERLITERAL
         ;
-
-/* DECLARATION STATEMENT */
 
 
 
