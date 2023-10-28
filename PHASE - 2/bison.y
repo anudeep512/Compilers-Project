@@ -128,7 +128,7 @@ statements: ;
 
 
  /*LOOPS*/
-loop: for_loop | while_loop
+loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
 for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON predicate SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
@@ -156,26 +156,28 @@ when_default: DEFAULT SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOP
 
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array | analyze_syntax COLON array 
+analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array next_analyze ;
 
-analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement"); }
+next_analyze   : COLON array next_analyze | SEMICOLON { fprintf(yyout, " : analyze statement");  }
+
 
 /*calls*/
 
 /*Function calls using Invoke*/
-func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
+func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON ;
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON ;
 
 arguments    : IDENTIFIER
-             | arguments COMMA IDENTIFIER
+             | arguments COMMA IDENTIFIER 
+             ;
 
 /*get statement*/
-get_invoke : GET ARROW TIME
+get_invoke : GET ARROW TIME ;
 
 /*Sleep*/
-sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE
+sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE ;
 
 array : ;
 
@@ -191,7 +193,7 @@ input : IP file_name COLON IDENTIFIER nextip
 nextip : COMMA IDENTIFIER nextip
      | SEMICOLON
      { 
-      fprintf(yyout, " : analyze statement");
+      fprintf(yyout, " : scan statement");
      }
     ;
 
@@ -201,7 +203,7 @@ stringvalues : STRINGLITERAL
 
 output : OP COLON opstring file_name SEMICOLON
        { 
-        fprintf(yyout, " : analyze statement");
+        fprintf(yyout, " : print statement");
        }
       ;
 
@@ -220,5 +222,5 @@ nextop : HASH stringvalues nextop
 %%
 
 void yyerror(std::string s){
-  std::cout << "Syntax Error: " << s << std::endl;
+  std::cout << "Syntax Error: " << s << " at line number - " << yylineno << std::endl;
 }
