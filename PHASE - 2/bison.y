@@ -234,6 +234,9 @@ stringvalues : STRINGLITERAL
              | IDENTIFIER
             ;
 
+/* Return */
+
+return : RETURN RHS SEMICOLON ;
 
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
@@ -264,11 +267,11 @@ func_statements: declarationList
                | task_invoke 
                | func_invoke 
                | loop 
-               | return_statement
+               | return
                | conditional 
                | analyze_statement
                | input | output 
-               | sleep_statement
+               | sleep
                ;
 
 
