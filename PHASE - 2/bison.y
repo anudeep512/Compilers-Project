@@ -165,11 +165,12 @@ conditional: when_statement when_default;
 
 /*WHEN STATEMENT*/
 when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE
-              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE
               ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE 
+when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE 
+            | 
             ;  
 
  /*ANALYSIS STATEMENT*/
@@ -243,6 +244,16 @@ opstring : stringvalues nextop
 nextop : HASH stringvalues nextop
        |
        ;
+
+
+/*FUNCTION IMPLEMENTATION SCOPE*/
+function:         func_decl func_body ;
+
+func_args:        IDENTIFIER | func_args COMMA IDENTIFIER ;
+func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
+
+func_body : ;
+
 
 %%
 
