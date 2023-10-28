@@ -151,12 +151,14 @@ log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");
     ;
 
 
+both_assignment: assignment_statement 
+                | declarationStmt ;
 
  /*LOOPS*/
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON RHS SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+for_loop: FOR SQUAREOPEN both_assignment SEMICOLON RHS SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
 
  /*WHILE LOOP*/
 while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
