@@ -161,18 +161,32 @@ analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON arr
 
 next_analyze   : COLON array next_analyze | SEMICOLON { fprintf(yyout, " : analyze statement");  }
 
+constants: INTEGERLITERAL
+           | CHARACTERLITERAL
+           | FLOATLITERAL
+           | BOOLEANLITERAL
+           | STRINGLITERAL
+           ;
 
 /*calls*/
 
-/*Function calls using Invoke*/
-func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON ;
+/* Function calls */
+is: IDENTIFIER
+  | constants
+  | func_invoke
+  ;
+
+func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
+          ;
+
+arguments : is
+             | arguments COMMA is
+             | NULL_ARGS
+             ;
+
 
 /*Task call using Make Parallel*/
 task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON ;
-
-arguments    : IDENTIFIER
-             | arguments COMMA IDENTIFIER 
-             ;
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
