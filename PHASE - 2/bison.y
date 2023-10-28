@@ -252,7 +252,20 @@ function:         func_decl func_body ;
 func_args:        IDENTIFIER | func_args COMMA IDENTIFIER ;
 func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
 
-func_body : ;
+func_body : SCOPEOPEN func_statements SCOPECLOSE;
+
+func_statements: declarationList
+               | assignment_statement 
+               | expression_statement 
+               | task_invoke 
+               | func_invoke 
+               | loop 
+               | return_statement
+               | conditional 
+               | analyze_statement
+               | input | output 
+               | sleep_statement
+               ;
 
 
 %%
