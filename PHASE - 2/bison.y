@@ -191,7 +191,7 @@ func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : ca
           ;
 
 arguments : is
-             | arguments COMMA is
+             | is COMMA arguments
              | NULL_ARGS
              ;
 
