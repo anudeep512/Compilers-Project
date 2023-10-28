@@ -12,3 +12,6 @@ y.tab.c
 y.tab.h
 main.o
 testcases/
+main_temp.cpp
+bash_test.sh
+main_temp.o

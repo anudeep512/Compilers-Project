@@ -1,7 +1,11 @@
-ip->"input.txt":a,b,c;
-ip: var1, var2, okk ;
-
 op: str -> Op ;
 op: str -> "file.txt" ;
 op: "Ok" # "Dude" # "Bro" -> "file2.txt" ;
+
+("ok" + "done") ;
+(1 + 2 && ((7) || 10) - (90/7^6)) ;
+(1 > 2) ;
+
+
+
 

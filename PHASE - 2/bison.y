@@ -69,16 +69,16 @@
 %%
 
 all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
-expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ; //didn't include EQ (=)
-comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ; //didn't add '~' negation operator
+expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
+comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
-operators: EQ | expression_op | comparison_op | NEG | AND | OR | ARROW | arithmetic_op ;
+logical_op: AND | OR ;
+unary_logical_op: NEG ;
+operators: EQ | expression_op | comparison_op | logical_op | ARROW | arithmetic_op ;
 
 
 begin : 
       ;
-
-RHS: ;
 
 
  /*ASSIGNMENT STATEMENT*/
@@ -97,10 +97,10 @@ statements: ;
 loop: for_loop | while_loop
 
  /*FOR LOOP*/
-for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON predicate SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON RHS SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
 
  /*WHILE LOOP*/
-while_loop: REPEAT SQUAREOPEN predicate SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
 
 
 
@@ -108,15 +108,14 @@ while_loop: REPEAT SQUAREOPEN predicate SQUARECLOSE  {fprintf(yyout, " : loop st
 conditional: when_statement when_default;
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
-              | when_statement ELSE_WHEN SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
               ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT SQUAREOPEN predicate SQUARECLOSE SCOPEOPEN statements SCOPECLOSE 
-              | {} ;  
-
-
+when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE 
+            |
+            ;  
 
  /*ANALYSIS STATEMENT*/
 
@@ -157,7 +156,7 @@ input : IP file_name COLON IDENTIFIER nextip
 nextip : COMMA IDENTIFIER nextip
      | SEMICOLON
      { 
-      fprintf(yyout, " : analyze statement");
+      fprintf(yyout, " : Input");
      }
     ;
 
@@ -167,7 +166,7 @@ stringvalues : STRINGLITERAL
 
 output : OP COLON opstring file_name SEMICOLON
        { 
-        fprintf(yyout, " : analyze statement");
+        fprintf(yyout, " : Output");
        }
       ;
 
@@ -177,11 +176,6 @@ opstring : stringvalues nextop
 nextop : HASH stringvalues nextop
        |
        ;
-
-
-
-
-
 
 %%
 
