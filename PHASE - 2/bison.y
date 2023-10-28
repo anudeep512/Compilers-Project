@@ -174,6 +174,7 @@ constants: INTEGERLITERAL
 is: IDENTIFIER
   | constants
   | func_invoke
+  | RHS 
   ;
 
 func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
