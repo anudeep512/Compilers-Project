@@ -35,8 +35,6 @@
 %token NARRBOOL
 %token NARRLET
 %token NARRTEXT
-%token NARRVOID
-
 
 %token ANUM
 %token ADEC
@@ -80,6 +78,44 @@ operators: EQ | expression_op | comparison_op | logical_op | ARROW | arithmetic_
 begin : 
       ;
 
+RHS: ;
+
+/* DATATYPE SEGREGATION FOR DECL STATEMENTS */
+nonAtomicSimple : NNUM|NDEC|NBOOL|NLET|NTEXT|NVOID ;
+atomicSimple : ANUM|ADEC|ABOOL|ALET|ATEXT;
+
+nonAtomicArray : NARRNUM|NARRDEC|NARRBOOL|NARRLET|NARRTEXT;
+atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
+
+declaration : declarationList
+            ;
+
+declarationList : declarationStmt SEMICOLON
+                | declarationList declarationStmt SEMICOLON
+                ;
+
+simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|AUDATATYPE;
+arrayDatatype  : nonAtomicArray|atomicArray;
+
+declarationStmt : simpleDatatype simpleList 
+                | arrayDatatype arrayList
+                ;
+
+simpleList: IDENTIFIER
+          | simpleList COMMA IDENTIFIER
+          ;
+
+arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+          ;
+
+dimlist : dimlist COMMA INTEGERLITERAL
+        | INTEGERLITERAL
+        ;
+
+/* DECLARATION STATEMENT */
+
+
 
  /*ASSIGNMENT STATEMENT*/
 assignment_statement: IDENTIFIER EQ RHS;
@@ -94,7 +130,7 @@ statements: ;
 
 
  /*LOOPS*/
-loop: for_loop | while_loop
+loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
 for_loop: FOR SQUAREOPEN assignment_statement SEMICOLON RHS SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
@@ -121,26 +157,28 @@ when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
 
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array | analyze_syntax COLON array 
+analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array next_analyze ;
 
-analyze_statement : analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement"); }
+next_analyze   : COLON array next_analyze | SEMICOLON { fprintf(yyout, " : analyze statement");  }
+
 
 /*calls*/
 
 /*Function calls using Invoke*/
-func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
+func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON ;
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON ;
 
 arguments    : IDENTIFIER
-             | arguments COMMA IDENTIFIER
+             | arguments COMMA IDENTIFIER 
+             ;
 
 /*get statement*/
-get_invoke : GET ARROW TIME
+get_invoke : GET ARROW TIME ;
 
 /*Sleep*/
-sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE
+sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE ;
 
 array : ;
 
@@ -156,7 +194,7 @@ input : IP file_name COLON IDENTIFIER nextip
 nextip : COMMA IDENTIFIER nextip
      | SEMICOLON
      { 
-      fprintf(yyout, " : Input");
+      fprintf(yyout, " : scan statement");
      }
     ;
 
@@ -166,7 +204,7 @@ stringvalues : STRINGLITERAL
 
 output : OP COLON opstring file_name SEMICOLON
        { 
-        fprintf(yyout, " : Output");
+        fprintf(yyout, " : print statement");
        }
       ;
 
@@ -180,5 +218,5 @@ nextop : HASH stringvalues nextop
 %%
 
 void yyerror(std::string s){
-  std::cout << "Syntax Error: " << s << std::endl;
+  std::cout << "Syntax Error: " << s << " at line number - " << yylineno << std::endl;
 }
