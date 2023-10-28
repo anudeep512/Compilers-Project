@@ -80,6 +80,31 @@ begin :
 
 RHS: ;
 
+/* DATATYPE SEGREGATION FOR DECL STATEMENTS */
+nonAtomicSimple : NNUM|NDEC|NBOOL|NLET|NTEXT|NVOID ;
+atomicSimple : ANUM|ADEC|ABOOL|ALET|ATEXT;
+
+
+declaration : declarationList
+            ;
+
+declarationList : declarationStmt SEMICOLON
+                | declarationList declarationStmt SEMICOLON
+                ;
+
+simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|AUDATATYPE;
+
+declarationStmt : simpleDatatype simpleList 
+                | arrayDatatype arrayList
+                ;
+
+simpleList: IDENTIFIER
+          | simpleList COMMA IDENTIFIER
+          ;
+
+/* DECLARATION STATEMENT */
+
+
 
  /*ASSIGNMENT STATEMENT*/
 assignment_statement: IDENTIFIER EQ RHS;

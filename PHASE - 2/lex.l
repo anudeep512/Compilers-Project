@@ -40,7 +40,7 @@ INTEGERLIT -?[0-9]+
 BOOLIT ("true"|"false")
 
 /* Float Constant */
-FLOATLIT -?[0-9]+.[0-9]+
+FLOATLIT -?[0-9]+"."[0-9]+
 
 /* Character Constant */
 CHARACTERLIT '(\\.|[^\\'])+'
