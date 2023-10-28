@@ -146,8 +146,6 @@ log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");
     ;
 
 
-/*statements*/
-statements: ;
 
  /*LOOPS*/
 loop: for_loop | while_loop ;
@@ -202,12 +200,11 @@ arguments : is
 task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } ;
 
 /*get statement*/
-get_invoke : GET ARROW TIME ;
+get_invoke : GET ARROW TIME SEMICOLON
 
 /*SLEEP STATEMENT*/
 sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
 
-array : ;
 
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
