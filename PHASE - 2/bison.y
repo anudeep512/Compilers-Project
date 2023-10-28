@@ -178,12 +178,14 @@ when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditiona
             | 
             ;  
 
+analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM ;
+
  /*ANALYSIS STATEMENT*/
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array analyze_statement ;
+analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_statement ;
 
-analyze_statement   : COLON array analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  }
+analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  }
 
 /*calls*/
 
