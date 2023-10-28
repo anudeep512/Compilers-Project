@@ -82,6 +82,8 @@ RHS: ;
 nonAtomicSimple : NNUM|NDEC|NBOOL|NLET|NTEXT|NVOID ;
 atomicSimple : ANUM|ADEC|ABOOL|ALET|ATEXT;
 
+nonAtomicArray : NARRNUM|NARRDEC|NARRBOOL|NARRLET|NARRTEXT;
+atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 
 declaration : declarationList
             ;
@@ -91,6 +93,7 @@ declarationList : declarationStmt SEMICOLON
                 ;
 
 simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|AUDATATYPE;
+arrayDatatype  : nonAtomicArray|atomicArray;
 
 declarationStmt : simpleDatatype simpleList 
                 | arrayDatatype arrayList
@@ -99,6 +102,14 @@ declarationStmt : simpleDatatype simpleList
 simpleList: IDENTIFIER
           | simpleList COMMA IDENTIFIER
           ;
+
+arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+          ;
+
+dimlist : dimlist COMMA INTEGERLITERAL
+        | INTEGERLITERAL
+        ;
 
 /* DECLARATION STATEMENT */
 
