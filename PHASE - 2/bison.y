@@ -16,6 +16,7 @@
 %token AND OR GT LT GTEQ LTEQ NOT_EQ NEG EQUAL_TWO
 %token INTEGERLITERAL STRINGLITERAL CHARACTERLITERAL BOOLEANLITERAL FLOATLITERAL
 %token COMMA SEMICOLON COLON
+
 %token IDENTIFIER
 %token SCOPEOPEN SCOPECLOSE
 %token ROUNDOPEN ROUNDCLOSE
@@ -23,30 +24,13 @@
 %token HASH
 %token LEXERROR
 
-%token NNUM
-%token NDEC
-%token NBOOL
-%token NLET
-%token NTEXT
-%token NVOID
+%token NNUM NDEC NBOOL NLET NTEXT NVOID
 
-%token NARRNUM
-%token NARRDEC
-%token NARRBOOL
-%token NARRLET
-%token NARRTEXT
+%token NARRNUM NARRDEC NARRBOOL NARRLET NARRTEXT
 
-%token ANUM
-%token ADEC
-%token ABOOL
-%token ALET
-%token ATEXT
+%token ANUM ADEC ABOOL ALET ATEXT
 
-%token AARRNUM
-%token AARRDEC
-%token AARRBOOL
-%token AARRLET
-%token AARRTEXT
+%token AARRNUM AARRDEC AARRBOOL AARRLET AARRTEXT
 
 %token UDATATYPE AUDATATYPE
 
@@ -73,10 +57,13 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 unary_logical_op: NEG ;
 operators: EQ | expression_op | comparison_op | logical_op | ARROW | arithmetic_op ;
+nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
+atomic_datatypes:      atomicArray | atomicSimple ;
 
 
 begin : 
       ;
+
 
 /* RHS */
 
@@ -105,7 +92,8 @@ RHS :	constants
     | T
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
-    | NEG ROUNDOPEN RHS ROUNDCLOSE
+    | NEG ROUNDOPEN RHS ROUNDCLOSE 
+    | get_invoke
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
@@ -151,6 +139,12 @@ assignment_statement: IDENTIFIER EQ RHS;
  /*EXPRESSION STATEMENT*/
 expression_statement: IDENTIFIER expression_op RHS ;
 
+//for logging
+log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  } 
+    | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
+    | get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
+    ;
+
 
 /*statements*/
 statements: ;
@@ -170,22 +164,20 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 conditional: when_statement when_default;
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
+when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE
               | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE
               ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
 when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE SCOPEOPEN statements SCOPECLOSE 
-            |
             ;  
 
  /*ANALYSIS STATEMENT*/
-
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array next_analyze ;
+analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array analyze_statement ;
 
-next_analyze   : COLON array next_analyze | SEMICOLON { fprintf(yyout, " : analyze statement");  }
+analyze_statement   : COLON array analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  }
 
 /*calls*/
 
@@ -196,7 +188,7 @@ is: IDENTIFIER
   | RHS 
   ;
 
-func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON
+func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  }
           ;
 
 arguments : is
@@ -206,13 +198,13 @@ arguments : is
 
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON ;
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } ;
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
 
-/*Sleep*/
-sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE ;
+/*SLEEP STATEMENT*/
+sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
 
 array : ;
 
@@ -225,6 +217,7 @@ file_name : ARROW STRINGLITERAL
 input : IP file_name COLON IDENTIFIER nextip
       ;
 
+/*SCAN STATEMENT*/
 nextip : COMMA IDENTIFIER nextip
      | SEMICOLON
      { 
@@ -236,6 +229,8 @@ stringvalues : STRINGLITERAL
              | IDENTIFIER
             ;
 
+
+/*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
        { 
         fprintf(yyout, " : print statement");
