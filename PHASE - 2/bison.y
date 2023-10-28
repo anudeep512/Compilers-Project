@@ -78,7 +78,35 @@ operators: EQ | expression_op | comparison_op | logical_op | ARROW | arithmetic_
 begin : 
       ;
 
-RHS: ;
+/* RHS */
+
+T : IDENTIFIER
+  | func_invoke
+  ;
+
+all_ops: arithmetic_op
+      | comparison_op
+      | logical_op
+      | HASH
+      ;
+
+constants: INTEGERLITERAL
+           | CHARACTERLITERAL
+           | FLOATLITERAL
+           | BOOLEANLITERAL
+           | STRINGLITERAL
+           ;
+
+next : RHS all_ops next 
+	| RHS 				
+	;
+
+RHS :	constants
+    | T
+    | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
+    | ROUNDOPEN RHS ROUNDCLOSE
+    | NEG ROUNDOPEN RHS ROUNDCLOSE
+    ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
 nonAtomicSimple : NNUM|NDEC|NBOOL|NLET|NTEXT|NVOID ;
@@ -127,8 +155,6 @@ expression_statement: IDENTIFIER expression_op RHS ;
 /*statements*/
 statements: ;
 
-
-
  /*LOOPS*/
 loop: for_loop | while_loop ;
 
@@ -160,13 +186,6 @@ analyze_label : STRINGLITERAL | IDENTIFIER ;
 analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON array COLON array next_analyze ;
 
 next_analyze   : COLON array next_analyze | SEMICOLON { fprintf(yyout, " : analyze statement");  }
-
-constants: INTEGERLITERAL
-           | CHARACTERLITERAL
-           | FLOATLITERAL
-           | BOOLEANLITERAL
-           | STRINGLITERAL
-           ;
 
 /*calls*/
 
