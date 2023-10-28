@@ -176,9 +176,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 }
 
 {ARRAY} {
-    if(!strcmp(yytext, "array void")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRVOID;
-    }
+    
     if(!strcmp(yytext, "array number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRNUM;
     }

@@ -35,8 +35,6 @@
 %token NARRBOOL
 %token NARRLET
 %token NARRTEXT
-%token NARRVOID
-
 
 %token ANUM
 %token ADEC
@@ -68,7 +66,7 @@
 
 %%
 
-all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
+all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | NVOID | ABOOL | ADEC | ALET | ATEXT | ANUM | NARRBOOL | NARRNUM | NARRDEC | NARRTEXT | NARRLET | AARRBOOL | AARRDEC | AARRLET | AARRNUM | AARRTEXT ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ; //didn't include EQ (=)
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ; //didn't add '~' negation operator
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
