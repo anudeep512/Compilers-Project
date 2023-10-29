@@ -276,6 +276,21 @@ func_statements: declarationList
                | sleep
                ;
 
+/* Task declaration and implemenatation scope */
+task: TASK IDENTIFIER COLON func_args SCOPEOPEN taskscope SCOPECLOSE
+    ;
+
+taskscope: declaration taskscope
+        | assignment_statement taskscope
+        | expression_op taskscope
+        | conditional taskscope
+        | loop taskscope
+        | func_invoke taskscope
+        | output taskscope
+        | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
+        | sleep taskscope
+        | 
+        ;
 
 %%
 
