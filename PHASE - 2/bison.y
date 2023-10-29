@@ -195,9 +195,9 @@ func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : ca
           ;
 
 arguments : is
-             | arguments COMMA is
-             | NULL_ARGS
-             ;
+            | arguments COMMA is
+            | NULL_ARGS
+            ;
 
 
 /*Task call using Make Parallel*/
@@ -264,8 +264,7 @@ atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_data
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
 func_statements: declaration func_statements
-               | assignment_statement func_statements
-               | expression_statement func_statements
+               | log func_statements
                | task_invoke func_statements
                | func_invoke func_statements
                | loop func_statements
@@ -291,8 +290,7 @@ tid_expr : NNUM IDENTIFIER EQ TID SEMICOLON
          ;
 
 taskscope: declaration taskscope
-        | assignment_statement taskscope
-        | expression_statement taskscope
+        | log taskscope
         | conditional taskscope
         | loop taskscope
         | func_invoke taskscope
@@ -306,8 +304,7 @@ taskscope: declaration taskscope
 
 /* Scope for Conditionals and Loop Statements */
 statement: declaration
-          | assignment_statement
-          | expression_statement
+          | log
           | conditional
           | loop
           | return_statement
@@ -362,8 +359,7 @@ in_statement : IN ARROW IDENTIFIER SEMICOLON
              ;
 
 method_statements: declaration
-                 | assignment_statement
-                 | expression_statement
+                 | log
                  | task_invoke
                  | func_invoke
                  | loop
