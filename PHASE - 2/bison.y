@@ -106,7 +106,7 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 
-declaration : declarationList { fprintf(yyout, " : Declaration statement"); }
+declaration : declarationList { fprintf(yyout, " : declaration statement"); }
             ;
 
 declarationList : declarationStmt SEMICOLON
@@ -184,7 +184,7 @@ analyze_label : STRINGLITERAL | IDENTIFIER ;
 
 analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_statement ;
 
-analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  }
+analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
 
 /*calls*/
 
@@ -208,7 +208,7 @@ arguments : is
 task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } ;
 
 /*get statement*/
-get_invoke : GET ARROW TIME SEMICOLON
+get_invoke : GET ARROW TIME ;
 
 get_statement: NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
               | ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
@@ -298,6 +298,7 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke taskscope
         | output taskscope
+        | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
         | 
