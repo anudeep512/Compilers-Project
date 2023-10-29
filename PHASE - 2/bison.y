@@ -333,6 +333,40 @@ attributes: attribute SEMICOLON
 attribute: simpleDatatype IDENTIFIER
          | arrayDatatype IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
          ;
+
+methods: method
+       | methods method
+       ;
+
+method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
+
+method_invoke: IDENTIFIER ARROW func_invoke
+
+in_statement : IN ARROW IDENTIFIER SEMICOLON
+             | IN ARROW func_invoke
+             ;
+
+method_statements: declaration
+                 | assignment_statement
+                 | expression_statement
+                 | task_invoke
+                 | func_invoke
+                 | loop
+                 | return_statement
+                 | conditional
+                 | analyze_statement
+                 | input
+                 | output
+                 | sleep
+                 | SCOPEOPEN method_statements SCOPECLOSE
+                 | get_statement
+                 | in_statement
+                 | method_invoke
+                 ;
+
+method_body: method_statements
+           | method_body method_statements
+           ;
 %%
 
 void yyerror(std::string s){
