@@ -322,14 +322,17 @@ statement: declaration
 statements: statement
           | statements statement
           ;
-
 /* TYPE DEFINITION */
-type_declaration: TYPE UDATATYPE SCOPEOPEN type_scope SCOPECLOSE
+type_declaration: TYPE UDATATYPE SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
-methods: function
-       | methods function
-       ;
+attributes: attribute SEMICOLON
+          | attributes attribute SEMICOLON
+          ;
+
+attribute: simpleDatatype IDENTIFIER
+         | arrayDatatype IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+         ;
 %%
 
 void yyerror(std::string s){
