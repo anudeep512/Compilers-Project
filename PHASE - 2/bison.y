@@ -106,7 +106,7 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 
-declaration : declarationList
+declaration : declarationList { fprintf(yyout, " : Declaration statement"); }
             ;
 
 declarationList : declarationStmt SEMICOLON
@@ -237,8 +237,7 @@ stringvalues : STRINGLITERAL
             ;
 
 /* Return */
-
-return : RETURN RHS SEMICOLON ;
+return_statement : RETURN RHS SEMICOLON { fprintf(yyout, " : return statement"); } ;
 
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
@@ -255,7 +254,7 @@ nextop : HASH stringvalues nextop
        ;
 
 
-/*FUNCTION IMPLEMENTATION SCOPE*/
+/*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
 function:         func_decl func_body ;
 
 func_args:        IDENTIFIER | func_args COMMA IDENTIFIER ;
@@ -263,26 +262,28 @@ func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fp
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
-func_statements: declarationList
-               | assignment_statement 
-               | expression_statement 
-               | task_invoke 
-               | func_invoke 
-               | loop 
-               | return
-               | conditional 
-               | analyze_statement
-               | input | output 
-               | sleep
+func_statements: declaration func_statements
+               | assignment_statement func_statements
+               | expression_statement func_statements
+               | task_invoke func_statements
+               | func_invoke func_statements
+               | loop func_statements
+               | return_statement func_statements
+               | conditional func_statements
+               | analyze_statement func_statements
+               | input func_statements | output func_statements
+               | sleep func_statements 
+               | SCOPEOPEN taskscope SCOPECLOSE func_statements //Doubt 
+               |
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON func_args SCOPEOPEN taskscope SCOPECLOSE
+task: TASK IDENTIFIER COLON func_args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
     ;
 
 taskscope: declaration taskscope
         | assignment_statement taskscope
-        | expression_op taskscope
+        | expression_statement taskscope
         | conditional taskscope
         | loop taskscope
         | func_invoke taskscope
