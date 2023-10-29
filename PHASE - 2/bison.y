@@ -50,16 +50,11 @@
 
 %%
 
-all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
-unary_logical_op: NEG ;
-operators: EQ | expression_op | comparison_op | logical_op | ARROW | arithmetic_op ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
-atomic_datatypes:      atomicArray | atomicSimple ;
-
 
 begin :
       | begin declaration
@@ -276,11 +271,13 @@ func_statements: declaration func_statements
                | loop func_statements
                | return_statement func_statements
                | conditional func_statements
-               | analyze_statement func_statements
+               | analyze_syntax func_statements
                | input func_statements | output func_statements
                | sleep func_statements 
                | SCOPEOPEN func_statements SCOPECLOSE func_statements //check 
                | get_statement func_statements
+               | method_invoke func_statements
+               | access func_statements
                |
                ;
 
@@ -304,6 +301,7 @@ taskscope: declaration taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
         | method_invoke
+        | access
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -315,13 +313,14 @@ statement: declaration
           | return_statement
           | func_invoke
           | task_invoke
-          | analyze_statement
+          | analyze_syntax
           | output
           | sleep
           | BREAK SEMICOLON
           | CONTINUE SEMICOLON
           | input
           | method_invoke
+          | access
           ;
 
 statements: statement
@@ -378,6 +377,7 @@ method_statements: declaration
                  | get_statement
                  | in_statement
                  | method_invoke
+                 | access
                  ;
 
 method_body: method_statements
