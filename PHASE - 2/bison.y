@@ -256,10 +256,11 @@ nextop : HASH stringvalues nextop
 
 
 /*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
-function:         func_decl func_body ;
+function:         func_decl func_body | atomic_func_decl func_body;
 
 func_args:        IDENTIFIER | func_args COMMA IDENTIFIER ;
 func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
@@ -321,6 +322,14 @@ statement: declaration
 statements: statement
           | statements statement
           ;
+
+/* TYPE DEFINITION */
+type_declaration: TYPE UDATATYPE SCOPEOPEN type_scope SCOPECLOSE
+                ;
+
+methods: function
+       | methods function
+       ;
 %%
 
 void yyerror(std::string s){
