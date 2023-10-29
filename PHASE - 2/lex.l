@@ -7,6 +7,7 @@
   extern FILE* fp;
 
   int chkType = 0; // to track if the encountered token is type or not
+  int chkAtomic = 0;
   std::map<std::string, int> userdefined;
 %}
 
@@ -17,7 +18,7 @@
 /*RESERVED KEYWORDS*/
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
-KEYWORD_3               "start"|"return"|"type"|"atomic type"|"in"|"func"|"invoke"|"ip"|"op" 
+KEYWORD_3               "start"|"return"|"type"|"atomic"|"in"|"func"|"invoke"|"ip"|"op" 
 KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
@@ -122,9 +123,9 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
         chkType = 1;
         return TYPE; 
     }
-	if(strcmp(yytext,"atomic type") == 0) { 
-        chkType = 2;
-        return ATYPE; 
+	if(strcmp(yytext,"atomic") == 0) { 
+        chkAtomic = 1;
+        return ATOMIC;
     }
 	if(strcmp(yytext,"in") == 0) { return IN; }
 	if(strcmp(yytext,"func") == 0) { return FUNC; }
@@ -295,14 +296,6 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     return UDATATYPE;
   }
 
-  if(chkType == 2)
-  {
-    fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
-    userdefined[y] = 2;
-    chkType = 0;
-    return AUDATATYPE;
-  }
-
   else if(userdefined.find(y) == userdefined.end())
   {
     return IDENTIFIER;
@@ -316,9 +309,9 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
       return UDATATYPE;
     }
 
-    else if(userdefined[y] == 2)
+    else if(userdefined[y] == 1 && chkAtomic == 1)
     {
-      fprintf(fp, "Atomic Userdefined Datatype: %s\n", x);
+      fprintf(fp, "Userdefined Datatype: %s\n", x);
       return AUDATATYPE;
     }
   }
@@ -366,7 +359,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 {NEWLINE} ;
 
  /*COMMENTS*/
-{COMMENTS};
+{COMMENTS} ;
 
  /*OTHER TOKENS*/
 . {

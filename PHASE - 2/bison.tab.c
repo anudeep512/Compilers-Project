@@ -138,7 +138,7 @@ extern int yydebug;
     START = 273,
     RETURN = 274,
     TYPE = 275,
-    ATYPE = 276,
+    ATOMIC = 276,
     IN = 277,
     FUNC = 278,
     INVOKE = 279,
@@ -604,7 +604,7 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "WHEN", "REPEAT", "ELSE_WHEN", "DEFAULT",
   "FOR", "BREAK", "CONTINUE", "TASK", "MAKE_PARALLEL", "NULL_ARGS", "TID",
-  "ANALYZE", "GET", "SLEEP", "TIME", "START", "RETURN", "TYPE", "ATYPE",
+  "ANALYZE", "GET", "SLEEP", "TIME", "START", "RETURN", "TYPE", "ATOMIC",
   "IN", "FUNC", "INVOKE", "IP", "OP", "DIV", "ADD", "SUB", "MUL",
   "EXPONENT", "MODULO", "ARROW", "EQ", "INCR", "DECR", "ASSN_MODULO",
   "ASSN_EXPONENT", "ASSN_DIV", "ASSN_MUL", "AND", "OR", "GT", "LT", "GTEQ",
@@ -1630,7 +1630,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 325 "bison.y"
+#line 324 "bison.y"
 
 
 void yyerror(std::string s){

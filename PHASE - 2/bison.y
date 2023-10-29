@@ -9,7 +9,7 @@
 
 %token WHEN REPEAT ELSE_WHEN DEFAULT FOR BREAK CONTINUE 
 %token TASK MAKE_PARALLEL NULL_ARGS TID ANALYZE GET SLEEP TIME
-%token START RETURN TYPE ATYPE IN FUNC INVOKE IP OP
+%token START RETURN TYPE ATOMIC IN FUNC INVOKE IP OP
 %token DIV ADD SUB MUL EXPONENT MODULO 
 %token ARROW
 %token EQ INCR DECR ASSN_MODULO ASSN_EXPONENT ASSN_DIV ASSN_MUL 
@@ -110,7 +110,7 @@ declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration stateme
                 | declaration declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
                 ;
 
-simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|AUDATATYPE;
+simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|ATOMIC AUDATATYPE;
 arrayDatatype  : nonAtomicArray|atomicArray;
 
 declarationStmt : simpleDatatype simpleList 
@@ -321,7 +321,6 @@ statement: declaration
 statements: statement
           | statements statement
           ;
-
 %%
 
 void yyerror(std::string s){
