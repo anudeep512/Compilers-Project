@@ -1,6 +1,6 @@
 %{
   #include <iostream>
-  #include <map>
+  #include <unordered_set>
   #include <string>
   #include "y.tab.h"
 
@@ -8,7 +8,7 @@
 
   int chkType = 0; // to track if the encountered token is type or not
   int chkAtomic = 0;
-  std::map<std::string, int> userdefined;
+  std::unordered_set<std::string> userdefined;
 %}
 
 %option yylineno
@@ -291,7 +291,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   if(chkType == 1)
   {
     fprintf(fp, "Userdefined Datatype: %s\n", x);
-    userdefined[y] = 1;
+    userdefined.insert(y);
     chkType = 0;
     return UDATATYPE;
   }
@@ -303,16 +303,16 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
   else
   {
-    if(userdefined[y] == 1)
-    {
-      fprintf(fp, "Userdefined Datatype: %s\n", x);
-      return UDATATYPE;
-    }
-
-    else if(userdefined[y] == 1 && chkAtomic == 1)
+    if(userdefined.find(y) != userdefined.end() && chkAtomic == 1)
     {
       fprintf(fp, "Userdefined Datatype: %s\n", x);
       return AUDATATYPE;
+    }
+
+    else if(userdefined.find(y) != userdefined.end())
+    {
+      fprintf(fp, "Userdefined Datatype: %s\n", x);
+      return UDATATYPE;
     }
   }
 }
