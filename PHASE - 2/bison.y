@@ -65,7 +65,7 @@ begin :
       | begin declaration
       | begin function
       | begin task
-      | begin type
+      | begin type_declaration
       ;
 
 
@@ -303,7 +303,7 @@ taskscope: declaration taskscope
         | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
-        | method_invokes
+        | method_invoke
         ;
 
 /* Scope for Conditionals and Loop Statements */
