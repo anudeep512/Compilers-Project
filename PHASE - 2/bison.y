@@ -196,7 +196,7 @@ func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : ca
           ;
 
 arguments : is
-             | is COMMA arguments
+             | arguments COMMA is
              | NULL_ARGS
              ;
 
@@ -207,8 +207,8 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 /*get statement*/
 get_invoke : GET ARROW TIME ;
 
-get_statement: NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
-              | ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
+get_statement: NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
+              | ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
               ;
 
 
@@ -339,6 +339,7 @@ methods: method
        ;
 
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
+
 
 method_invoke: IDENTIFIER ARROW func_invoke
 
