@@ -91,8 +91,7 @@ RHS :	constants
     | T
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
-    | NEG ROUNDOPEN RHS ROUNDCLOSE 
-    | get_invoke
+    | NEG ROUNDOPEN RHS ROUNDCLOSE
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
@@ -184,11 +183,7 @@ analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fpri
 /*calls*/
 
 /* calls */
-is: IDENTIFIER
-  | constants
-  | func_invoke
-  | RHS 
-  ;
+is:  RHS;
 
 func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  }
           ;
@@ -205,9 +200,9 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 /*get statement*/
 get_invoke : GET ARROW TIME ;
 
-get_statement: NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-              | ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-              ;
+get_statement: ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
+             | NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
+             ;
 
 
 /*SLEEP STATEMENT*/
@@ -262,21 +257,24 @@ atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_data
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
-func_statements: declaration func_statements
-               | log func_statements
-               | task_invoke func_statements
-               | func_invoke func_statements
-               | loop func_statements
-               | return_statement func_statements
-               | conditional func_statements
-               | analyze_syntax func_statements
-               | input func_statements | output func_statements
-               | sleep func_statements 
-               | SCOPEOPEN func_statements SCOPECLOSE func_statements //check 
-               | get_statement func_statements
-               | method_invoke func_statements
-               | access func_statements
-               |
+func_scope: declaration
+          | log
+          | task_invoke
+          | func_invoke
+          | loop
+          | return_statement
+          | conditional
+          | analyze_syntax
+          | input | output
+          | sleep
+          | SCOPEOPEN func_statements SCOPECLOSE
+          | get_statement
+          | method_invoke
+          | access
+          ;
+
+func_statements: func_scope
+               | func_statements func_scope
                ;
 
 
