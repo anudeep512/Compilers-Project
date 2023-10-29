@@ -280,6 +280,10 @@ func_statements: declarationList
 task: TASK IDENTIFIER COLON func_args SCOPEOPEN taskscope SCOPECLOSE
     ;
 
+tid_expr : NNUM IDENTIFIER EQ TID SEMICOLON
+         | ANUM IDENTIFIER EQ TID SEMICOLON 
+         ;
+
 taskscope: declaration taskscope
         | assignment_statement taskscope
         | expression_op taskscope
@@ -287,6 +291,7 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke taskscope
         | output taskscope
+        | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
         | 
