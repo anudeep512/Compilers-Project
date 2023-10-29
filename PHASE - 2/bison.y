@@ -299,7 +299,7 @@ taskscope: declaration taskscope
         | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
-        | 
+        | method_invokes
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -317,12 +317,20 @@ statement: declaration
           | BREAK SEMICOLON
           | CONTINUE SEMICOLON
           | input
+          | method_invoke
           ;
 
 statements: statement
           | statements statement
           ;
+          
+          
+access : IDENTIFIER id;
+id     : ARROW IDENTIFIER
+       | id ARROW IDENTIFIER
+       ;
 /* TYPE DEFINITION */
+
 type_declaration: TYPE UDATATYPE SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
@@ -341,7 +349,10 @@ methods: method
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 
-method_invoke: IDENTIFIER ARROW func_invoke
+method_invoke : IDENTIFIER ARROW func_invoke
+              | IDENTIFIER id ARROW func_invoke
+              ;
+
 
 in_statement : IN ARROW IDENTIFIER SEMICOLON
              | IN ARROW func_invoke
