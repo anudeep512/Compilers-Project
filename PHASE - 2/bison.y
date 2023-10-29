@@ -301,6 +301,27 @@ taskscope: declaration taskscope
         | 
         ;
 
+/* Scope for Conditionals and Loop Statements */
+statement: declaration
+          | assignment_statement
+          | expression_statement
+          | conditional
+          | loop
+          | return_statement
+          | func_invoke
+          | task_invoke
+          | analyze_statement
+          | output
+          | sleep
+          | BREAK SEMICOLON
+          | CONTINUE SEMICOLON
+          | input
+          ;
+
+statements: statement
+          | statements statement
+          ;
+
 %%
 
 void yyerror(std::string s){
