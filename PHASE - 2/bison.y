@@ -61,7 +61,11 @@ nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 atomic_datatypes:      atomicArray | atomicSimple ;
 
 
-begin : 
+begin :
+      | begin declaration
+      | begin function
+      | begin task
+      | begin type
       ;
 
 
@@ -185,7 +189,7 @@ analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fpri
 
 /*calls*/
 
-/* Function calls */
+/* calls */
 is: IDENTIFIER
   | constants
   | func_invoke
@@ -379,6 +383,7 @@ method_statements: declaration
 method_body: method_statements
            | method_body method_statements
            ;
+           
 %%
 
 void yyerror(std::string s){
