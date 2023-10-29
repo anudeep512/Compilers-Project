@@ -147,7 +147,6 @@ expression_statement: IDENTIFIER expression_op RHS ;
 //for logging
 log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  } 
     | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
-    | get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
     ;
 
 
@@ -211,6 +210,11 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 /*get statement*/
 get_invoke : GET ARROW TIME SEMICOLON
 
+get_statement: NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
+              | ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  };
+              ;
+
+
 /*SLEEP STATEMENT*/
 sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
 
@@ -273,9 +277,11 @@ func_statements: declaration func_statements
                | analyze_statement func_statements
                | input func_statements | output func_statements
                | sleep func_statements 
-               | SCOPEOPEN taskscope SCOPECLOSE func_statements //Doubt 
+               | SCOPEOPEN func_statements SCOPECLOSE func_statements //check 
+               | get_statement func_statements
                |
                ;
+
 
 /* Task declaration and implemenatation scope */
 task: TASK IDENTIFIER COLON func_args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
@@ -292,7 +298,6 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke taskscope
         | output taskscope
-        | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope // Doubt
         | sleep taskscope
         | 
