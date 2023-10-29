@@ -106,8 +106,7 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
-                | declaration declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
-                ;
+            ;
 
 simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|ATOMIC AUDATATYPE;
 arrayDatatype  : nonAtomicArray|atomicArray;
