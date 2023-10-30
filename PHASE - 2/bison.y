@@ -179,14 +179,14 @@ analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM ;
  /*ANALYSIS STATEMENT*/
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_statement ;
+analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_syntax ;
 
-analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
+analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
 
 /*calls*/
 
 /* calls */
-is:  RHS;
+// RHS:  RHS;
 
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
@@ -194,8 +194,8 @@ func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
 func_invoke: INVOKE IDENTIFIER COLON arguments 
           ;
 
-arguments : is
-            | arguments COMMA is
+arguments : RHS
+            | arguments COMMA RHS
             | NULL_ARGS
             ;
 
@@ -266,7 +266,7 @@ func_scope: declaration
           | loop
           | return_statement
           | conditional
-          | analyze_syntax
+          | analyze_statement
           | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
           | method_invoke
@@ -302,7 +302,7 @@ statement: declaration
           | return_statement
           | func_invoke2
           | task_invoke
-          | analyze_syntax
+          | analyze_statement
           | output
           | sleep
           | BREAK SEMICOLON
