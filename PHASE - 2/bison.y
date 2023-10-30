@@ -1,6 +1,7 @@
 %{
   #include <iostream>
   #include <string>
+  #include<fstream>
 
   extern int yylex();
   extern int yylineno;
@@ -265,8 +266,7 @@ func_scope: declaration
           | return_statement
           | conditional
           | analyze_syntax
-          | input | outputall_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
-          | sleep
+          | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
           | get_statement
           | method_invoke
@@ -328,7 +328,7 @@ id     : ARROW IDENTIFIER
        ;
 /* TYPE DEFINITION */
 
-type_declaration: TYPE UDATATYPE fprintf(yyout, " : type declaration statement"); SCOPEOPEN attributes methods SCOPECLOSE
+type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
 attributes: attribute SEMICOLON
