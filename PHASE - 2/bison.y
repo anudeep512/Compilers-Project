@@ -92,6 +92,8 @@ next : RHS all_ops next
 
 RHS :	constants
     | T
+    | TID
+    | get_invoke
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
     | NEG ROUNDOPEN RHS ROUNDCLOSE
@@ -179,14 +181,14 @@ analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM ;
  /*ANALYSIS STATEMENT*/
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_syntax : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_statement ;
+analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_syntax ;
 
-analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
+analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
 
 /*calls*/
 
 /* calls */
-is:  RHS;
+// RHS:  RHS;
 
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
@@ -194,8 +196,8 @@ func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
 func_invoke: INVOKE IDENTIFIER COLON arguments 
           ;
 
-arguments : is
-            | arguments COMMA is
+arguments : RHS
+            | arguments COMMA RHS
             | NULL_ARGS
             ;
 
@@ -205,10 +207,6 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
-
-get_statement: ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-             | NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-             ;
 
 
 /*SLEEP STATEMENT*/
@@ -270,10 +268,9 @@ func_scope: declaration
           | loop
           | return_statement
           | conditional
-          | analyze_syntax
+          | analyze_statement
           | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
-          | get_statement
           | method_invoke
           | access
           ;
@@ -287,17 +284,12 @@ func_statements: func_scope
 task: TASK IDENTIFIER COLON func_args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
     ;
 
-tid_expr : NNUM IDENTIFIER EQ TID SEMICOLON
-         | ANUM IDENTIFIER EQ TID SEMICOLON 
-         ;
-
 taskscope: declaration taskscope
         | log taskscope
         | conditional taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke
@@ -312,7 +304,7 @@ statement: declaration
           | return_statement
           | func_invoke2
           | task_invoke
-          | analyze_syntax
+          | analyze_statement
           | output
           | sleep
           | BREAK SEMICOLON
@@ -389,7 +381,6 @@ method_statements: declaration
                  | output
                  | sleep
                  | SCOPEOPEN method_statements SCOPECLOSE
-                 | get_statement
                  | in_statement
                  | method_invoke
                  | access
