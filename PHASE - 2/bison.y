@@ -59,11 +59,11 @@ logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
 begin :
-      | begin startdec
-      | begin declaration
-      | begin function
-      | begin task
-      | begin type_declaration
+      | startdec begin
+      | declaration begin
+      | function begin
+      | task begin
+      | type_declaration begin
       ;
 
 
@@ -71,6 +71,8 @@ begin :
 
 T : IDENTIFIER
   | func_invoke
+  /* | access */
+  | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE
   ;
 
 all_ops: arithmetic_op
@@ -222,8 +224,9 @@ func_invoke: INVOKE IDENTIFIER COLON arguments
           ;
 
 
-arguments : RHS
-            | arguments COMMA RHS ;
+arguments : arguments COMMA RHS 
+          | RHS
+          ;
 
 
 /*Task call using Make Parallel*/
@@ -301,11 +304,10 @@ func_scope: declaration
           | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
           | method_invoke
-          | access
           ;
 
-func_statements: func_scope
-               | func_statements func_scope
+func_statements: func_scope func_statements
+               | 
                ;
 
 
@@ -321,8 +323,8 @@ taskscope: declaration taskscope
         | output taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
-        | method_invoke
-        | access
+        | method_invoke taskscope
+        | 
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -340,11 +342,10 @@ statement: declaration
           | CONTINUE SEMICOLON
           | input
           | method_invoke
-          | access
           ;
 
-statements: statement
-          | statements statement
+statements: statement statements
+          | 
           ;
           
           
@@ -369,6 +370,7 @@ start: declaration start
      | input start
      | SCOPEOPEN start SCOPECLOSE start
      | sleep start
+     | method_invoke start
      |
      ;
 
@@ -389,8 +391,8 @@ methods: methods method
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 
-method_invoke : IDENTIFIER ARROW IDENTIFIER COLON arguments 
-              | IDENTIFIER id ARROW IDENTIFIER COLON arguments 
+method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON RHS arguments 
+              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON RHS arguments 
               ;
 
 
@@ -398,7 +400,7 @@ in_statement : IN ARROW IDENTIFIER SEMICOLON
              | IN ARROW IDENTIFIER COLON arguments 
              ;
 
-method_statements: declaration
+method_statements: declaration 
                  | log
                  | task_invoke
                  | func_invoke2
@@ -412,11 +414,10 @@ method_statements: declaration
                  | SCOPEOPEN method_statements SCOPECLOSE
                  | in_statement
                  | method_invoke
-                 | access
                  ;
 
-method_body: method_statements
-           | method_body method_statements
+method_body: method_statements method_body
+           |
            ;
            
 %%
