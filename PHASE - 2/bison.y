@@ -63,7 +63,6 @@ begin : begin startdec
       | begin function
       | begin task
       | begin type_declaration
-      | 
       ;
 
 
@@ -77,6 +76,7 @@ all_ops: arithmetic_op
       | comparison_op
       | logical_op
       | HASH
+      | ARROW
       ;
 
 constants: INTEGERLITERAL
@@ -135,22 +135,46 @@ dimlist : dimlist COMMA INTEGERLITERAL
         | INTEGERLITERAL
         ;
 
+LHS : IDENTIFIER
+    | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE
+    | access
+    ;
 
+arr_access: dimlist
+          | exprlist
+          ;
+
+exprlist: arith_expr
+         | exprlist COMMA arith_expr
+         ;
+
+arith_operand: IDENTIFIER
+              | INTEGERLITERAL
+              | FLOATLITERAL
+              | ROUNDOPEN arith_expr ROUNDCLOSE
+              ;
+
+arith_expr:  arith_operand arithmetic_op arith_operand
+          ;
 
  /*ASSIGNMENT STATEMENT*/
-assignment_statement: IDENTIFIER EQ RHS;
+assignment_statement: LHS EQ RHS;
 
  /*EXPRESSION STATEMENT*/
-expression_statement: IDENTIFIER expression_op RHS ;
+expression_statement: LHS expression_op RHS ;
 
 //for logging
 log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  } 
     | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
     ;
 
+g: IDENTIFIER EQ RHS
+ | g COMMA IDENTIFIER EQ RHS
+ ;
 
 both_assignment: assignment_statement 
-                | declarationStmt ;
+                | simpleDatatype g
+                ;
 
  /*LOOPS*/
 loop: for_loop | while_loop ;
@@ -187,27 +211,27 @@ analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yy
 
 /*calls*/
 
-/* calls */
 // RHS:  RHS;
 
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
 
 func_invoke: INVOKE IDENTIFIER COLON arguments 
+           | INVOKE IDENTIFIER COLON NULL_ARGS
           ;
 
+
 arguments : RHS
-            | arguments COMMA RHS
-            | NULL_ARGS
-            ;
+            | arguments COMMA RHS ;
 
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } ;
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } 
+              | MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON NULL_ARGS SEMICOLON { fprintf(yyout, " : call statement");  } ;
+               ;
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
-
 
 /*SLEEP STATEMENT*/
 sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
@@ -256,8 +280,12 @@ nextop : HASH stringvalues nextop
 function:         func_decl func_body | atomic_func_decl func_body;
 
 func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
-func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
+
+func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } 
+                 | FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ; 
+; 
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }
+                     | ATOMIC FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ;  
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
@@ -348,16 +376,13 @@ start: declaration start
 type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
-attributes: attribute SEMICOLON
-          | attributes attribute SEMICOLON
+attributes: declarationStmt SEMICOLON
+          | attributes declarationStmt SEMICOLON
           ;
 
-attribute: simpleDatatype IDENTIFIER
-         | arrayDatatype IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-         ;
 
-methods: method
-       | methods method
+methods: methods method
+       | 
        ;
 
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;

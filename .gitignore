@@ -15,3 +15,7 @@ testcases/
 main_temp.cpp
 bash_test.sh
 main_temp.o
+bison.tab.h
+bison.tab.c
+exe
+bison.output

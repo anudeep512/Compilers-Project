@@ -19,7 +19,7 @@
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
 KEYWORD_3               "start"|"return"|"type"|"atomic"|"in"|"func"|"invoke"|"ip"|"op" 
-KEYWORD 			    {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
+KEYWORD 			      {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
 /*DATATYPES*/
@@ -138,77 +138,98 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
  /*DATATYPES*/
 {PRIMITIVE} {
     if(!strcmp(yytext, "number")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext); fprintf(yyout, "%s", yytext);
+ return NNUM;
     }
     if(!strcmp(yytext, "decimal")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NDEC;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NDEC;
     }
     if(!strcmp(yytext, "boolean")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NBOOL;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NBOOL;
     }
     if(!strcmp(yytext, "letter")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NLET;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NLET;
     }
     if(!strcmp(yytext, "text")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NTEXT;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NTEXT;
     }
     if(!strcmp(yytext, "void")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NVOID;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NVOID;
     }
 }
 
 {ATOMIC_PRIMITIVE} {
     if(!strcmp(yytext, "atomic number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ANUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return ANUM;
     }
     if(!strcmp(yytext, "atomic decimal")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ADEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return ADEC;
     }
     if(!strcmp(yytext, "atomic boolean")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ABOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return ABOOL;
     }
     if(!strcmp(yytext, "atomic letter")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ALET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return ALET;
     }
     if(!strcmp(yytext, "atomic text")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return ATEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return ATEXT;
     }
 }
 
 {ARRAY} {
   
     if(!strcmp(yytext, "array number")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRNUM;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NARRNUM;
     }
     if(!strcmp(yytext, "array decimal")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRDEC;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NARRDEC;
     }
     if(!strcmp(yytext, "array boolean")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRBOOL;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NARRBOOL;
     }
     if(!strcmp(yytext, "array letter")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRLET;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NARRLET;
     }
     if(!strcmp(yytext, "array text")){
-      fprintf(fp,"inbuilt datatype: %s\n", yytext); return NARRTEXT;
+      fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return NARRTEXT;
     }
 }
 
 {ATOMIC_ARRAY} {
     if(!strcmp(yytext, "atomic array number")){
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRNUM;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return AARRNUM;
     }
     if(!strcmp(yytext, "atomic array decimal")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRDEC;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return AARRDEC;
     }
     if(!strcmp(yytext, "atomic array boolean")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRBOOL;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return AARRBOOL;
     }
     if(!strcmp(yytext, "atomic array letter")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRLET;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return AARRLET;
     }
     if(!strcmp(yytext, "atomic array text")) {
-      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext); return AARRTEXT;
+      fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
+ return AARRTEXT;
     }
 }
 
@@ -216,7 +237,8 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
  /*PUNCTUATION*/
 {PUNCTUATIONS} {
-fprintf(fp,"PUNCTUATION: %s\n",yytext);
+fprintf(fp,"PUNCTUATION: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
 if(strcmp(yytext,",") ==0){ return COMMA;}
 else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
 else if(strcmp(yytext,":") ==0){ return COLON;}
@@ -224,27 +246,32 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*CONSTANTS*/
 {INTEGERLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
+  fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
   return INTEGERLITERAL;
 }
 
 {CHARACTERLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
+  fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
   return CHARACTERLITERAL;
 }
 
 {STRINGLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
+  fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
   return STRINGLITERAL;
 }
 
 {FLOATLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
+  fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
   return FLOATLITERAL;
 }
 
 {BOOLIT} {
-  fprintf(fp,"Constant: %s\n",yytext);
+  fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
+
   return BOOLEANLITERAL;
 }
 
@@ -288,6 +315,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   if(chkType == 1)
   {
     fprintf(fp, "Userdefined Datatype: %s\n", x);
+    fprintf(yyout, "%s", x);
+
     userdefined.insert(y);
     chkType = 0;
     return UDATATYPE;
@@ -295,6 +324,9 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
   else if(userdefined.find(y) == userdefined.end())
   {
+    fprintf(fp, "Identifier: %s\n", x);
+    fprintf(yyout, "%s", yytext);
+
     return IDENTIFIER;
   }
 
@@ -303,13 +335,15 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   {
     if(userdefined.find(y) != userdefined.end() && chkAtomic == 1)
     {
-      fprintf(fp, "Userdefined Datatype: %s\n", x);
+      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+
       return AUDATATYPE;
     }
 
     else if(userdefined.find(y) != userdefined.end())
     {
-      fprintf(fp, "Userdefined Datatype: %s\n", x);
+      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", yytext);
+
       return UDATATYPE;
     }
   }
@@ -318,14 +352,16 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*WRONG IDENTIFIERS*/
 {INVALIDID} {
-  fprintf(fp,"Lex Error in line: %d\n Invalid Identifier: %s\n",yylineno,yytext);
+  fprintf(fp,"Lex Error in line: %d\n Invalid Identifier: %s\n",yylineno,yytext); fprintf(yyout, "%s", yytext);
+
   return LEXERROR;
 }
 
 
  /*SPECIAL SYMBOLS*/
 {SPECIALSYMBOL} {
-  fprintf(fp,"Special Symbol: %s\n",yytext);
+  fprintf(fp,"Special Symbol: %s\n",yytext); fprintf(yyout, "%s", yytext);
+
   if(!strcmp("<<",yytext)){
     return SCOPEOPEN;
   }
@@ -355,10 +391,14 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
 
  /*WHITESPACES*/
-{WHITESPACES} ;
+{WHITESPACES} {
+    fprintf(yyout, "%s", yytext);
+}
 
  /*NEWLINE*/
-{NEWLINE} ;
+{NEWLINE} {
+  fprintf(yyout, "%s", yytext);
+}
 
  /*COMMENTS*/
 {COMMENTS} ;
