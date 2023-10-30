@@ -136,13 +136,33 @@ dimlist : dimlist COMMA INTEGERLITERAL
         | INTEGERLITERAL
         ;
 
+LHS : IDENTIFIER
+    | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE
+    | access
+    ;
 
+arr_access: dimlist
+          | exprlist
+          ;
+
+exprlist: arith_expr
+         | exprlist COMMA arith_expr
+         ;
+
+arith_operand: IDENTIFIER
+              | INTEGERLITERAL
+              | FLOATLITERAL
+              | ROUNDOPEN arith_expr ROUNDCLOSE
+              ;
+
+arith_expr:  arith_operand arithmetic_op arith_operand
+          ;
 
  /*ASSIGNMENT STATEMENT*/
-assignment_statement: IDENTIFIER EQ RHS;
+assignment_statement: LHS EQ RHS;
 
  /*EXPRESSION STATEMENT*/
-expression_statement: IDENTIFIER expression_op RHS ;
+expression_statement: LHS expression_op RHS ;
 
 //for logging
 log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  } 
