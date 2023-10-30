@@ -69,10 +69,13 @@ begin :
 
 /* RHS */
 
-T : IDENTIFIER
+E : 
+| SQUAREOPEN arr_access SQUARECLOSE
+;
+
+T : IDENTIFIER E 
   | func_invoke
   | access
-  | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE
   ;
 
 all_ops: arithmetic_op
@@ -349,8 +352,8 @@ statements: statement statements
           ;
           
           
-access : IDENTIFIER id;
-id     : ARROW IDENTIFIER
+access : IDENTIFIER ARROW id;
+id     : IDENTIFIER
        | id ARROW IDENTIFIER
        ;
        
