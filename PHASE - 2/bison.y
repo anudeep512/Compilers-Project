@@ -58,12 +58,12 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
-begin : begin start
+begin : begin start_scope
+       |
       | begin declaration
       | begin function
       | begin task
       | begin type_declaration
-      | 
       ;
 
 
@@ -77,6 +77,7 @@ all_ops: arithmetic_op
       | comparison_op
       | logical_op
       | HASH
+      | ARROW
       ;
 
 constants: INTEGERLITERAL
@@ -187,19 +188,18 @@ analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yy
 
 /*calls*/
 
-/* calls */
 // RHS:  RHS;
 
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
 
 func_invoke: INVOKE IDENTIFIER COLON arguments 
+           | INVOKE IDENTIFIER COLON NULL_ARGS
           ;
 
+
 arguments : RHS
-            | arguments COMMA RHS
-            | NULL_ARGS
-            ;
+            | arguments COMMA RHS ;
 
 
 /*Task call using Make Parallel*/
@@ -207,7 +207,6 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
-
 
 /*SLEEP STATEMENT*/
 sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
@@ -256,8 +255,12 @@ nextop : HASH stringvalues nextop
 function:         func_decl func_body | atomic_func_decl func_body;
 
 func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
-func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
+
+func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } 
+                 | FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ; 
+; 
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }
+                     | ATOMIC FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ;  
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
@@ -325,36 +328,36 @@ id     : ARROW IDENTIFIER
        ;
        
 /* START DEFINAITON */
+start_scope: START SCOPEOPEN stt SCOPECLOSE;
 
-start: declaration start
-     | log start
-     | conditional start
-     | loop start
-     | func_invoke2 start
-     | task_invoke start
-     | analyze_syntax start
-     | output start
-     | input start
-     | SCOPEOPEN start SCOPECLOSE start
-     | sleep start
-     |
+start_body: declaration 
+     | log 
+     | conditional 
+     | loop 
+     | func_invoke2 
+     | task_invoke 
+     | analyze_syntax 
+     | output 
+     | input 
+     | SCOPEOPEN stt SCOPECLOSE 
+     | sleep 
      ;
+
+stt: start_body
+    | stt start_body ;
 
 /* TYPE DEFINITION */
 
 type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
-attributes: attribute SEMICOLON
-          | attributes attribute SEMICOLON
+attributes: declarationStmt SEMICOLON
+          | attributes declarationStmt SEMICOLON
           ;
 
-attribute: simpleDatatype IDENTIFIER
-         | arrayDatatype IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-         ;
 
-methods: method
-       | methods method
+methods: methods method
+       | 
        ;
 
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
