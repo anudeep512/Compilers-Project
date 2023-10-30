@@ -186,7 +186,10 @@ analyze_statement   : COLON analysis_arrays analyze_statement | SEMICOLON { fpri
 /* calls */
 is:  RHS;
 
-func_invoke: INVOKE IDENTIFIER COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  }
+func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
+             ;
+
+func_invoke: INVOKE IDENTIFIER COLON arguments 
           ;
 
 arguments : is
