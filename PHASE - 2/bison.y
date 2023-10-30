@@ -71,7 +71,7 @@ begin :
 
 T : IDENTIFIER
   | func_invoke
-  /* | access */
+  | access
   | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE
   ;
 
@@ -219,7 +219,7 @@ analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yy
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
 
-func_invoke: INVOKE IDENTIFIER COLON arguments 
+func_invoke: INVOKE IDENTIFIER COLON arguments COLON
            | INVOKE IDENTIFIER COLON NULL_ARGS
           ;
 
@@ -230,8 +230,8 @@ arguments : arguments COMMA RHS
 
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } 
-              | MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON NULL_ARGS SEMICOLON { fprintf(yyout, " : call statement");  } ;
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
+              | MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON NULL_ARGS COLON SEMICOLON { fprintf(yyout, " : call statement");  } ;
                ;
 
 /*get statement*/
@@ -391,13 +391,14 @@ methods: methods method
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 
-method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON RHS arguments 
-              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON RHS arguments 
+method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON RHS arguments COLON
+              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON RHS arguments COLON
               ;
 
 
 in_statement : IN ARROW IDENTIFIER SEMICOLON
-             | IN ARROW IDENTIFIER COLON arguments 
+             | INVOKE IN ARROW IDENTIFIER COLON arguments COLON
+             | INVOKE IN ARROW IDENTIFIER COLON NULL_ARGS COLON
              ;
 
 method_statements: declaration 
