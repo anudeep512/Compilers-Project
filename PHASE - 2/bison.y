@@ -149,9 +149,13 @@ log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");
     | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
     ;
 
+g: IDENTIFIER EQ RHS
+ | g COMMA IDENTIFIER EQ RHS
+ ;
 
 both_assignment: assignment_statement 
-                | declarationStmt ;
+                | simpleDatatype g
+                ;
 
  /*LOOPS*/
 loop: for_loop | while_loop ;
