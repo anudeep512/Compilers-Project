@@ -203,7 +203,9 @@ arguments : RHS
 
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } ;
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments SEMICOLON { fprintf(yyout, " : call statement");  } 
+              | MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON NULL_ARGS SEMICOLON { fprintf(yyout, " : call statement");  } ;
+               ;
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
