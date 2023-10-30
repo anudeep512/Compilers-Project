@@ -264,7 +264,7 @@ func_body : SCOPEOPEN func_statements SCOPECLOSE;
 func_scope: declaration
           | log
           | task_invoke
-          | func_invoke
+          | func_invoke2
           | loop
           | return_statement
           | conditional
@@ -293,7 +293,7 @@ taskscope: declaration taskscope
         | log taskscope
         | conditional taskscope
         | loop taskscope
-        | func_invoke taskscope
+        | func_invoke2 taskscope
         | output taskscope
         | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
@@ -308,7 +308,7 @@ statement: declaration
           | conditional
           | loop
           | return_statement
-          | func_invoke
+          | func_invoke2
           | task_invoke
           | analyze_syntax
           | output
@@ -349,19 +349,19 @@ methods: method
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 
-method_invoke : IDENTIFIER ARROW func_invoke
-              | IDENTIFIER id ARROW func_invoke
+method_invoke : IDENTIFIER ARROW IDENTIFIER COLON arguments 
+              | IDENTIFIER id ARROW IDENTIFIER COLON arguments 
               ;
 
 
 in_statement : IN ARROW IDENTIFIER SEMICOLON
-             | IN ARROW func_invoke
+             | IN ARROW IDENTIFIER COLON arguments 
              ;
 
 method_statements: declaration
                  | log
                  | task_invoke
-                 | func_invoke
+                 | func_invoke2
                  | loop
                  | return_statement
                  | conditional
