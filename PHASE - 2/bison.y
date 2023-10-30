@@ -293,7 +293,7 @@ taskscope: declaration taskscope
         | func_invoke taskscope
         | output taskscope
         | tid_expr taskscope
-        | SCOPEOPEN taskscope SCOPECLOSE
+        | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke
         | access
