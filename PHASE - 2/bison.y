@@ -5,6 +5,7 @@
 
   extern int yylex();
   extern int yylineno;
+  extern FILE * yyout;
   void yyerror(std::string s);
 %}
 
@@ -57,11 +58,12 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
-begin :
+begin : begin start
       | begin declaration
       | begin function
       | begin task
       | begin type_declaration
+      | 
       ;
 
 
@@ -329,6 +331,23 @@ access : IDENTIFIER id;
 id     : ARROW IDENTIFIER
        | id ARROW IDENTIFIER
        ;
+       
+/* START DEFINAITON */
+
+start: declaration start
+     | log start
+     | conditional start
+     | loop start
+     | func_invoke2 start
+     | task_invoke start
+     | analyze_syntax start
+     | output start
+     | input start
+     | SCOPEOPEN start SCOPECLOSE start
+     | sleep start
+     |
+     ;
+
 /* TYPE DEFINITION */
 
 type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE

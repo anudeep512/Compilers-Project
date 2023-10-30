@@ -2,7 +2,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <string>
-#include "bison.tab.h"
+#include "y.tab.h"
 
 extern int yyparse();
 extern FILE * yyin ;

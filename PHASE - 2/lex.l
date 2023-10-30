@@ -301,6 +301,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     return IDENTIFIER;
   }
 
+
   else
   {
     if(userdefined.find(y) != userdefined.end() && chkAtomic == 1)
