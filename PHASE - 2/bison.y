@@ -18,7 +18,7 @@
 %token AND OR GT LT GTEQ LTEQ NOT_EQ NEG EQUAL_TWO
 %token INTEGERLITERAL STRINGLITERAL CHARACTERLITERAL BOOLEANLITERAL FLOATLITERAL
 %token COMMA SEMICOLON COLON
-
+%token PIPE
 %token IDENTIFIER
 %token SCOPEOPEN SCOPECLOSE
 %token ROUNDOPEN ROUNDCLOSE
@@ -58,7 +58,7 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
-begin : begin start
+begin : begin startdec
       | begin declaration
       | begin function
       | begin task
@@ -156,7 +156,7 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR SQUAREOPEN both_assignment SEMICOLON RHS SEMICOLON expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
 
  /*WHILE LOOP*/
 while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
@@ -325,6 +325,9 @@ id     : ARROW IDENTIFIER
        ;
        
 /* START DEFINAITON */
+
+startdec: START SCOPEOPEN start SCOPECLOSE 
+       ;
 
 start: declaration start
      | log start

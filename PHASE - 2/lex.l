@@ -347,6 +347,10 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   if(!strcmp("#",yytext)){
     return HASH;
   }
+  if(!strcmp("|",yytext)){
+    return PIPE;
+  }
+  
 }
 
 
