@@ -269,7 +269,6 @@ func_scope: declaration
           | analyze_syntax
           | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
-          | get_statement
           | method_invoke
           | access
           ;
@@ -289,7 +288,6 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | tid_expr taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke
@@ -364,7 +362,6 @@ method_statements: declaration
                  | output
                  | sleep
                  | SCOPEOPEN method_statements SCOPECLOSE
-                 | get_statement
                  | in_statement
                  | method_invoke
                  | access
