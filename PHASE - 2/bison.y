@@ -58,7 +58,8 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
-begin : begin startdec
+begin :
+      | begin startdec
       | begin declaration
       | begin function
       | begin task
