@@ -90,6 +90,8 @@ next : RHS all_ops next
 
 RHS :	constants
     | T
+    | TID
+    | get_invoke
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
     | NEG ROUNDOPEN RHS ROUNDCLOSE
@@ -204,10 +206,6 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL
 /*get statement*/
 get_invoke : GET ARROW TIME ;
 
-get_statement: ADEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-             | NDEC IDENTIFIER EQ get_invoke SEMICOLON { fprintf(yyout, " : get statement");  }
-             ;
-
 
 /*SLEEP STATEMENT*/
 sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
@@ -284,10 +282,6 @@ func_statements: func_scope
 /* Task declaration and implemenatation scope */
 task: TASK IDENTIFIER COLON func_args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
     ;
-
-tid_expr : NNUM IDENTIFIER EQ TID SEMICOLON
-         | ANUM IDENTIFIER EQ TID SEMICOLON 
-         ;
 
 taskscope: declaration taskscope
         | log taskscope
