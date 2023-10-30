@@ -1,6 +1,7 @@
 %{
   #include <iostream>
   #include <string>
+  #include<fstream>
 
   extern int yylex();
   extern int yylineno;
@@ -49,7 +50,7 @@
 %start begin
 
 %%
-
+all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -251,7 +252,7 @@ nextop : HASH stringvalues nextop
 /*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
 function:         func_decl func_body | atomic_func_decl func_body;
 
-func_args:        IDENTIFIER | func_args COMMA IDENTIFIER ;
+func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
 func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
 atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } ; 
 
@@ -265,8 +266,7 @@ func_scope: declaration
           | return_statement
           | conditional
           | analyze_syntax
-          | input | output
-          | sleep
+          | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
           | get_statement
           | method_invoke
@@ -328,7 +328,7 @@ id     : ARROW IDENTIFIER
        ;
 /* TYPE DEFINITION */
 
-type_declaration: TYPE UDATATYPE SCOPEOPEN attributes methods SCOPECLOSE
+type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE
                 ;
 
 attributes: attribute SEMICOLON
