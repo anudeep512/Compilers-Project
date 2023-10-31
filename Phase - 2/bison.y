@@ -205,7 +205,7 @@ when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional
               ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE 
+when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE 
             | 
             ;  
 
