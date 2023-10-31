@@ -222,7 +222,7 @@ func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
 
 func_invoke: INVOKE IDENTIFIER COLON arguments COLON
-           | INVOKE IDENTIFIER COLON NULL_ARGS
+           | INVOKE IDENTIFIER COLON NULL_ARGS COLON
           ;
 
 
