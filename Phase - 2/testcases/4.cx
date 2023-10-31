@@ -15,6 +15,15 @@ type return_single
 <<
   text str ; $$ This stores the log data of the single check
   bool valid ;
+
+  func compare : int a, int b : bool
+  <<
+    when[(in->str == "Hi")]
+    <<
+      valid = false ;
+    >>
+  return ~(valid) ;
+  >>
 >>
 
 type return_full
