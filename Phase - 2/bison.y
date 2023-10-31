@@ -136,8 +136,10 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
           ;
 
-dimlist : dimlist COMMA INTEGERLITERAL
-        | INTEGERLITERAL
+array_inValues: INTEGERLITERAL | IDENTIFIER ;
+
+dimlist : dimlist COMMA array_inValues
+        | array_inValues
         ;
 
 LHS : IDENTIFIER
@@ -168,6 +170,8 @@ assignment_statement: LHS EQ RHS;
  /*EXPRESSION STATEMENT*/
 expression_statement: LHS expression_op RHS ;
 
+exprrr: expression_statement | ROUNDOPEN expression_statement ROUNDCLOSE ;
+
 //for logging
 log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  } 
     | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
@@ -177,7 +181,7 @@ g: IDENTIFIER EQ RHS
  | g COMMA IDENTIFIER EQ RHS
  ;
 
-both_assignment: assignment_statement 
+both_assignment: assignment_statement | ROUNDOPEN assignment_statement ROUNDCLOSE 
                 | simpleDatatype g
                 ;
 
@@ -185,7 +189,7 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE expression_statement SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
 
  /*WHILE LOOP*/
 while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
@@ -288,11 +292,12 @@ function:         func_decl func_body | atomic_func_decl func_body;
 
 func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
 
-func_decl :       FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } 
-                 | FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ; 
-; 
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON func_args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }
-                     | ATOMIC FUNC IDENTIFIER COLON NULL_ARGS COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }  ;  
+args: func_args | NULL_ARGS ;
+
+func_decl :       FUNC IDENTIFIER COLON args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } 
+                 ;
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }
+                     ;
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
 
@@ -313,9 +318,8 @@ func_statements: func_scope func_statements
                | 
                ;
 
-
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON func_args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
+task: TASK IDENTIFIER COLON args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
     ;
 
 taskscope: declaration taskscope

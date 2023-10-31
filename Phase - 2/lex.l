@@ -79,7 +79,7 @@ INVALIDID [a-zA-Z0-9_]*
 
 
 /*SPECIAL SYMBOLS*/
-SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#") 
+SPECIALSYMBOL ("<<"|">>"|"("|")"|"["|"]"|"#"|"|") 
 
 
 
