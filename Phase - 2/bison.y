@@ -403,9 +403,6 @@ method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON arguments COLON
               | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON arguments COLON
               ;
 
-
-in_statement: in_stmt SEMICOLON;  
-
 in_stmt : IN ARROW IDENTIFIER
              | INVOKE IN ARROW IDENTIFIER COLON arguments COLON
              | INVOKE IN ARROW IDENTIFIER COLON NULL_ARGS COLON
