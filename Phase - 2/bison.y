@@ -294,9 +294,13 @@ func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENT
 
 args: func_args | NULL_ARGS ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); } 
+func_return : nonAtomic_datatypes
+            | UDATATYPE
+            ;
+
+func_decl :       FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); } 
                  ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON nonAtomic_datatypes { fprintf(yyout, " : function declaration statement"); }
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); }
                      ;
 
 func_body : SCOPEOPEN func_statements SCOPECLOSE;
