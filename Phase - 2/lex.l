@@ -145,7 +145,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return NDEC;
     }
-    if(!strcmp(yytext, "boolean")){
+    if(!strcmp(yytext, "bool")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return NBOOL;
     }
@@ -172,7 +172,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return ADEC;
     }
-    if(!strcmp(yytext, "atomic boolean")){
+    if(!strcmp(yytext, "atomic bool")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return ABOOL;
     }
@@ -196,7 +196,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return NARRDEC;
     }
-    if(!strcmp(yytext, "array boolean")){
+    if(!strcmp(yytext, "array bool")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return NARRBOOL;
     }
@@ -219,7 +219,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return AARRDEC;
     }
-    if(!strcmp(yytext, "atomic array boolean")) {
+    if(!strcmp(yytext, "atomic array bool")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
  return AARRBOOL;
     }

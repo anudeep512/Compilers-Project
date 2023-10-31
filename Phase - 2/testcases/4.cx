@@ -3,20 +3,20 @@ number K;
 number N;
 number n;
 
-array number sudoko[100,100] $$ In this vector array the sudoko is stored
+array number sudoko[100,100]; $$ In this vector array the sudoko is stored
 
 type datak
 <<
   number tno ;
-  text type ;
+  text typee ;
 >>
 
 type return_single
 <<
   text str ; $$ This stores the log data of the single check
-  bool valid ;
+  bool valid;
 
-  func compare : int a, int b : bool
+  func compare : number a, number b : bool
   <<
     when[(in->str == "Hi")]
     <<
@@ -33,13 +33,14 @@ type return_full
 >>
 
 $$ The following function checks if the newly added values already exists or not
+
 func check_if_present : array number check_value, number index, number value : bool 
 <<
 
   bool ret = false;
   for[number i = 0 | (i < index) | i+=1]
   <<
-    when[ check_value[i] == value] 
+    when[( check_value[i] == value)] 
     <<
       ret = true;
       break;
@@ -49,7 +50,7 @@ func check_if_present : array number check_value, number index, number value : b
 >>
 
 $$ The following functions checks if the given row/column/grid is valid/not
-check_given_values : number I , number J , number tno , text type : return_single 
+check_given_values : number I , number J , number tno , text typee : return_single 
 <<
   array number check_values[N];
   number check = 1;
@@ -78,7 +79,7 @@ check_given_values : number I , number J , number tno , text type : return_singl
     a *= 10 ;
   >>
 
-  when[type == "column"]
+  when[(type == "column")]
   <<
     num = J + 1;
     for[number i = 0 | (i < N) | i +=1]

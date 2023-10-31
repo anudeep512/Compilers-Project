@@ -51,7 +51,7 @@
 %start begin
 
 %%
-all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM ;
+all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -98,7 +98,7 @@ next : RHS all_ops next
 RHS :	constants
     | T
     | TID
-    | get_invoke | method_invoke
+    | get_invoke | method_invoke | in_stmt
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
     | NEG ROUNDOPEN RHS ROUNDCLOSE
@@ -404,7 +404,9 @@ method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON arguments COLON
               ;
 
 
-in_statement : IN ARROW IDENTIFIER SEMICOLON
+in_statement: in_stmt SEMICOLON;  
+
+in_stmt : IN ARROW IDENTIFIER
              | INVOKE IN ARROW IDENTIFIER COLON arguments COLON
              | INVOKE IN ARROW IDENTIFIER COLON NULL_ARGS COLON
              ;
