@@ -37,13 +37,13 @@ func findPi : number total, number tid : void
     when[invoke check:x,y:]
     <<
       num_of_points += 1;
-      mem(i+1) = x;
-      mem(i+5) = y;
+      mem[i+1] = x;
+      mem[i+5] = y;
     >>
     default
     <<
-      mem(i-1) = -2.0;
-      mem(i+2) = -2.0;
+      mem[i-1] = -2.0;
+      mem[i+2] = -2.0;
     >>
   >>
 >>
@@ -67,7 +67,3 @@ start
     make parallel parallelpi:i:10: N ;
   >>
 >>
-
-
-
-
