@@ -1,7 +1,9 @@
 number num_threads, k, lam1, lam2;
 decimal sum = 0, max_wait = 0;
 
-number waiting[1000];
+$$ number waiting[1000]; $$ should give an error ; comment out this line to go through rest part of the code
+
+array number waiting[1000]; $$ no error
 atomic number bounded_cas_lock = 0;
 
 type ThreadData_op
@@ -10,7 +12,8 @@ type ThreadData_op
   array text result[1000];
   decimal waiting_time_count = 0;
   array decimal waiting_time[1000];
-<<
+$$ << $$ should give out an error; comment out this line to go through rest part of the code
+>>
 
 type thread_data_ip
 <<
@@ -26,9 +29,9 @@ func entry_sec: number id : void
   number new_val = 1;
   bool key = false;
 
-  waiting[id-1] = 1;
+  waiting[(id - 1)] = 1;
 
-  repeat [((waiting[id-1] == 1) && (key == false))]
+  repeat [((waiting[id - 1] == 1) && (key == false))]
   <<
     key = invoke bounded_cas_lock->compare_exchange_strong: exp_val, new_val: ;
     $$ Doing Nothing
@@ -36,7 +39,7 @@ func entry_sec: number id : void
     new_val = 1;
   >>
 
-  waiting[id-1] = 0;
+  waiting[id - 1] = 0;
   return void;
 >>
 

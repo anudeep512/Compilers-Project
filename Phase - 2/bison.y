@@ -230,7 +230,7 @@ func_invoke: INVOKE IDENTIFIER COLON arguments COLON
           ;
 
 
-arguments : arguments COMMA RHS 
+arguments : arguments COMMA RHS
           | RHS
           ;
 
@@ -403,8 +403,10 @@ method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;
 
-method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON arguments COLON 
-              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON arguments COLON
+method_args : arguments | NULL_ARGS ;
+
+method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON method_args COLON 
+              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON
               ;
 
 in_stmt : IN ARROW IDENTIFIER
