@@ -75,7 +75,6 @@ E :
 
 T : IDENTIFIER E 
   | func_invoke
-  | access
   ;
 
 all_ops: arithmetic_op
