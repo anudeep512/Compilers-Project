@@ -1,17 +1,17 @@
 type pair
 <<
   decimal a = 0;
-  decimal b = 0;
+  decimal b = 0 ;
 >>
 
 type thr_details
 <<
   number circle_points = 0, squ_points = 0;
-  $$ array pair a[100] coordcric, coordsq; $$ Didnot allow array datatypes yet
-  
-  func add : number a, number b, number c : bool
+  $$ array pair a[100] coordcirc, coordsq; $$ Didnot allow array datatypes yet
+
+  func add : number a, number b, number c : bool 
   <<
-    when [(a+b==c)]
+    when[(a+b==c)]
     <<
       return false ;
     >>
@@ -21,9 +21,9 @@ type thr_details
 
 func thread_func : number tno, number len, array number b : void
 <<
-  number i = 0;
+  number i = 0 ;
   repeat[(i < len)]
-  <<
+  <<  
     pair coord ;
     coord->a = (2*(invoke rand:null:) - 1) ;
     coord->b = (2*(invoke rand:null:) - 1) ;
