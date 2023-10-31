@@ -92,10 +92,12 @@ NEWLINE [\n]
 
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
-MULTI_LINE_COMMENT         "$*"(.|NEWLINE)*"*$"
+MULTI_LINE_COMMENT         "$*"([^"*$"]|[\n])*"*$" 
 COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
+
 %%
+
 
 {KEYWORD}		{
 
@@ -287,7 +289,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 	if(strcmp(yytext,"+") == 0) { return ADD; }
 	if(strcmp(yytext,"-") == 0) { return SUB; }
 	if(strcmp(yytext,"^") == 0) { return EXPONENT; }
-	if(strcmp(yytext,"%%") == 0) { return MODULO; }
+	if(strcmp(yytext,"%") == 0) { return MODULO; }
 	if(strcmp(yytext,"->") == 0) { return ARROW; }
 	if(strcmp(yytext,"+=") == 0) { return INCR; }
 	if(strcmp(yytext,"-=") == 0) { return DECR; }
@@ -295,7 +297,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 	if(strcmp(yytext,"^=") == 0) { return ASSN_EXPONENT; }
 	if(strcmp(yytext,"/=") == 0) { return ASSN_DIV; }
 	if(strcmp(yytext,"=") == 0) { return EQ; }
-	if(strcmp(yytext,"%%=") == 0) { return ASSN_MODULO; }
+	if(strcmp(yytext,"%=") == 0) { return ASSN_MODULO; }
 	if(strcmp(yytext,"&&") == 0) { return AND; }
 	if(strcmp(yytext,"||") == 0) { return OR; }
 	if(strcmp(yytext,"<") == 0) { return LT; }

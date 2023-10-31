@@ -50,15 +50,16 @@ func check_if_present : array number check_value, number index, number value : b
 >>
 
 $$ The following functions checks if the given row/column/grid is valid/not
-check_given_values : number I , number J , number tno , text typee : return_single 
+
+func check_given_values : number I , number J , number tno , text typee : return_single 
 <<
   array number check_values[N];
   number check = 1;
   number index = 0;
   number num = 0; $$ This variable stores the value of the number row/column/grid
-  when[type == "row"]
+  when[(typee == "row")]
   <<
-    num = I + 1;
+    num = (I + 1);
     for[number j = 0 | (j < N) | j +=1]
     <<
       when[invoke check_if_present : check_values,index,sudoko[I,j] :]
@@ -79,9 +80,9 @@ check_given_values : number I , number J , number tno , text typee : return_sing
     a *= 10 ;
   >>
 
-  when[(type == "column")]
+  when[(typee == "column")]
   <<
-    num = J + 1;
+    num = (J + 1);
     for[number i = 0 | (i < N) | i +=1]
     <<
       when[invoke check_if_present : check_values,index,sudoko[i,J] : ]
@@ -96,9 +97,9 @@ check_given_values : number I , number J , number tno , text typee : return_sing
       >>
     >>
   >>
-  else when[type == "grid"]
+  else when[(typee == "grid")]
   <<
-    num = J/n + 1 + I;
+    num = (J/n + 1 + I) ;
     for[number i=0 | (i < n) | i+=1]
     <<
       for[number j=0 | (j < n) | j+=1]
@@ -108,7 +109,7 @@ check_given_values : number I , number J , number tno , text typee : return_sing
           check = 0;
           break;
         >>
-        else 
+        default 
         <<
           check_values[index] = sudoko[I+i,J+j];
           index += 1;
@@ -119,8 +120,8 @@ check_given_values : number I , number J , number tno , text typee : return_sing
 
   return_single r ;
   text str = "";
-  str = ("Thread" # tno # " checks " # type # " " # number # " and is ") ;
-  when[check == 0]
+  str = ("Thread" # tno # " checks " # typee # " " # numberrr # " and is ") ;
+  when[(check == 0)]
   <<
     str = (str # "invalid") ;
     r->valid = false ;
@@ -140,25 +141,25 @@ func function : datak dat : void
 <<
 
   ret->valid = true;
-  when[dat->type == "row"]
+  when[(dat->typee == "row")]
   <<
-    for[number I = dat->tno-1 | (I < N) | I += K]
+    for[number I = (dat->tno - 1) | (I < N) | I += K]
     <<
-      return_single r = invoke check_given_values:0,J,dat->tno,dat->type:;
-      ret->a[1] = r->str ;
+      return_single r = invoke check_given_values:0,J,(dat->tno),(dat->typee):;
+     $$ ret->a[1] = (r->str) ;
       ret->valid = (ret->valid && r->valid);
     >>
   >>
-  else when[dat->type == "column]
+  else when[(dat->typee == "column")]
   <<
-    for[number J = dat->tno-1 | (J < N) | J += K]
+    for[number J = (dat->tno - 1) | (J < N) | J += K]
     <<
-      return_single r = invoke check_given_values:0,J,dat->tno,dat->type:;
-      ret->a[1] = r->str ;
+      return_single r = invoke check_given_values:0,J,(dat->tno),(dat->typee):;
+     $$ ret->a[1] = r->str ;
       ret->valid = (ret->valid && r->valid);
     >>
   >>
-  else when[dat->type == "grid"]
+  else when[(dat->typee == "grid")]
   <<
     array number I[N]; $$ x[k] represents i value of kth grid
     array number J[N]; $$ y[k] represents j value of kth grid
@@ -166,15 +167,15 @@ func function : datak dat : void
     <<
       for[ number j=0 | (j < n) | j += 1]
       <<
-        I[N*j + i] = (n * j) ;
-        J[N*j + i] = (n * i) ;
+        I[(N*j + i)] = (n * j) ;
+        J[(N*j + i)] = (n * i) ;
       >>
     >>
 
-    for[number grid_no = dat->tno | (grid_no <= N) | grid_no += K]
+    for[number grid_no = (dat->tno) | (grid_no <= N) | grid_no += K]
     <<
-      return_single r = invoke check_given_values:0,J,dat->tno,dat->type :;
-      ret->a[1] = r->str ;
+      return_single r = invoke check_given_values:0,J,(dat->tno),(dat->typee) :;
+      $$ ret->a[1] = r->str ;
       ret->valid = (ret->valid && r->valid);
     >>
   >>
@@ -186,14 +187,14 @@ task finder : null
 <<
   datak dat ;
   dat->tno = tid ;
-  dat->type = "row" ;
+  dat->typee = "row" ;
   invoke function : dat :;
 >>
 
 start 
 <<
   ip->"input.txt": K, N ;
-  n = N^(1.0/2);
+  n = (N^(1.0/2));
   for[number i = 0 | (i < N) | i += 1]
   <<
     array number temp[1000];
@@ -207,12 +208,12 @@ start
   >>
 
   make parallel finder:K:10: null :;
-  dec time = get->time;
+  decimal timee = get->time;
 
   $$ Writing to output file
-  op: "Total time taken is: " # time ;
+  op: "Total time taken is: " # timee ;
   text s = "output_pthread.txt" ;
-  when[sudoko_check == false]
+  when[(sudoko_check == false)]
   <<
     op: "sudoko is invalid" -> s ;
   >>
@@ -221,6 +222,3 @@ start
     op: "sudoko is valid" -> s ;
   >>
 >>
-
-
-
