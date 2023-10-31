@@ -267,7 +267,8 @@ stringvalues : STRINGLITERAL
 
 /* Return */
 return_statement : RETURN RHS SEMICOLON { fprintf(yyout, " : return statement"); } ;
-
+                 | RETURN NVOID SEMICOLON { fprintf(yyout, " : return statement"); } ;
+                 
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
        { 
