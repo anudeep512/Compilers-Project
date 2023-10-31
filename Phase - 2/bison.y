@@ -98,7 +98,7 @@ next : RHS all_ops next
 RHS :	constants
     | T
     | TID
-    | get_invoke
+    | get_invoke | method_invoke
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
     | NEG ROUNDOPEN RHS ROUNDCLOSE
@@ -214,9 +214,9 @@ analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM ;
  /*ANALYSIS STATEMENT*/
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
-analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_syntax ;
+analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement");  } ; ;
 
-analyze_syntax   : COLON analysis_arrays analyze_syntax | SEMICOLON { fprintf(yyout, " : analyze statement");  } ;
+analyze_syntax   : COLON analysis_arrays analyze_syntax | ;
 
 /*calls*/
 
@@ -236,8 +236,8 @@ arguments : arguments COMMA RHS
 
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON arguments COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
-              | MAKE_PARALLEL IDENTIFIER COLON INTEGERLITERAL COLON INTEGERLITERAL COLON NULL_ARGS COLON SEMICOLON { fprintf(yyout, " : call statement");  } ;
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON arith_expr COLON arith_expr COLON arguments COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
+              | MAKE_PARALLEL IDENTIFIER COLON arith_expr COLON arith_expr COLON NULL_ARGS COLON SEMICOLON { fprintf(yyout, " : call statement");  } ;
                ;
 
 /*get statement*/
@@ -311,7 +311,7 @@ func_scope: declaration
           | analyze_statement
           | input | output    | sleep
           | SCOPEOPEN func_statements SCOPECLOSE
-          | method_invoke
+          | method_invoke2
           ;
 
 func_statements: func_scope func_statements
@@ -330,7 +330,7 @@ taskscope: declaration taskscope
         | output taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
-        | method_invoke taskscope
+        | method_invoke2 taskscope
         | 
         ;
 
@@ -348,7 +348,7 @@ statement: declaration
           | BREAK SEMICOLON
           | CONTINUE SEMICOLON
           | input
-          | method_invoke
+          | method_invoke2
           ;
 
 statements: statement statements
@@ -372,23 +372,22 @@ start: declaration start
      | loop start
      | func_invoke2 start
      | task_invoke start
-     | analyze_syntax start
+     | analyze_statement start
      | output start
      | input start
      | SCOPEOPEN start SCOPECLOSE start
      | sleep start
-     | method_invoke start
+     | method_invoke2 start
      |
      ;
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN attributes methods SCOPECLOSE
+type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
                 ;
 
-attributes: declarationStmt SEMICOLON
-          | attributes declarationStmt SEMICOLON
-          ;
+type_scope: declaration type_scope |  ;
+
 
 
 methods: methods method
@@ -398,8 +397,10 @@ methods: methods method
 method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
 
 
-method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON RHS arguments COLON
-              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON RHS arguments COLON
+method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;
+
+method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON arguments COLON 
+              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON arguments COLON
               ;
 
 
@@ -421,7 +422,7 @@ method_statements: declaration
                  | sleep
                  | SCOPEOPEN method_statements SCOPECLOSE
                  | in_statement
-                 | method_invoke
+                 | method_invoke2
                  ;
 
 method_body: method_statements method_body
