@@ -92,7 +92,7 @@ NEWLINE [\n]
 
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
-MULTI_LINE_COMMENT         "$*"(.|NEWLINE)*"*$"
+MULTI_LINE_COMMENT         "$*"[^"*"]*"*"("*"|([^"$*"]*[^"*"]*"*"))*"$"
 COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
 %%
