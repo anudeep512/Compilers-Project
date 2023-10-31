@@ -423,7 +423,6 @@ method_statements: declaration
                  | output
                  | sleep
                  | SCOPEOPEN method_statements SCOPECLOSE
-                 | in_statement
                  | method_invoke2
                  ;
 
