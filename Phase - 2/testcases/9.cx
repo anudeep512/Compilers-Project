@@ -1,10 +1,10 @@
 type data
 <<
   number total;
-  number tid; 
+  number thread; 
 >>
 
-func check : decimal x, decimal y : boolean 
+func check : decimal x, decimal y : bool
 <<
   when [(x^2+y^2 < 0)]
   <<
@@ -16,7 +16,7 @@ func check : decimal x, decimal y : boolean
   >>
 >>
 
-func findPi : number total, number tid : void
+func findPi : number total, number thread : void
 <<
   array decimal mem[100];
   mem[0] = p;
