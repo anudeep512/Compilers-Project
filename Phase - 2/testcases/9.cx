@@ -59,10 +59,10 @@ start
 <<
   number N;
   number Th;
-  ip:N,Th-> "inp
+  ip:N,Th-> "inp.txt" ;
   number i;
   i = 0;
-  for[i = 2|i<=64|i ^= 2]
+  for[i = 2|(i<=64)|i ^= 2]
   <<
     make parallel parallelpi:i:10: N ;
   >>

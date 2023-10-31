@@ -1,5 +1,4 @@
 .vscode/
-bash.sh
 lex_test.l
 bison_test.y
 testcases_temp/

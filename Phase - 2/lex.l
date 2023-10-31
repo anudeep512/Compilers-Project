@@ -2,7 +2,7 @@
   #include <iostream>
   #include <unordered_set>
   #include <string>
-  #include "y.tab.h"
+  #include "bison.tab.h"
 
   extern FILE* fp;
 
