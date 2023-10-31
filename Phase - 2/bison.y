@@ -147,8 +147,7 @@ LHS : IDENTIFIER
     | access
     ;
 
-arr_access: dimlist
-          | exprlist
+arr_access: exprlist
           ;
 
 exprlist: arith_expr
@@ -161,7 +160,8 @@ arith_operand: IDENTIFIER
               | ROUNDOPEN arith_expr ROUNDCLOSE
               ;
 
-arith_expr:  arith_operand arithmetic_op arith_operand
+arith_expr: arith_expr arithmetic_op arith_operand
+          | arith_operand
           ;
 
  /*ASSIGNMENT STATEMENT*/
