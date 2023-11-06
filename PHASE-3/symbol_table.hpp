@@ -2,13 +2,14 @@
 #define _SYMBOL_TABLE_HPP
 
 #include <iostream>
-
+//#include <vector>
+//#include <string>
 
 class GlobalTable{
 public:
-  vector<ClassTable > c_tb ;
-  vector<TaskTable > t_tb ;
-  vector<FunctionTable > f_tb ;
+  vector<ClassTable> c_tb ;
+  vector<TaskTable> t_tb ;
+  vector<FunctionTable> f_tb ;
   IdentifierTable i_tb ;
   StartTable s_tb ;
   auto p_tb ;
@@ -36,6 +37,29 @@ public:
   // 2) Adding a new ncl-table object to 
   int add();
   int del();
+}
+
+class IdentifierTable{
+public:
+  string id_name;
+  bool is_atomic;
+  bool is_array;
+  char datatype;
+  /* 
+  'n' for number datatype
+  'd' for decimal datatype
+  'l' for letter datatype
+  't' for text datatype
+  'u' for user-defined datatye
+  
+  Any other character would be illegal
+  
+  */
+  auto p_tb;  
+  
+  
+  int add();
+  int del();  
 }
 
 // Global Search Function for an identifier
