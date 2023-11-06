@@ -11,7 +11,7 @@
 
 %token WHEN REPEAT ELSE_WHEN DEFAULT FOR BREAK CONTINUE 
 %token TASK MAKE_PARALLEL NULL_ARGS TID ANALYZE GET SLEEP TIME
-%token START RETURN TYPE ATOMIC IN FUNC INVOKE IP OP
+%token START RETURN TYPE ATOMIC ARRAY IN FUNC INVOKE IP OP
 %token DIV ADD SUB MUL EXPONENT MODULO 
 %token ARROW
 %token EQ INCR DECR ASSN_MODULO ASSN_EXPONENT ASSN_DIV ASSN_MUL 
@@ -34,7 +34,9 @@
 
 %token AARRNUM AARRDEC AARRBOOL AARRLET AARRTEXT
 
-%token UDATATYPE AUDATATYPE
+%token TYPENAME
+%token NUDATATYPE AUDATATYPE // Simple User Defined, Simple Atomic user defined
+%token NARRUDATATYPE AARRUDATATYPE // Array user defined, Array atomic user defined
 
 %left ROUNDOPEN ROUNDCLOSE ARROW
 %right EXPONENT
@@ -51,7 +53,7 @@
 %start begin
 
 %%
-all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
+all_datatypes: NUDATATYPE | AUDATATYPE | NARRUDATATYPE | AARRUDATATYPE| NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -117,8 +119,8 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
 
-simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|ATOMIC AUDATATYPE;
-arrayDatatype  : nonAtomicArray|atomicArray;
+simpleDatatype : nonAtomicSimple|atomicSimple|NUDATATYPE|ATOMIC AUDATATYPE;
+arrayDatatype  : nonAtomicArray|atomicArray|ARRAY NARRUDATATYPE|ATOMIC ARRAY AARRUDATATYPE;
 
 declarationStmt : simpleDatatype simpleList 
                 | arrayDatatype arrayList
@@ -295,7 +297,7 @@ func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENT
 args: func_args | NULL_ARGS ;
 
 func_return : nonAtomic_datatypes
-            | UDATATYPE
+            | NUDATATYPE
             ;
 
 func_decl :       FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); } 
@@ -387,7 +389,7 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
+type_declaration: TYPE TYPENAME { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
                 ;
 
 type_scope: declaration type_scope |  ;
