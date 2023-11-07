@@ -75,7 +75,7 @@ public:
 
 };
 
-class IdentifierTable{
+class IdentifierStruct{
 public:
   string id_name;
   bool is_atomic;
@@ -91,12 +91,18 @@ public:
   Any other character would be illegal
   
   */
+}
+
+class IdentifierTable{
+public:
+  vector<IdentifierStruct *> v_is;
+
   auto p_tb;  
-  
   
   int add();
   int del();  
 };
+
 
 
 class TypeTable
