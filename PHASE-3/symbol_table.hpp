@@ -7,7 +7,7 @@
 
 class GlobalTable{
 public:
-  vector<ClassTable> c_tb ;
+  vector<TypeTable> c_tb ;
   vector<TaskTable> t_tb ;
   vector<FunctionTable> f_tb ;
   IdentifierTable i_tb ;
@@ -96,7 +96,34 @@ public:
   
   int add();
   int del();  
-}
+};
+
+
+class TypeTable
+{
+public:
+    IdentifierTable *attributes;
+    std::vector<FunctionTable *> methods;
+    auto p_tb;
+
+    int add();
+    int del();
+};
+
+class TaskTable
+{
+public:
+  string task_name;
+  IdentifierTable *i_tb;
+  int num_param;
+  vector<NCLTable *> ncl_tb;
+  auto p_tb;
+
+  int add();
+  int del();
+};
+
+
 
 // Global Search Function for an identifier
 // Use -> if the identifier name string is sent as input then outputs if it is present or not.
