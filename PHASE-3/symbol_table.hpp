@@ -1,9 +1,9 @@
 #ifndef _SYMBOL_TABLE_HPP
 #define _SYMBOL_TABLE_HPP
 
-#include <iostream>
-//#include <vector>
-//#include <string>
+// #include <iostream>
+// #include <vector>
+// #include <string>
 
 class GlobalTable{
 public:
@@ -37,7 +37,43 @@ public:
   // 2) Adding a new ncl-table object to 
   int add();
   int del();
-}
+};
+
+class StartTable {
+  public:
+        IdentifierTable i_tb ;
+        vector<NCLTable> ncl_tb ;
+  
+        auto p_tb ; // Parent pointer
+
+  // Adding can be:
+  // 1) Pointing to an identifier table and then adding variables to the table
+  // 2) Adding a new ncl-table object to 
+      int add();
+      int del();
+
+};
+
+class FunctionTable {
+
+public: 
+        string id_name; // function name
+        int num_param; // number of parameters
+        IdentifierTable i_tb ; // pointer to identifier table (both parameters & varaiables in this table)
+        string return_type; // (number/decimal/letter/text/user-defined/ arrays)
+        vector<NCLTable> ncl_tb ; // pointer to NCL Tables 
+  
+        auto p_tb ; //Parent pointer
+
+  // Adding can be:
+  // 1) Pointing to an identifier table and then adding variables to the table
+  // 2) Adding a new ncl-table object to 
+      int add();
+      int del();
+
+
+
+};
 
 class IdentifierTable{
 public:
