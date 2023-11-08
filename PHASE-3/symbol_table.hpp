@@ -25,6 +25,7 @@ public:
   // 6) Points to parent table
   void add_function(string id_name, int param_count, string retr_type);
   void add_task(string id_name, int param_count, string retr_type);
+  void add_type(string id_name);
 
 };
 
@@ -69,7 +70,6 @@ public:
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-  void add(string id_name, int param_count, string retr_type);
 };
 
 class IdentifierStruct{
@@ -106,7 +106,8 @@ public:
   vector<FunctionTable<TypeTable>> f_tb;
   T * p_tb;
 
-  void add();
+  void add_attr(string s1, bool a1, bool a2, string s2);
+  void add_method(string id_name, int param_count, string retr_type);
 };
 
 template <class T>
@@ -119,8 +120,6 @@ public:
   IdentifierTable<TaskTable> i_tb;
   vector<NCLTable<TaskTable>> ncl_tb;
   T * p_tb;
-
-  void add();
 
 };
 

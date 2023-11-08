@@ -213,13 +213,37 @@ void GlobalTable<T>::add_task(string id_name, int param_count, string retr_type)
 
 }
 
+template <class T>
+void GlobalTable<T>::add_type(string id_name){
+   TypeTable Ty_struct;
+   
+   Ty_struct.id_name = id_name;
+   this->c_tb.push_back(T_struct);
+}
+
+template <class T>
+void TypeTable<T>::add_attr(string s1, bool a1, bool a2, string s2){
+   IdentifierStruct I;
+   I.id_name = s1;
+   I.is_atomic = a1;
+   I.is_array = a2;
+   I.datatype = s2;
+   
+   this->i_tb.push_back(I);
+}
 
 
+template <class T>
+void TypeTable<T>::add_method(string id_name, int param_count, string retr_type){
+   
+   FunctionTable F_struct;
+   F_struct.id_name = id_name;
+   F_struct.num_param = param_count;
+   F_struct.return_type = retr_type;  
 
+   this->f_tb.push_back(F_struct);
 
-
-
-
+}
 
 
 
