@@ -100,6 +100,7 @@ template <class T>
 class TypeTable
 {
 public:
+  string type_name;
   IdentifierTable<TypeTable> i_tb;
   vector<FunctionTable<TypeTable>> f_tb;
   T * p_tb;
@@ -131,6 +132,11 @@ bool search_identifier(T cur_ptr, string id);
 
 template <class T>
 void add_identifier(IdentifierTable<T> & i_tb);
+template <class T>
+bool search_attribute(T g_ptr, string attr_name, string class_name);
+
+template <class T>
+bool seach_type_idenitifer(T g_ptr, string id);
 
 #endif
 

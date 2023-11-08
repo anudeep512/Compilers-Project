@@ -36,3 +36,35 @@ bool search_func_identifier(T global_ptr, vector<string>& func_check ){
    return false;
    
 }
+
+
+/*
+  Semantics required for class function:
+    -  Check if a class with given name exists
+    -  Whenever an attribute is accessed, check if there is an attribute with that identifier
+    -  Whenever a class method is accessed, search of there is a function with that name and those parameters
+*/
+template <class T>
+bool seach_type_idenitifer(T g_ptr, string id){
+  for(auto i: g_ptr.c_tb){
+    if(i.type_name == id) return true;
+  }
+
+  return false;
+}
+
+template <class T>
+bool search_attribute(T g_ptr, string attr_name, string class_name)
+{
+  for(auto i:g_ptr.c_tb){
+    if(i.type_name == class_name){
+      for(auto j : i.i_tb.i_struct)
+      {
+        if(j.id_name == attr_name) return true;
+      }
+      return false;
+    }
+  }
+
+  return false;
+}
