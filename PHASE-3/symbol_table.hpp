@@ -1,18 +1,20 @@
 #ifndef _SYMBOL_TABLE_HPP
 #define _SYMBOL_TABLE_HPP
 
-// #include <iostream>
-// #include <vector>
-// #include <string>
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
 
+template <class T>
 class GlobalTable{
 public:
-  vector<TypeTable> c_tb ;
-  vector<TaskTable> t_tb ;
-  vector<FunctionTable> f_tb ;
-  IdentifierTable i_tb ;
-  StartTable s_tb ;
-  auto p_tb ;
+  vector<TypeTable<GlobalTable>> c_tb ;
+  vector<TaskTable<GlobalTable>> t_tb ;
+  vector<FunctionTable<GlobalTable>> f_tb ;
+  IdentifierTable<GlobalTable> i_tb ;
+  StartTable<GlobalTable> s_tb ;
+  T * p_tb ;
 
   // Adding can be:
   // 1) Adding a new class-table object to vector c_tb
@@ -22,57 +24,51 @@ public:
   // 5) Pointing to a new start table using s_tb 
   // 6) Points to parent table
   int add();
-  int del();
 
 };
 
+template <class T>
 class NCLTable{
 public:
-  IdentifierTable i_tb ;
-  vector<NCLTable> ncl_tb ;
-  auto p_tb ;
+  IdentifierTable<NCLTable> i_tb ;
+  vector<NCLTable<NCLTable>> ncl_tb ;
+  T * p_tb ;
 
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
   int add();
-  int del();
 };
 
+template <class T>
 class StartTable {
   public:
-        IdentifierTable i_tb ;
-        vector<NCLTable> ncl_tb ;
-  
-        auto p_tb ; // Parent pointer
+    IdentifierTable<StartTable> i_tb ;
+    vector<NCLTable<StartTable>> ncl_tb ;
+    T * p_tb ; // Parent pointer
 
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-      int add();
-      int del();
+    int add();
 
 };
 
+template <class T>
 class FunctionTable {
-
 public: 
-        string id_name; // function name
-        int num_param; // number of parameters
-        IdentifierTable i_tb ; // pointer to identifier table (both parameters & varaiables in this table)
-        string return_type; // (number/decimal/letter/text/user-defined/ arrays)
-        vector<NCLTable> ncl_tb ; // pointer to NCL Tables 
-  
-        auto p_tb ; //Parent pointer
+  string id_name; // function name
+  int num_param; // number of parameters
+  string return_type; // (number/decimal/letter/text/user-defined/ arrays)
+
+  IdentifierTable<FunctionTable> i_tb ; // pointer to identifier table (both parameters & varaiables in this table)
+  vector<NCLTable<FunctionTable>> ncl_tb ; // pointer to NCL Tables 
+  T * p_tb ; //Parent pointer
 
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-      int add();
-      int del();
-
-
-
+  int add();
 };
 
 class IdentifierStruct{
@@ -80,61 +76,74 @@ public:
   string id_name;
   bool is_atomic;
   bool is_array;
-  char datatype;
   /* 
-  'n' for number datatype
-  'd' for decimal datatype
-  'l' for letter datatype
-  't' for text datatype
-  'u' for user-defined datatye
-  
+  "number" for number datatype
+  "decimal" for decimal datatype
+  "letter" for letter datatype
+  "text" for text datatype
+  class-name" for user-defined datatye
   Any other character would be illegal
-  
   */
-}
-
-class IdentifierTable{
-public:
-  vector<IdentifierStruct *> v_is;
-
-  auto p_tb;  
-  
-  int add();
-  int del();  
+  string datatype;
 };
 
+template <class T>
+class IdentifierTable{
+public:
+  vector<IdentifierStruct> i_struct;
+  T * p_tb;  
+  
+  int add();
+};
 
-
+template <class T>
 class TypeTable
 {
 public:
-    IdentifierTable *attributes;
-    std::vector<FunctionTable *> methods;
-    auto p_tb;
+  IdentifierTable<TypeTable> i_tb;
+  vector<FunctionTable<TypeTable>> f_tb;
+  T * p_tb;
 
-    int add();
-    int del();
+  int add();
 };
 
+template <class T>
 class TaskTable
 {
 public:
-  string task_name;
-  IdentifierTable *i_tb;
   int num_param;
-  vector<NCLTable *> ncl_tb;
-  auto p_tb;
+
+  string task_name;
+  IdentifierTable<TaskTable> i_tb;
+  vector<NCLTable<TaskTable>> ncl_tb;
+  T * p_tb;
 
   int add();
-  int del();
+
 };
-
-
 
 // Global Search Function for an identifier
 // Use -> if the identifier name string is sent as input then outputs if it is present or not.
 // We need to send info of type = function/ task/ variable declaration.
 // We should even mention if the identifier which we are using is assigned with the keyword in or not, then the search is changed according to that
-bool search();
+template <class T>
+bool search_identifier(T cur_ptr, string id);
+
+template <class T>
+void add_identifier(IdentifierTable<T> & i_tb);
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
