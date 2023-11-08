@@ -172,4 +172,53 @@ bool search_method(T global_ptr, string class_name, vector<string> &method_check
 
 
 template <class T>
-bool search_NCL_identifers()
+bool search_NCL_identifers(){}
+
+
+//Insertion functions
+template <class T>
+void IdentiferTable<T>::add(string s1, bool a1, bool a2, string s2){
+   IdentifierStruct I;
+   I.id_name = s1;
+   I.is_atomic = a1;
+   I.is_array = a2;
+   I.datatype = s2;
+   
+   this->i_struct.push_back(I);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

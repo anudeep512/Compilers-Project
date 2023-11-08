@@ -23,7 +23,7 @@ public:
   // 4) Pointing to an identifier table and then adding variables to the table
   // 5) Pointing to a new start table using s_tb 
   // 6) Points to parent table
-  int add();
+  void add();
 
 };
 
@@ -37,7 +37,7 @@ public:
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-  int add();
+  void add();
 };
 
 template <class T>
@@ -50,7 +50,7 @@ class StartTable {
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-    int add();
+    void add();
 
 };
 
@@ -68,14 +68,14 @@ public:
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-  int add();
+  void add();
 };
 
 class IdentifierStruct{
 public:
-  string id_name;
-  bool is_atomic;
-  bool is_array;
+  string id_name; // Identifier name
+  bool is_atomic; // Atomic or Non_atomic type
+  bool is_array; // Simple or Array type
   /* 
   "number" for number datatype
   "decimal" for decimal datatype
@@ -84,7 +84,7 @@ public:
   class-name" for user-defined datatye
   Any other character would be illegal
   */
-  string datatype;
+  string datatype; // Datatype of the identifier
 };
 
 template <class T>
@@ -93,7 +93,7 @@ public:
   vector<IdentifierStruct> i_struct;
   T * p_tb;  
   
-  int add();
+  void add();
 };
 
 template <class T>
@@ -105,7 +105,7 @@ public:
   vector<FunctionTable<TypeTable>> f_tb;
   T * p_tb;
 
-  int add();
+  void add();
 };
 
 template <class T>
@@ -119,7 +119,7 @@ public:
   vector<NCLTable<TaskTable>> ncl_tb;
   T * p_tb;
 
-  int add();
+  void add();
 
 };
 
@@ -131,20 +131,19 @@ template <class T>
 bool search_identifier(T cur_ptr, string id);
 
 template <class T>
-void add_identifier(IdentifierTable<T> & i_tb);
-
-template <class T>
 bool search_func_identifier(T global_ptr, vector<string>& func_check);
 
 template <class T>
 bool search_task_identifier(T global_ptr, vector<string>& task_check);
-
 
 template <class T>
 bool search_attribute(T g_ptr, string attr_name, string class_name);
 
 template <class T>
 bool seach_type_idenitifer(T g_ptr, string id);
+
+
+// Insertion functions
 
 #endif
 
