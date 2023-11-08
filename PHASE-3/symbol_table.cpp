@@ -25,23 +25,27 @@ bool search_func_identifier(T global_ptr, vector<string> &func_check)
   {
     if (i.id_name == func_name)
     {
+      if((func_check.size()-1) != i.num_param){
+         return false;
+      } 
+      
       int a = 1;
+      
 
-      for (auto j : global_ptr.f_tb.i_tb.i_struct)
+      for (auto j : i.i_tb.i_struct)
       {
-        if (j.datatype == func_check[a])
+        if (j.datatype != func_check[a])
         {
-          a++;
+          return false;
         }
-
-        else if (a > global_ptr.f_tb.num_param)
-        {
-          break;
-        }
-
-        else
-        {
-          return false
+        
+        else{
+           a++;
+           
+           if(a> i.num_param){
+              return true;
+           }
+           
         }
       }
     }
@@ -59,6 +63,10 @@ bool search_task_identifier(T global_ptr, vector<string> &task_check)
   {
     if (i.id_name == task_name)
     {
+      if((task_check.size()-1) != i.num_param){
+         return false;
+      } 
+      
       int a = 1;
 
       for (auto j : i.i_tb.i_struct)
@@ -132,6 +140,11 @@ bool search_method(T global_ptr, string class_name, vector<string> &method_check
       {
         if (i.id_name == method)
         {
+           if(method_check.size() - 1 != i.num_param)
+           {
+           	break;
+           }
+           
           int a = 1;
 
           for (auto j : i.i_tb.i_struct)
@@ -156,3 +169,7 @@ bool search_method(T global_ptr, string class_name, vector<string> &method_check
   }
   return false;
 }
+
+
+template <class T>
+bool search_NCL_identifers()

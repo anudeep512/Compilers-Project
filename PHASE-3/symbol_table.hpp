@@ -133,6 +133,8 @@ bool search_identifier(T cur_ptr, string id);
 template <class T>
 void add_identifier(IdentifierTable<T> & i_tb);
 
+template <class T>
+bool search_func_identifier(T global_ptr, vector<string>& func_check);
 
 template <class T>
 bool search_task_identifier(T global_ptr, vector<string>& task_check);
