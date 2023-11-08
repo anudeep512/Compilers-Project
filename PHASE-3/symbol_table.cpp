@@ -38,6 +38,34 @@ bool search_func_identifier(T global_ptr, vector<string>& func_check ){
 }
 
 
+template <class T>
+bool search_task_identifier(T global_ptr, vector<string>& task_check){
+
+   string task_name = task_check[0];
+   
+   for(auto i: global_ptr.t_tb){
+      if(i.id_name == task_name){
+         int a = 1;
+         
+         for(auto j: global_ptr.t_tb.i_tb.i_struct){
+            
+            if(j.datatype != task_check[a]){
+               return false;
+            } else {
+              a++; 
+              if(a > global_ptr.t_tb.num_param){
+                  break;
+              }
+            } 
+         }
+      }
+   }
+   return true;
+  
+}
+
+
+
 /*
   Semantics required for class function:
     -  Check if a class with given name exists
