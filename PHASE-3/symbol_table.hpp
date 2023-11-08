@@ -23,7 +23,8 @@ public:
   // 4) Pointing to an identifier table and then adding variables to the table
   // 5) Pointing to a new start table using s_tb 
   // 6) Points to parent table
-  void add();
+  void add_function(string id_name, int param_count, string retr_type);
+  void add_task(string id_name, int param_count, string retr_type);
 
 };
 
@@ -68,7 +69,7 @@ public:
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to 
-  void add();
+  void add(string id_name, int param_count, string retr_type);
 };
 
 class IdentifierStruct{
@@ -93,7 +94,7 @@ public:
   vector<IdentifierStruct> i_struct;
   T * p_tb;  
   
-  void add();
+  void add(string s1, bool a1, bool a2, string s2);
 };
 
 template <class T>
@@ -140,10 +141,9 @@ template <class T>
 bool search_attribute(T g_ptr, string attr_name, string class_name);
 
 template <class T>
-bool seach_type_idenitifer(T g_ptr, string id);
+bool search_type_idenitifer(T g_ptr, string id);
 
 
-// Insertion functions
 
 #endif
 

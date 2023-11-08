@@ -97,7 +97,7 @@ bool search_task_identifier(T global_ptr, vector<string> &task_check)
     -  Whenever a class method is accessed, search of there is a function with that name and those parameters
 */
 template <class T>
-bool seach_type_idenitifer(T g_ptr, string id)
+bool search_type_idenitifer(T g_ptr, string id)
 {
   for (auto i : g_ptr.c_tb)
   {
@@ -177,7 +177,7 @@ bool search_NCL_identifers(){}
 
 //Insertion functions
 template <class T>
-void IdentiferTable<T>::add(string s1, bool a1, bool a2, string s2){
+void IdentifierTable<T>::add(string s1, bool a1, bool a2, string s2){
    IdentifierStruct I;
    I.id_name = s1;
    I.is_atomic = a1;
@@ -185,6 +185,32 @@ void IdentiferTable<T>::add(string s1, bool a1, bool a2, string s2){
    I.datatype = s2;
    
    this->i_struct.push_back(I);
+}
+
+
+template <class T>
+void GlobalTable<T>::add_function(string id_name, int param_count, string retr_type){
+   
+   FunctionTable F_struct;
+   F_struct.id_name = id_name;
+   F_struct.num_param = param_count;
+   F_struct.return_type = retr_type;  
+
+   this->f_tb.push_back(F_struct);
+
+}
+
+template <class T>
+void GlobalTable<T>::add_task(string id_name, int param_count, string retr_type){
+   
+   TaskTable T_struct;
+   
+   T_struct.id_name = id_name;
+   T_struct.num_param = param_count;
+   T_struct.return_type = retr_type;
+
+   this->t_tb.push_back(T_struct);
+
 }
 
 
