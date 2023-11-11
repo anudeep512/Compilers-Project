@@ -7,7 +7,7 @@ bool search_identifier(T curr_ptr, string id)
 {
   for (auto i : curr_ptr.i_tb.i_struct)
   {
-    if (i.id_name == id)
+    if (i.name == id)
       return true;
   }
   if (curr_ptr.p_tb == NULL)
@@ -16,6 +16,10 @@ bool search_identifier(T curr_ptr, string id)
     return search_identifier(*(curr_ptr.p_tb), id);
 }
 
+// func_check is a vector where 
+// func_check[0] = function name
+// func_check[1] = return type
+// func_check[i] = arguments data type -> for i >= 2 
 template <class T>
 bool search_func_identifier(T global_ptr, vector<string> &func_check)
 {
@@ -23,14 +27,15 @@ bool search_func_identifier(T global_ptr, vector<string> &func_check)
 
   for (auto i : global_ptr.f_tb)
   {
-    if (i.id_name == func_name)
+    if (i.name == func_name)
     {
-      if((func_check.size()-1) != i.num_param){
+      if((func_check.size()-2) != i.num_param){
          return false;
       } 
-      
-      int a = 1;
-      
+    
+      if(func_check[1] != i.return_type) return false ;
+      if(func_check[2] == "null") return true ;
+      int a = 2;
 
       for (auto j : i.i_tb.i_struct)
       {
@@ -38,14 +43,11 @@ bool search_func_identifier(T global_ptr, vector<string> &func_check)
         {
           return false;
         }
-        
         else{
-           a++;
-           
-           if(a> i.num_param){
+           a++;  
+           if(a > i.num_param + 2 ){
               return true;
            }
-           
         }
       }
     }
@@ -53,15 +55,19 @@ bool search_func_identifier(T global_ptr, vector<string> &func_check)
   return false;
 }
 
+// func_check  
+
+// func_check is a vector where 
+// func_check[0] = function name
+// func_check[i] = arguments data type -> for i >= 1
 template <class T>
 bool search_task_identifier(T global_ptr, vector<string> &task_check)
 {
 
   string task_name = task_check[0];
-
   for (auto i : global_ptr.t_tb)
   {
-    if (i.id_name == task_name)
+    if (i.name == task_name)
     {
       if((task_check.size()-1) != i.num_param){
          return false;
@@ -117,7 +123,7 @@ bool search_attribute(T g_ptr, string attr_name, string class_name)
     {
       for (auto j : i.i_tb.i_struct)
       {
-        if (j.id_name == attr_name)
+        if (j.name == attr_name)
           return true;
       }
       return false;
@@ -138,7 +144,7 @@ bool search_method(T global_ptr, string class_name, vector<string> &method_check
     {
       for (auto i : k.f_tb)
       {
-        if (i.id_name == method)
+        if (i.name == method)
         {
            if(method_check.size() - 1 != i.num_param)
            {
@@ -179,7 +185,7 @@ bool search_NCL_identifers(){}
 template <class T>
 void IdentifierTable<T>::add(string s1, bool a1, bool a2, string s2){
    IdentifierStruct I;
-   I.id_name = s1;
+   I.name = s1;
    I.is_atomic = a1;
    I.is_array = a2;
    I.datatype = s2;
@@ -187,44 +193,41 @@ void IdentifierTable<T>::add(string s1, bool a1, bool a2, string s2){
    this->i_struct.push_back(I);
 }
 
-
-template <class T>
-void GlobalTable<T>::add_function(string id_name, int param_count, string retr_type){
+void GlobalTable::add_function(GlobalTable * parent,string id_name, int param_count, string retr_type){
    
-   FunctionTable F_struct;
-   F_struct.id_name = id_name;
-   F_struct.num_param = param_count;
-   F_struct.return_type = retr_type;  
-
-   this->f_tb.push_back(F_struct);
+  FunctionTable<GlobalTable> F_struct;
+  F_struct.name = id_name;
+  F_struct.num_param = param_count;
+  F_struct.return_type = retr_type;  
+  F_struct.p_tb = parent ;
+  this->f_tb.push_back(F_struct);
 
 }
 
-template <class T>
-void GlobalTable<T>::add_task(string id_name, int param_count, string retr_type){
+void GlobalTable::add_task(GlobalTable * parent,string id_name, int param_count, string retr_type){
    
-   TaskTable T_struct;
-   
-   T_struct.id_name = id_name;
-   T_struct.num_param = param_count;
-   T_struct.return_type = retr_type;
-
-   this->t_tb.push_back(T_struct);
+  TaskTable<GlobalTable> T_struct;
+  
+  T_struct.name = id_name;
+  T_struct.num_param = param_count;
+  T_struct.p_tb = parent ;
+  this->t_tb.push_back(T_struct);
 
 }
 
-template <class T>
-void GlobalTable<T>::add_type(string id_name){
-   TypeTable Ty_struct;
+void GlobalTable::add_type(GlobalTable * parent,string id_name){
+   TypeTable<GlobalTable> Ty_struct;
    
-   Ty_struct.id_name = id_name;
-   this->c_tb.push_back(T_struct);
+   Ty_struct.name = id_name;
+   Ty_struct.p_tb = parent ;
+   this->c_tb.push_back(Ty_struct);
+
 }
 
 template <class T>
 void TypeTable<T>::add_attr(string s1, bool a1, bool a2, string s2){
    IdentifierStruct I;
-   I.id_name = s1;
+   I.name = s1;
    I.is_atomic = a1;
    I.is_array = a2;
    I.datatype = s2;
@@ -237,7 +240,7 @@ template <class T>
 void TypeTable<T>::add_method(string id_name, int param_count, string retr_type){
    
    FunctionTable F_struct;
-   F_struct.id_name = id_name;
+   F_struct.name = id_name;
    F_struct.num_param = param_count;
    F_struct.return_type = retr_type;  
 
@@ -245,11 +248,23 @@ void TypeTable<T>::add_method(string id_name, int param_count, string retr_type)
 
 }
 
+template <class T>
+void NCLTable<T>::add_ncltable(NCLTable<T> * parent){
+  NCLTable<NCLTable<T>> child ;
+  child.p_tb = parent ;
+  this->ncl_tb.push_back(child); 
+}
 
+template <class T>
+void NCLTable<T>::add_idtable(NCLTable<T> * parent){
+  IdentifierTable<NCLTable<T>> child ;
+  child.p_tb = parent ;
+  this->i_tb = child; 
+}
 
+void StartTable(){
 
-
-
+}
 
 
 

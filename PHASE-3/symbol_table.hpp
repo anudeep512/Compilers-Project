@@ -6,16 +6,18 @@
 #include <string>
 using namespace std;
 
-template <class T>
+
 class GlobalTable{
 public:
   vector<TypeTable<GlobalTable>> c_tb ;
   vector<TaskTable<GlobalTable>> t_tb ;
   vector<FunctionTable<GlobalTable>> f_tb ;
   IdentifierTable<GlobalTable> i_tb ;
-  StartTable<GlobalTable> s_tb ;
-  T * p_tb ;
-
+  StartTable s_tb ;
+  int * p_tb ;
+  GlobalTable(){
+    p_tb = NULL ;
+  }
   // Adding can be:
   // 1) Adding a new class-table object to vector c_tb
   // 2) Adding a new task-table object to t_tb
@@ -23,43 +25,45 @@ public:
   // 4) Pointing to an identifier table and then adding variables to the table
   // 5) Pointing to a new start table using s_tb 
   // 6) Points to parent table
-  void add_function(string id_name, int param_count, string retr_type);
-  void add_task(string id_name, int param_count, string retr_type);
-  void add_type(string id_name);
+  void add_function(GlobalTable * parent,string id_name, int param_count, string retr_type);
+  void add_task(GlobalTable * parent,string id_name, int param_count, string retr_type);
+  void add_type(GlobalTable * parent,string id_name);
+  // Pending 
+  void add_start() ;
 
 };
 
 template <class T>
 class NCLTable{
 public:
-  IdentifierTable<NCLTable> i_tb ;
-  vector<NCLTable<NCLTable>> ncl_tb ;
+  IdentifierTable<NCLTable<T>> i_tb ;
+  vector<NCLTable<NCLTable<T>>> ncl_tb ;
   T * p_tb ;
 
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
-  // 2) Adding a new ncl-table object to 
-  void add();
+  // 2) Adding a new ncl-table object to current existing parent
+  void add_idtable(NCLTable<T> * parent);
+  void add_ncltable(NCLTable<T> * parent);
 };
 
-template <class T>
 class StartTable {
   public:
     IdentifierTable<StartTable> i_tb ;
     vector<NCLTable<StartTable>> ncl_tb ;
-    T * p_tb ; // Parent pointer
+    GlobalTable * p_tb ; // Parent pointer
 
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
-  // 2) Adding a new ncl-table object to 
-    void add();
-
+  // 2) Adding a new ncl-table object to current exisiting parent
+    void add_idtable(StartTable * parent);
+    void add_ncltable(StartTable * parent);
 };
 
 template <class T>
 class FunctionTable {
 public: 
-  string id_name; // function name
+  string name; // function name
   int num_param; // number of parameters
   string return_type; // (number/decimal/letter/text/user-defined/ arrays)
 
@@ -74,7 +78,7 @@ public:
 
 class IdentifierStruct{
 public:
-  string id_name; // Identifier name
+  string name; // Identifier name
   bool is_atomic; // Atomic or Non_atomic type
   bool is_array; // Simple or Array type
   /* 
@@ -101,7 +105,7 @@ template <class T>
 class TypeTable
 {
 public:
-  string type_name;
+  string name;
   IdentifierTable<TypeTable> i_tb;
   vector<FunctionTable<TypeTable>> f_tb;
   T * p_tb;
@@ -115,8 +119,7 @@ class TaskTable
 {
 public:
   int num_param;
-
-  string task_name;
+  string name;
   IdentifierTable<TaskTable> i_tb;
   vector<NCLTable<TaskTable>> ncl_tb;
   T * p_tb;
