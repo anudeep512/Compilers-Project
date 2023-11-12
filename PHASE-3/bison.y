@@ -9,32 +9,53 @@
   void yyerror(std::string s);
 %}
 
-%token WHEN REPEAT ELSE_WHEN DEFAULT FOR BREAK CONTINUE 
-%token TASK MAKE_PARALLEL NULL_ARGS TID ANALYZE GET SLEEP TIME
-%token START RETURN TYPE ATOMIC IN FUNC INVOKE IP OP
-%token DIV ADD SUB MUL EXPONENT MODULO 
-%token ARROW
-%token EQ INCR DECR ASSN_MODULO ASSN_EXPONENT ASSN_DIV ASSN_MUL 
-%token AND OR GT LT GTEQ LTEQ NOT_EQ NEG EQUAL_TWO
-%token INTEGERLITERAL STRINGLITERAL CHARACTERLITERAL BOOLEANLITERAL FLOATLITERAL
-%token COMMA SEMICOLON COLON
-%token PIPE
-%token IDENTIFIER
-%token SCOPEOPEN SCOPECLOSE
-%token ROUNDOPEN ROUNDCLOSE
-%token SQUAREOPEN SQUARECLOSE
-%token HASH
-%token LEXERROR
 
-%token NNUM NDEC NBOOL NLET NTEXT NVOID
+%union 
+{
+       struct attribute
+       {
+              char* ID;   // Name of the variable
+              char* _type; // Variable/Function/Task/Type/Constant Marchali
+              bool is_atomic;
+              bool is_array;
+              char* datatype;
+              int intVal;
+              float decVal;
+              char charVal;
+              bool boolVal;
+              char* stringVal;
+              char* token;
+       }attr;
+}
 
-%token NARRNUM NARRDEC NARRBOOL NARRLET NARRTEXT
+%token<attr> WHEN REPEAT ELSE_WHEN DEFAULT FOR BREAK CONTINUE 
+%token<attr> TASK MAKE_PARALLEL NULL_ARGS TID ANALYZE GET SLEEP TIME
+%token<attr> START RETURN TYPE ATOMIC ARRAY IN FUNC INVOKE IP OP
+%token<attr> DIV ADD SUB MUL EXPONENT MODULO 
+%token<attr> ARROW
+%token<attr> EQ INCR DECR ASSN_MODULO ASSN_EXPONENT ASSN_DIV ASSN_MUL 
+%token<attr> AND OR GT LT GTEQ LTEQ NOT_EQ NEG EQUAL_TWO
+%token<attr> INTEGERLITERAL STRINGLITERAL CHARACTERLITERAL BOOLEANLITERAL FLOATLITERAL
+%token<attr> COMMA SEMICOLON COLON
+%token<attr> PIPE
+%token<attr> IDENTIFIER
+%token<attr> SCOPEOPEN SCOPECLOSE
+%token<attr> ROUNDOPEN ROUNDCLOSE
+%token<attr> SQUAREOPEN SQUARECLOSE
+%token<attr> HASH
+%token<attr> LEXERROR
 
-%token ANUM ADEC ABOOL ALET ATEXT
+%token<attr> NNUM NDEC NBOOL NLET NTEXT NVOID
 
-%token AARRNUM AARRDEC AARRBOOL AARRLET AARRTEXT
+%token<attr> NARRNUM NARRDEC NARRBOOL NARRLET NARRTEXT
 
-%token UDATATYPE AUDATATYPE
+%token<attr> ANUM ADEC ABOOL ALET ATEXT
+
+%token<attr> AARRNUM AARRDEC AARRBOOL AARRLET AARRTEXT
+
+%token<attr> TYPENAME
+%token<attr> NUDATATYPE AUDATATYPE // Simple User Defined, Simple Atomic user defined
+%token<attr> NARRUDATATYPE AARRUDATATYPE // Array user defined, Array atomic user defined
 
 %left ROUNDOPEN ROUNDCLOSE ARROW
 %right EXPONENT
@@ -48,10 +69,13 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
+
+%type<attr> constants
+
 %start begin
 
 %%
-all_datatypes: UDATATYPE | AUDATATYPE | NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
+all_datatypes: NUDATATYPE | AUDATATYPE | NARRUDATATYPE | AARRUDATATYPE| NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -84,11 +108,11 @@ all_ops: arithmetic_op
       | ARROW
       ;
 
-constants: INTEGERLITERAL
-           | CHARACTERLITERAL
-           | FLOATLITERAL
-           | BOOLEANLITERAL
-           | STRINGLITERAL
+constants: INTEGERLITERAL {$$.intVal = yylval.attr.intVal;}
+           | CHARACTERLITERAL {$$.charVal = yylval.attr.charVal;}
+           | FLOATLITERAL {$$.decVal = yylval.attr.decVal;}
+           | BOOLEANLITERAL {$$.boolVal = yylval.attr.charVal;}
+           | STRINGLITERAL {$$.stringVal = yylval.attr.stringVal;}
            ;
 
 next : RHS all_ops next 
@@ -117,8 +141,8 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
 
-simpleDatatype : nonAtomicSimple|atomicSimple|UDATATYPE|ATOMIC AUDATATYPE;
-arrayDatatype  : nonAtomicArray|atomicArray;
+simpleDatatype : nonAtomicSimple|atomicSimple|NUDATATYPE|ATOMIC AUDATATYPE;
+arrayDatatype  : nonAtomicArray|atomicArray|ARRAY NARRUDATATYPE|ATOMIC ARRAY AARRUDATATYPE;
 
 declarationStmt : simpleDatatype simpleList 
                 | arrayDatatype arrayList
@@ -295,7 +319,7 @@ func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENT
 args: func_args | NULL_ARGS ;
 
 func_return : nonAtomic_datatypes
-            | UDATATYPE
+            | NUDATATYPE
             ;
 
 func_decl :       FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); } 
@@ -387,7 +411,7 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE UDATATYPE { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
+type_declaration: TYPE TYPENAME { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
                 ;
 
 type_scope: declaration type_scope |  ;
