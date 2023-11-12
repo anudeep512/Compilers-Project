@@ -97,6 +97,9 @@ public:
   Any other character would be illegal
   */
   string datatype; // Datatype of the identifier
+  // dimensions[0] = not an array
+  // If array then dimensions[0], ... represent the size allocated to the arrayx
+  vector<int> dimensions ; 
 };
 
 template <class T>
@@ -105,7 +108,7 @@ public:
   vector<IdentifierStruct> i_struct;
   T * p_tb;  
   
-  void add_variable(string name, bool is_atomic, bool is_array, string datatype);
+  void add_variable(string name, bool is_atomic, bool is_array, string datatype, vector<int> dims);
 };
 
 template <class T>

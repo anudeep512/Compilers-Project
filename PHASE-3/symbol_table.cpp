@@ -8,12 +8,20 @@ using namespace std;
 /*-----------------------------------------------------------------------------SEARCH FUNCTIONS-----------------------------------------------------------------------------*/
 // This function is used to search for identifier in any scope given the pointer to that scope table
 template <class T>
-bool search_identifier(T curr_ptr, string id)
+bool search_identifier(T curr_ptr, string id, bool is_array, vector<int> dims)
 {
   for (auto i : curr_ptr.i_tb.i_struct)
   {
-    if (i.name == id)
+    if (i.name == id && is_array == false)
       return true;
+    else if(i.name == id && is_array == true){
+      if(dims.size() == i.dimensions.size()){
+        for(int j =0;j<dims.size();j++){
+          if(dims[j] >= i.dimensions[j]) return false ;
+        }
+        return true ;
+      }else return false;
+    }
   }
   if (curr_ptr.p_tb == NULL)
     return false;
@@ -233,15 +241,16 @@ void GlobalTable::add_start(GlobalTable * parent){
 /*-----------------------------------------------------------------------------Identifier Table Functions-----------------------------------------------------------------------------*/
 // This function is used to insert an identifier into i_tb
 template <class T>
-void IdentifierTable<T>::add_variable(string name, bool is_atomic, bool is_array, string datatype){
+void IdentifierTable<T>::add_variable(string name, bool is_atomic, bool is_array, string datatype, vector<int> dims){
   
   IdentifierStruct I;
   I.name = name;
   I.is_atomic = is_atomic;
   I.is_array = is_array;
   I.datatype = datatype;
+  for(auto a: dims)
+  I.dimensions.push_back(a);
   this->i_struct.push_back(I);
-
 }
 
 // If we have a Identifier table object then we can perform the following
