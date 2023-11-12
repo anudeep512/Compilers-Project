@@ -6,6 +6,14 @@
 #include <string>
 using namespace std;
 
+class GlobalTable;
+template <class T> class NCLTable ;
+class StartTable ;
+template<class T> class FunctionTable ;
+class IdentifierStruct ;
+template<class T> class IdentifierTable ;
+template<class T> class TypeTable ;
+template<class T> class TaskTable ;
 
 class GlobalTable{
 public:
@@ -15,8 +23,9 @@ public:
   IdentifierTable<GlobalTable> i_tb ;
   StartTable s_tb ;
   int * p_tb ;
-  GlobalTable(){
+  GlobalTable(){ 
     p_tb = NULL ;
+    i_tb.p_tb = this;
   }
   // Adding can be:
   // 1) Adding a new class-table object to vector c_tb
@@ -29,8 +38,7 @@ public:
   void add_task(GlobalTable * parent,string id_name, int param_count, string retr_type);
   void add_type(GlobalTable * parent,string id_name);
   // Pending 
-  void add_start() ;
-
+  void add_start(GlobalTable * parent) ;
 };
 
 template <class T>
@@ -39,11 +47,12 @@ public:
   IdentifierTable<NCLTable<T>> i_tb ;
   vector<NCLTable<NCLTable<T>>> ncl_tb ;
   T * p_tb ;
-
+  NCLTable(){
+    i_tb.p_tb = this;
+  }
   // Adding can be:
   // 1) Pointing to an identifier table and then adding variables to the table
   // 2) Adding a new ncl-table object to current existing parent
-  void add_idtable(NCLTable<T> * parent);
   void add_ncltable(NCLTable<T> * parent);
 };
 
@@ -52,11 +61,9 @@ class StartTable {
     IdentifierTable<StartTable> i_tb ;
     vector<NCLTable<StartTable>> ncl_tb ;
     GlobalTable * p_tb ; // Parent pointer
-
-  // Adding can be:
-  // 1) Pointing to an identifier table and then adding variables to the table
-  // 2) Adding a new ncl-table object to current exisiting parent
-    void add_idtable(StartTable * parent);
+    StartTable(){
+      i_tb.p_tb = this ;
+    }
     void add_ncltable(StartTable * parent);
 };
 
@@ -67,13 +74,13 @@ public:
   int num_param; // number of parameters
   string return_type; // (number/decimal/letter/text/user-defined/ arrays)
 
-  IdentifierTable<FunctionTable> i_tb ; // pointer to identifier table (both parameters & varaiables in this table)
-  vector<NCLTable<FunctionTable>> ncl_tb ; // pointer to NCL Tables 
+  IdentifierTable<FunctionTable<T>> i_tb ; // pointer to identifier table (both parameters & varaiables in this table)
+  vector<NCLTable<FunctionTable<T>>> ncl_tb ; // pointer to NCL Tables 
   T * p_tb ; //Parent pointer
-
-  // Adding can be:
-  // 1) Pointing to an identifier table and then adding variables to the table
-  // 2) Adding a new ncl-table object to 
+  FunctionTable(){
+    i_tb.p_tb = this;
+  }
+  void add_ncltable(FunctionTable<T> * parent);
 };
 
 class IdentifierStruct{
@@ -98,7 +105,7 @@ public:
   vector<IdentifierStruct> i_struct;
   T * p_tb;  
   
-  void add(string s1, bool a1, bool a2, string s2);
+  void add_variable(string name, bool is_atomic, bool is_array, string datatype);
 };
 
 template <class T>
@@ -109,9 +116,10 @@ public:
   IdentifierTable<TypeTable> i_tb;
   vector<FunctionTable<TypeTable>> f_tb;
   T * p_tb;
-
-  void add_attr(string s1, bool a1, bool a2, string s2);
-  void add_method(string id_name, int param_count, string retr_type);
+  TypeTable(){
+    i_tb.p_tb = this;
+  }
+  void add_method(string name, int num_param, string return_type);
 };
 
 template <class T>
@@ -123,7 +131,10 @@ public:
   IdentifierTable<TaskTable> i_tb;
   vector<NCLTable<TaskTable>> ncl_tb;
   T * p_tb;
-
+  TaskTable(){
+    i_tb.p_tb = this ;
+  }
+  void add_ncltable(TaskTable<T> * parent);
 };
 
 // Global Search Function for an identifier
@@ -144,8 +155,6 @@ bool search_attribute(T g_ptr, string attr_name, string class_name);
 
 template <class T>
 bool search_type_idenitifer(T g_ptr, string id);
-
-
 
 #endif
 

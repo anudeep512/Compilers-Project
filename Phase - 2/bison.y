@@ -86,7 +86,7 @@ all_ops: arithmetic_op
       | ARROW
       ;
 
-constants: INTEGERLITERAL
+constants: INTEGERLITERAL 
            | CHARACTERLITERAL
            | FLOATLITERAL
            | BOOLEANLITERAL
