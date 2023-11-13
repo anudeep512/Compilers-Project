@@ -14,17 +14,18 @@
 {
        struct attribute
        {
-              char* ID;   // Name of the variable
+              char* ID;   // Name of the variable/ task/ function
               char* _type; // Variable/Function/Task/Type/Constant Marchali
               bool is_atomic;
               bool is_array;
-              char* datatype;
+              char* datatype; // "number"/ "text"/ "decimal"/ "bool"/ "letter"/ user-defined("name")
               int intVal;
               float decVal;
               char charVal;
+              int arraylevel ; // Specifies about the state of the variable i.e., int **, int *, int levelling
               bool boolVal;
               char* stringVal;
-              char* token;
+              char* token; // Values which donot have to be manipulated during semantics
        }attr;
 }
 
@@ -341,7 +342,7 @@ func_scope: declaration
           | SCOPEOPEN func_statements SCOPECLOSE
           | method_invoke2
           ;
-
+       
 func_statements: func_scope func_statements
                | 
                ;

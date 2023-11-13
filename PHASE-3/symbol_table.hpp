@@ -27,17 +27,9 @@ public:
     p_tb = NULL ;
     i_tb.p_tb = this;
   }
-  // Adding can be:
-  // 1) Adding a new class-table object to vector c_tb
-  // 2) Adding a new task-table object to t_tb
-  // 3) Adding a new function-table object to f_tb
-  // 4) Pointing to an identifier table and then adding variables to the table
-  // 5) Pointing to a new start table using s_tb 
-  // 6) Points to parent table
   void add_function(GlobalTable * parent,string id_name, int param_count, string retr_type);
   void add_task(GlobalTable * parent,string id_name, int param_count, string retr_type);
   void add_type(GlobalTable * parent,string id_name);
-  // Pending 
   void add_start(GlobalTable * parent) ;
 };
 
@@ -97,7 +89,7 @@ public:
   Any other character would be illegal
   */
   string datatype; // Datatype of the identifier
-  // dimensions[0] = not an array
+  // dimensions[0] = 0 - not an array
   // If array then dimensions[0], ... represent the size allocated to the arrayx
   vector<int> dimensions ; 
 };
@@ -161,6 +153,10 @@ bool search_type_idenitifer(T g_ptr, string id);
 
 #endif
 
+// YACC Work
+// Values that need to be passed from bottom to top
+// constant values 
+// passing identifiers from top to bottom 
 
 
 

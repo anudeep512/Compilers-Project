@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include "symbol_table.hpp"
+#include "errors.hpp"
 using namespace std;
 
 /*-----------------------------------------------------------------------------SEARCH FUNCTIONS-----------------------------------------------------------------------------*/
@@ -15,7 +16,7 @@ bool search_identifier(T curr_ptr, string id, bool is_array, vector<int> dims)
     if (i.name == id && is_array == false)
       return true;
     else if(i.name == id && is_array == true){
-      if(dims.size() == i.dimensions.size()){
+      if(dims.size() <= i.dimensions.size()){
         for(int j =0;j<dims.size();j++){
           if(dims[j] >= i.dimensions[j]) return false ;
         }
@@ -27,6 +28,30 @@ bool search_identifier(T curr_ptr, string id, bool is_array, vector<int> dims)
     return false;
   else
     return search_identifier(*(curr_ptr.p_tb), id);
+}
+
+template <class T>
+bool search_attribute_type(string id, string class_name, bool is_array, vector<int> dims){
+  for (auto k : global_ptr.c_tb)
+  {
+    if (k.type_name == class_name)
+    {
+      for (auto i : k.i_tb.i_struct)
+      {
+        if (i.name == id && is_array == false)
+          return true;
+        else if(i.name == id && is_array == true){
+          if(dims.size() <= i.dimensions.size()){
+          for(int j =0;j<dims.size();j++){
+            if(dims[j] >= i.dimensions[j]) return false ;
+          }
+          return true ;
+        }else return false;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 // func_check is a vector where 
@@ -72,7 +97,6 @@ bool search_func_identifier(T global_ptr, vector<string> &func_check)
 template <class T>
 bool search_task_identifier(T global_ptr, vector<string> &task_check)
 {
-
   string task_name = task_check[0];
   for (auto i : global_ptr.t_tb)
   {
