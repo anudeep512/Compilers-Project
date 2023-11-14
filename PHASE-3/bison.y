@@ -24,6 +24,8 @@
   FunctionTable<TypeTable> * f_tb ;
   // Gives Pointer to current function table in global
   FunctionTable<GlobalTable> * m_tb ;
+  FunctionTable<TypeTable> * f_tb_type ;
+  GlobalTable *global_pt;
   // Gives Pointer to current type table
   TypeTable * c_tb ;
   // Gives Pointer to current task table
@@ -123,15 +125,15 @@
 %left COMMA
 
 
-%type<attr> all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration declarationStmt simpleDatatype arrayDatatype simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement when_default analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments file_name input nextip stringvalues output opstring nextop func_args args func_return func_decl atomic_func_decl func_body func_scope func_statements task taskscope statement statements access id startdec start type_declaration type_scope declaration_t declarationStmt_t methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body sleep task_invoke return_statement arith_operand get_invoke function 
+%type<attr> all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration declarationStmt simpleDatatype arrayDatatype simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement when_default analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments file_name input nextip stringvalues output opstring nextop func_args args func_return func_decl atomic_func_decl func_body func_scope func_statements task taskscope statement statements access id startdec start type_declaration type_scope declaration_t declarationStmt_t methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body sleep task_invoke return_statement arith_operand get_invoke function
 
 %start begin
 
 %%
 all_datatypes: NUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
              | AUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
-             | NARRUDATATYPE  {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;}
-             | AARRUDATATYPE  {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;}
+             | NARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+             | AARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = true;}
              | NBOOL          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
              | NDEC           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
              | NNUM           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
@@ -184,7 +186,7 @@ begin :
               g_tb->c_tb.push_back(c_tb);
               scopeType = 4;
       }
-       type_declaration {scopeType = 0;c_tb = NULL;TypesCount++;} begin
+       type_declaration {scopeType = 0;c_tb = NULL;typesCount++;} begin
       ;
 
 
@@ -276,7 +278,7 @@ declarationStmt : simpleDatatype simpleList
                      // Insertion to symbol Table is done now
                      for(auto i : id_vec){
                             if(scopeType == 1){
-                                   if(search_identifier(g_tb, $1.));
+                                   // if(search_identifier(g_tb, $1.)); commented, should complte else throwing error
                                    g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 2){
                                    g_tb->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
@@ -306,25 +308,29 @@ simpleList: IDENTIFIER
 arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
+                     dim_vec.push_back({});
               }
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
+                     dim_vec.push_back({});
           }
           | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
+                     dim_vec.push_back({});
           }
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
+                     dim_vec.push_back({});
           }
           ;
 
 array_inValues: INTEGERLITERAL            {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
 
-dimlist : dimlist COMMA array_inValues    {dim_vec.push_back($3.intVal);}
-        | array_inValues                  {dim_vec.push_back($1.intVal);}
+dimlist : dimlist COMMA array_inValues    {dim_vec[dim_vec.size()-1].push_back($3.intVal);}
+        | array_inValues                  {dim_vec[dim_vec.size()-1].push_back($1.intVal);}
         ;
 
 LHS : IDENTIFIER
@@ -479,7 +485,9 @@ nextop : HASH stringvalues nextop
 /*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
 function:         func_decl func_body {/*Type check for $1.datatype, $2.datatype*/printf("%s %s", $1.datatype, $2.datatype);} | atomic_func_decl func_body;
 
-func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
+func_args:        all_datatypes IDENTIFIER {printf("%s\n", $2.ID);}
+         | func_args COMMA all_datatypes IDENTIFIER 
+         ;
 
 args: func_args | NULL_ARGS ;
 
@@ -605,8 +613,8 @@ methods: methods method
        ;
 
 method: {
-           t_tb->add_method(); /** Need to Complete **/
-           f_tb_type = t_tb->f_tb[funcCountType];
+           // c_tb->add_method(); commented because throwing error due to no arguements /** Need to Complete **/
+           f_tb_type = c_tb->f_tb[funcCountType];
        } func_decl SCOPEOPEN method_body {funcCountType++;} SCOPECLOSE ;
 
 
