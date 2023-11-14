@@ -1,12 +1,17 @@
 %{
   #include <iostream>
   #include <string>
+  #include <vector>
   #include<fstream>
 
   extern int yylex();
   extern int yylineno;
   extern FILE * yyout;
   void yyerror(std::string s);
+  char *dt_state; // Datatype state
+  char *t_state; // Type i.e., class state
+  std::vector<char *> id_vec;
+  std::vector<int> dim_vec;
 %}
 
 
@@ -14,18 +19,17 @@
 {
        struct attribute
        {
-              char* ID;   // Name of the variable/ task/ function
+              char* ID;   // Name of the variable
               char* _type; // Variable/Function/Task/Type/Constant Marchali
               bool is_atomic;
               bool is_array;
-              char* datatype; // "number"/ "text"/ "decimal"/ "bool"/ "letter"/ user-defined("name")
+              char* datatype;
               int intVal;
               float decVal;
               char charVal;
-              int arraylevel ; // Specifies about the state of the variable i.e., int **, int *, int levelling
               bool boolVal;
               char* stringVal;
-              char* token; // Values which donot have to be manipulated during semantics
+              char* token;
        }attr;
 }
 
@@ -71,7 +75,8 @@
 %left COMMA
 
 
-%type<attr> constants
+%type<attr> constants nonAtomicSimple atomicSimple nonAtomicArray atomicArray simpleDatatype arrayDatatype simpleList arrayList declaration_t array_inValues dimlist
+
 
 %start begin
 
@@ -109,11 +114,7 @@ all_ops: arithmetic_op
       | ARROW
       ;
 
-constants: INTEGERLITERAL {$$.intVal = yylval.attr.intVal;}
-           | CHARACTERLITERAL {$$.charVal = yylval.attr.charVal;}
-           | FLOATLITERAL {$$.decVal = yylval.attr.decVal;}
-           | BOOLEANLITERAL {$$.boolVal = yylval.attr.charVal;}
-           | STRINGLITERAL {$$.stringVal = yylval.attr.stringVal;}
+constants: INTEGERLITERAL | CHARACTERLITERAL | FLOATLITERAL | BOOLEANLITERAL | STRINGLITERAL
            ;
 
 next : RHS all_ops next 
@@ -130,11 +131,32 @@ RHS :	constants
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
-nonAtomicSimple : NNUM|NDEC|NBOOL|NLET|NTEXT|NVOID ;
-atomicSimple : ANUM|ADEC|ABOOL|ALET|ATEXT;
+nonAtomicSimple : NNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NVOID {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                ;
+atomicSimple : ANUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;} 
+             | ADEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ABOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ALET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ATEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             ;
 
-nonAtomicArray : NARRNUM|NARRDEC|NARRBOOL|NARRLET|NARRTEXT;
-atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
+nonAtomicArray : NARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+               | NARRLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               ; 
+atomicArray : AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            ;
 
 
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
@@ -142,29 +164,46 @@ atomicArray : AARRNUM|AARRDEC|AARRBOOL|AARRLET|AARRTEXT;
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
 
-simpleDatatype : nonAtomicSimple|atomicSimple|NUDATATYPE|ATOMIC AUDATATYPE;
-arrayDatatype  : nonAtomicArray|atomicArray|ARRAY NARRUDATATYPE|ATOMIC ARRAY AARRUDATATYPE;
+simpleDatatype : nonAtomicSimple | atomicSimple | NUDATATYPE | ATOMIC AUDATATYPE;
 
-declarationStmt : simpleDatatype simpleList 
+arrayDatatype  : nonAtomicArray | atomicArray | ARRAY NARRUDATATYPE | ATOMIC ARRAY AARRUDATATYPE;
+
+declarationStmt : simpleDatatype simpleList {/*Here should make insertion to symtab, for all the vecotrlist and simpleDatatype attributes*/ id_vec.clear();}
                 | arrayDatatype arrayList
                 ;
 
-simpleList: IDENTIFIER
-          | simpleList COMMA IDENTIFIER
-          | IDENTIFIER EQ RHS
-          | simpleList COMMA IDENTIFIER EQ RHS
+simpleList: IDENTIFIER {$1.ID = yylval.attr.ID; id_vec.push_back($1.ID);}
+          | simpleList COMMA IDENTIFIER {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID);}
+          | IDENTIFIER EQ RHS {$1.ID = yylval.attr.ID; id_vec.push_back($1.ID); /*There should be a type check for RHS and dt_state*/}
+          | simpleList COMMA IDENTIFIER EQ RHS {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID); /*There should be a type check for RHS and dt_state*/}
           ;
 
-arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
+arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
+                     $1.ID = yylval.attr.ID;
+                     id_vec.push_back($1.ID);
+                     dim_vec.clear();
+              }
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
+                     $3.ID = yylval.attr.ID;
+                     id_vec.push_back($3.ID);
+                     dim_vec.clear();
+          }
+          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
+                     $1.ID = yylval.attr.ID;
+                     id_vec.push_back($1.ID);
+                     dim_vec.clear();
+          }
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
+                     $3.ID = yylval.attr.ID;
+                     id_vec.push_back($3.ID);
+                     dim_vec.clear();
+          }
           ;
 
-array_inValues: INTEGERLITERAL | IDENTIFIER ;
+array_inValues: INTEGERLITERAL {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
 
-dimlist : dimlist COMMA array_inValues
-        | array_inValues
+dimlist : dimlist COMMA array_inValues {dim_vec.push_back($3.intVal);}
+        | array_inValues {dim_vec.push_back($3.intVal);}
         ;
 
 LHS : IDENTIFIER
@@ -342,7 +381,7 @@ func_scope: declaration
           | SCOPEOPEN func_statements SCOPECLOSE
           | method_invoke2
           ;
-       
+
 func_statements: func_scope func_statements
                | 
                ;
@@ -412,12 +451,22 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE TYPENAME { fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
+type_declaration: TYPE TYPENAME { $2.datatype = yylval.attr.datatype; t_state = $2.datatype; /* Create type table function */ fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
                 ;
 
-type_scope: declaration type_scope |  ;
+type_scope: declaration_t {/*Here, we have to push_back to the vector of type with name dt_state*/} type_scope |  ;
 
+declaration_t : declarationStmt_t SEMICOLON { fprintf(yyout, " : declaration statement"); }
+            ;
 
+declarationStmt_t : simpleDatatype simpleList {/*Insert in the typetable of the t_state full vectorlist. is_array,is_atomic attr false, datatype will be there*/ 
+                     for(int i = 0; i <id_vec.size(); i++)
+                     {
+                            std::cout << id_vec[i] << " " << dt_state << " " << t_state << "\n";
+                     }
+                     id_vec.clear();}
+                | arrayDatatype arrayList
+                ;
 
 methods: methods method
        | 
