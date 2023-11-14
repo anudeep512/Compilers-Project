@@ -19,6 +19,7 @@
 #define TASK_NOT_FOUND 12
 #define REDECLARATION_OF_FUNCTION 13
 #define RETURN_TYPE_ERROR 14
+#define IN_SCOPE_ERROR 15 
 // Redeclaration error
 // Variable not found
 // Array out of bounds

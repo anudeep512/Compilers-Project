@@ -4,6 +4,10 @@
   #include <vector>
   #include<fstream>
   #include <climits>
+  #include "errors.hpp"
+  #include "symbol_table.hpp"
+  #include "semantics.hpp"
+
   using namepsace std;
   extern int yylex();
   extern int yylineno;
@@ -13,27 +17,30 @@
   char *t_state; // Type i.e., class state
   vector<char *> id_vec;
   vector<vector<int> > dim_vec;
-  GlobalTable * global_ptr = new GlobalTable();
-  IdentifierTable * i_tb ;
+  GlobalTable * g_tb = new GlobalTable();
   // Gives Pointer to current Start Table
   StartTable * s_tb ;
   // Gives Pointer to current function table in type
-  FunctionTable<TypeTable> * f_tb_type ;
+  FunctionTable<TypeTable> * f_tb ;
   // Gives Pointer to current function table in global
-  FunctionTable<GlobalTable> * f_tb_global ;
+  FunctionTable<GlobalTable> * m_tb ;
   // Gives Pointer to current type table
   TypeTable * c_tb ;
   // Gives Pointer to current task table
   TaskTable * t_tb ;
   // Used to define about scope where the variables are declared 
   // 1 -> Global
-  // 2 -> Function
-  // 3 -> Task
-  // 4 -> Method/ When type entry is done
-  // 5 -> NCL Table -> On hold for now
-  // 6 -> Start
+  // 2 -> Start
+  // 3 -> Type
+  // 4 -> Function
+  // 5 -> Task
+  // 6 -> Method
+  // 7 -> loops
+  // 8 -> conditionals
+  // 9 -> Nestings -> On hold for now
   int scopeType = 0;
-  // To keep track of scope level in the cuurrent scope
+  // To keep track of scope level in the current scope
+  // When we encouner a scopeopen then +1 is done, when scope is closed then -1 is done
   int scopeLevel = 0;
   // To keep track of the number of functions encountered until now
   int funcCountGlobal = 0;
@@ -61,10 +68,14 @@
               char* stringVal;
               char* token;
               // 1 -> Global
-              // 2 -> Function
-              // 3 -> Task
-              // 4 -> Method
-              // 5 -> NCL Table
+              // 2 -> Start
+              // 3 -> Type
+              // 4 -> Function
+              // 5 -> Task
+              // 6 -> Method
+              // 7 -> loops
+              // 8 -> conditionals
+              // 9 -> Nestings -> On hold for now
               int scopeType; // For declaration of the variable
 
        }attr;
@@ -154,15 +165,15 @@ begin :
        declaration {scopeType = 0;} begin
       | 
        {
-              f_tb_global = new FunctionTable<GlobalTable>();
-              global_ptr->f_tb.push_back(f_tb_global);
+              m_tb = new FunctionTable<GlobalTable>();
+              g_tb->f_tb.push_back(m_tb);
               scopeType = 2;
        } 
-       function {scopeType = 0;f_tb_global = NULL;funcCountGlobal++;} begin
+       function {scopeType = 0;m_tb = NULL;funcCountGlobal++;} begin
       | 
       {       
               t_tb = new TaskTable();
-              global_ptr->t_tb.push_back(t_tb);
+              g_tb->t_tb.push_back(t_tb);
               funcCountType = 0;
               scopeType = 3;
       } 
@@ -170,7 +181,7 @@ begin :
       | 
       {
               c_tb = new TypeTable();
-              global_ptr->c_tb.push_back(c_tb);
+              g_tb->c_tb.push_back(c_tb);
               scopeType = 4;
       }
        type_declaration {scopeType = 0;c_tb = NULL;TypesCount++;} begin
@@ -265,15 +276,15 @@ declarationStmt : simpleDatatype simpleList
                      // Insertion to symbol Table is done now
                      for(auto i : id_vec){
                             if(scopeType == 1){
-                                   if(search_identifier(global_ptr, $1.));
-                                   global_ptr->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                                   if(search_identifier(g_tb, $1.));
+                                   g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 2){
-                                   global_ptr->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                                   g_tb->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 3){
-                                   global_ptr->t_tb[taskCount]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                                   g_tb->t_tb[taskCount]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
                             else if(scopeType == 6){
-                                   global_ptr->s_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                                   g_tb->s_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
                             count++;
                      }

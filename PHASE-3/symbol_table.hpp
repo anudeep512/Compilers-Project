@@ -26,7 +26,8 @@ public:
   bool is_array;   // Simple or Array type
   string datatype; // Datatype of the identifier
   // dimensions[0] = 0 - not an array
-  // If array then dimensions[0], represent the size allocated to the arrayx
+  // If array then dimensions[0], represent the size allocated to the array
+  int scopeLevel;
   vector<int> dimensions;
 };
 
