@@ -8,7 +8,7 @@
   #include "symbol_table.hpp"
   #include "semantics.hpp"
 
-  using namepsace std;
+  using namespace std;
   extern int yylex();
   extern int yylineno;
   extern FILE * yyout;
@@ -19,15 +19,24 @@
   vector<vector<int> > dim_vec;
   GlobalTable * g_tb = new GlobalTable();
   // Gives Pointer to current Start Table
-  StartTable * s_tb ;
+  StartTable * s_tb = NULL ;
   // Gives Pointer to current function table in type
-  FunctionTable<TypeTable> * f_tb ;
+  FunctionTable<TypeTable> * f_tb = NULL;
   // Gives Pointer to current function table in global
-  FunctionTable<GlobalTable> * m_tb ;
+  FunctionTable<GlobalTable> * m_tb = NULL ;
   // Gives Pointer to current type table
-  TypeTable * c_tb ;
+  TypeTable * c_tb = NULL;
   // Gives Pointer to current task table
-  TaskTable * t_tb ;
+  TaskTable * t_tb = NULL;
+  // Gives pointer to Start Tables NCL Table
+  NCLTable<StartTable> * ncl_start = NULL ;
+  // Gives pointer to Method Tables NCL Table
+  NCLTable<FunctionTable<TypeTable> > * ncl_type = NULL;
+  // Gives pointer to Function Tables NCL Table
+  NCLTable<FunctionTable<GlobalTable> > * ncl_global = NULL;
+  // Gives pointer to Task Tables NCL Table
+  NCLTable<TaskTable> * ncl_task = NULL;
+  
   // Used to define about scope where the variables are declared 
   // 1 -> Global
   // 2 -> Start
@@ -35,12 +44,9 @@
   // 4 -> Function
   // 5 -> Task
   // 6 -> Method
-  // 7 -> loops
-  // 8 -> conditionals
-  // 9 -> Nestings -> On hold for now
   int scopeType = 0;
   // To keep track of scope level in the current scope
-  // When we encouner a scopeopen then +1 is done, when scope is closed then -1 is done
+  // When we encouner a scope is opened then +1 is done, when scope is closed then -1 is done
   int scopeLevel = 0;
   // To keep track of the number of functions encountered until now
   int funcCountGlobal = 0;
@@ -73,11 +79,7 @@
               // 4 -> Function
               // 5 -> Task
               // 6 -> Method
-              // 7 -> loops
-              // 8 -> conditionals
-              // 9 -> Nestings -> On hold for now
               int scopeType; // For declaration of the variable
-
        }attr;
 }
 
@@ -130,8 +132,8 @@
 %%
 all_datatypes: NUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
              | AUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
-             | NARRUDATATYPE  {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;}
-             | AARRUDATATYPE  {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;}
+             | NARRUDATATYPE  /* {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;} */
+             | AARRUDATATYPE  /* {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;} */
              | NBOOL          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
              | NDEC           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
              | NNUM           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
@@ -154,7 +156,7 @@ nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 begin :
       |       
        {
-              s_tb = global_pt->s_tb ;
+              s_tb = g_tb->s_tb ;
               scopeType = 6;
        } 
        startdec {s_tb = NULL;scopeType = 0;} begin
@@ -184,7 +186,7 @@ begin :
               g_tb->c_tb.push_back(c_tb);
               scopeType = 4;
       }
-       type_declaration {scopeType = 0;c_tb = NULL;TypesCount++;} begin
+       type_declaration {scopeType = 0;c_tb = NULL;typesCount++;} begin
       ;
 
 
@@ -273,10 +275,12 @@ arrayDatatype  : nonAtomicArray              {$$.datatype = $1.datatype; $$.is_a
 declarationStmt : simpleDatatype simpleList 
                 {
                      int count = 0;
-                     // Insertion to symbol Table is done now
+                     // Insertion to Symbol Table is done now
                      for(auto i : id_vec){
                             if(scopeType == 1){
-                                   if(search_identifier(g_tb, $1.));
+                                   if(search_identifier_out(g_tb, i)){
+                                          printError(yylineno, REDECLARATION_ERROR);
+                                   }
                                    g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 2){
                                    g_tb->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
@@ -374,10 +378,10 @@ both_assignment: assignment_statement | ROUNDOPEN assignment_statement ROUNDCLOS
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE;
 
  /*WHILE LOOP*/
-while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements SCOPECLOSE;
+while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE;
 
 
 
@@ -385,12 +389,12 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 conditional: when_statement when_default;
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE
-              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE
+when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE
+              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE
               ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE 
+when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE 
             | {;}
             ;  
 
@@ -492,7 +496,7 @@ func_decl :       FUNC IDENTIFIER COLON args COLON func_return             {$$.d
 atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return   {$$.datatype = $7.datatype ; $7.is_array = $7.is_array; fprintf(yyout, " : function declaration statement"); }
                      ;
 
-func_body : SCOPEOPEN func_statements SCOPECLOSE{$$.datatype = $2.datatype;};
+func_body : SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;} SCOPECLOSE /*{$$.datatype = $2.datatype;}*/;
 
 func_scope: declaration
           | log
@@ -503,7 +507,7 @@ func_scope: declaration
           | conditional
           | analyze_statement
           | input | output    | sleep
-          | SCOPEOPEN func_statements SCOPECLOSE
+          | SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;} SCOPECLOSE
           | method_invoke2
           ;
 
@@ -512,7 +516,7 @@ func_statements: func_scope func_statements {$$.datatype = $1.datatype;}
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope SCOPECLOSE
+task: TASK IDENTIFIER COLON args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN {scopeLevel++;} taskscope {scopeLevel--;} SCOPECLOSE
     ;
 
 taskscope: declaration taskscope
@@ -521,7 +525,7 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | SCOPEOPEN taskscope SCOPECLOSE taskscope
+        | SCOPEOPEN {scopeLevel++;} taskscope {scopeLevel--;} SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke2 taskscope
         | {;}
@@ -556,7 +560,7 @@ id     : IDENTIFIER
        
 /* START DEFINAITON */
 
-startdec: START SCOPEOPEN start SCOPECLOSE 
+startdec: START SCOPEOPEN {scopeLevel++;} start {scopeLevel--;} SCOPECLOSE 
        ;
 
 start: declaration start
@@ -568,7 +572,7 @@ start: declaration start
      | analyze_statement start
      | output start
      | input start
-     | SCOPEOPEN start SCOPECLOSE start
+     | SCOPEOPEN {scopeLevel++;} start {scopeLevel--;} SCOPECLOSE start
      | sleep start
      | method_invoke2 start
      | {;}
@@ -576,7 +580,7 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE TYPENAME { $2.datatype = yylval.attr.datatype; t_state = $2.datatype; /* Create type table function */ fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
+type_declaration: TYPE TYPENAME { $2.datatype = yylval.attr.datatype; t_state = $2.datatype; /* Create type table function */ fprintf(yyout, " : type declaration statement"); } SCOPEOPEN {scopeLevel++;} type_scope methods {scopeLevel--;} SCOPECLOSE
                 ;
 
 type_scope: declaration_t {/*Here, we have to push_back to the vector of type with name dt_state*/} type_scope |  {;};
@@ -587,13 +591,7 @@ declaration_t : declarationStmt_t SEMICOLON { fprintf(yyout, " : declaration sta
 declarationStmt_t : simpleDatatype simpleList {/*Insert in the typetable of the t_state full vectorlist. is_array,is_atomic attr false, datatype will be there*/ 
                      int count = 0;
                      // Insertion to symbol Table is done now
-                     for(auto i : id_vec){
-                            if(scopeType == 4){
 
-                                   f_tb_type->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
-                            }
-                            count++;
-                     }
                      id_vec.clear();
                      dim_vec.clear();
               }
@@ -605,9 +603,9 @@ methods: methods method
        ;
 
 method: {
-           t_tb->add_method(); /** Need to Complete **/
-           f_tb_type = t_tb->f_tb[funcCountType];
-       } func_decl SCOPEOPEN method_body {funcCountType++;} SCOPECLOSE ;
+       //     t_tb->add_method(); /** Need to Complete **/
+       //     f_tb_type = t_tb->f_tb[funcCountType];
+       } func_decl SCOPEOPEN {scopeLevel++;} method_body {funcCountType++;scopeLevel--;} SCOPECLOSE ;
 
 
 method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;
@@ -634,7 +632,7 @@ method_statements: declaration
                  | input
                  | output
                  | sleep
-                 | SCOPEOPEN method_statements SCOPECLOSE
+                 | SCOPEOPEN {scopeLevel++;} method_statements {scopeLevel--;} SCOPECLOSE
                  | method_invoke2
                  ;
 

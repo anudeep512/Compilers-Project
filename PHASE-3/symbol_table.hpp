@@ -4,6 +4,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "bison.tab.h"
+#include "errors.hpp"
+#include "semantics.hpp"
+
 using namespace std;
 
 class GlobalTable;
@@ -41,18 +45,33 @@ public:
   void add_variable(string name, bool is_atomic, bool is_array, string datatype, vector<int> dims);
 };
 
+// Whenever we enter scopes of Nested Scope, Conditional, loop scopes then we use this table
+template <class T>
+class NCLTable
+{
+public:
+  IdentifierTable<NCLTable<T> > * i_tb;
+  T *p_tb;
+  NCLTable()
+  {
+    i_tb = new IdentifierTable<NCLTable<T> >();
+    i_tb->p_tb = this;
+  }
+  void add_ncltable(string name, bool is_atomic, bool is_array, string datatype, vector<int> dims);
+  void pop_ncltable();
+};
+
+
 class StartTable
 {
 public:
-  IdentifierTable<StartTable> *i_tb;
-  vector<NCLTable<StartTable> *> ncl_tb;
-  GlobalTable *p_tb; // Parent pointer
+  NCLTable<StartTable> * ncl_tb;
+  GlobalTable *p_tb;
   StartTable()
   {
-    i_tb = new IdentifierTable<StartTable>();
-    i_tb->p_tb = this;
+    ncl_tb = new NCLTable<StartTable>();
+    ncl_tb->p_tb = this;
   }
-  void add_ncltable(StartTable *parent);
 };
 
 class GlobalTable
@@ -77,25 +96,6 @@ public:
   void add_start(GlobalTable *parent);
 };
 
-// Whenever we enter scopes of Nested Scope, Conditional, loop scopes then we use this table
-template <class T>
-class NCLTable
-{
-public:
-  IdentifierTable<NCLTable<T> > *i_tb;
-  vector<NCLTable<NCLTable<T> > *> ncl_tb;
-  T *p_tb;
-  NCLTable()
-  {
-    i_tb = new IdentifierTable<NCLTable>();
-    i_tb->p_tb = this;
-  }
-  // Adding can be:
-  // 1) Pointing to an identifier table and then adding variables to the table
-  // 2) Adding a new ncl-table object to current existing parent
-  void add_ncltable(NCLTable<T> *parent);
-};
-
 template <class T>
 class FunctionTable
 {
@@ -105,14 +105,15 @@ public:
   string return_type; // (number/decimal/letter/text/user-defined/ arrays)
 
   IdentifierTable<FunctionTable<T> > *i_tb;     // pointer to identifier table (both parameters & varaiables in this table)
-  vector<NCLTable<FunctionTable<T>  > *> ncl_tb; // pointer to NCL Tables
+  NCLTable<FunctionTable<T> > * ncl_tb; // pointer to NCL Tables
   T *p_tb;                                     // Parent pointer
   FunctionTable()
   {
     i_tb = new IdentifierTable<FunctionTable>();
+    ncl_tb = new NCLTable<FunctionTable<T> >();
     i_tb->p_tb = this;
+    ncl_tb->p_tb = this;
   }
-  void add_ncltable(FunctionTable<T> *parent);
 };
 
 class TypeTable
@@ -136,14 +137,15 @@ public:
   int num_param;
   string name;
   IdentifierTable<TaskTable> *i_tb;
-  vector<NCLTable<TaskTable> *> ncl_tb;
+  NCLTable<TaskTable> * ncl_tb;
   GlobalTable *p_tb;
   TaskTable()
   {
     i_tb = new IdentifierTable<TaskTable>();
-    i_tb->p_tb = this;
+    i_tb->p_tb = this ;
+    ncl_tb = new NCLTable<TaskTable>();
+    ncl_tb->p_tb = this ;
   }
-  void add_ncltable(TaskTable *parent);
 };
 
 // Global Search Function for an identifier
@@ -151,7 +153,10 @@ public:
 // We need to send info of type = function/ task/ variable declaration->
 // We should even mention if the identifier which we are using is assigned with the keyword in or not, then the search is changed according to that
 template <class T>
-bool search_identifier(T *cur_ptr, string id, bool is_array, vector<int> dims);
+bool search_identifier_out(T *cur_ptr, string id, bool is_array, vector<int> dims);
+
+template <class T>
+bool search_identifier_out_for_error(T *cur_ptr, string id);
 
 bool search_func_identifier(GlobalTable *global_ptr, vector<string> &func_check);
 

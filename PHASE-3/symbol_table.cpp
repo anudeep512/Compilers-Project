@@ -4,12 +4,15 @@
 #include <map>
 #include "symbol_table.hpp"
 #include "errors.hpp"
+#include "bison.tab.h"
+#include "semantics.hpp"
 using namespace std;
 extern int yylineno;
+extern int scopeLevel ;
 /*-----------------------------------------------------------------------------SEARCH FUNCTIONS-----------------------------------------------------------------------------*/
 // This function is used to search for identifier in any scope given the pointer to that scope table
 template <class T>
-bool search_identifier(T *curr_ptr, string id, bool is_array, vector<int> dims)
+bool search_identifier_out(T *curr_ptr, string id, bool is_array, vector<int> dims)
 {
   for (auto i : curr_ptr->i_tb->i_struct)
   {
@@ -43,6 +46,22 @@ bool search_identifier(T *curr_ptr, string id, bool is_array, vector<int> dims)
   }
   else
     return search_identifier(curr_ptr->p_tb, id);
+}
+
+template <class T>
+bool search_identifier_out_for_error(T *curr_ptr, string id)
+{
+  for (auto i : curr_ptr->i_tb->i_struct)
+  {
+    if (i->name == id)
+      return false;
+  }
+  if (curr_ptr->p_tb == NULL)
+  {
+    // printError(yylineno, VARIABLE_NOT_FOUND);
+    return true;
+  }
+  else return search_identifier_out_for_error(curr_ptr->p_tb, id);
 }
 
 bool search_attribute_type(GlobalTable *global_ptr, string id, string class_name, bool is_array, vector<int> dims)
@@ -287,6 +306,7 @@ void IdentifierTable<T>::add_variable(string name, bool is_atomic, bool is_array
   I->is_atomic = is_atomic;
   I->is_array = is_array;
   I->datatype = datatype;
+  I->scopeLevel = scopeLevel;
   for (auto a : dims)
     I->dimensions.push_back(a);
   this->i_struct.push_back(I);
@@ -317,55 +337,30 @@ void TypeTable::add_method(string name, int num_param, string return_type)
 
 /*-----------------------------------------------------------------------------NCL Table Functions-----------------------------------------------------------------------------*/
 template <class T>
-void NCLTable<T>::add_ncltable(NCLTable<T> *parent)
+void NCLTable<T>::add_ncltable(string name, bool is_atomic, bool is_array, string datatype, vector<int> dims)
 {
-  NCLTable<NCLTable<T> > *child = new NCLTable<NCLTable<T> >();
-  child->p_tb = parent;
-  this->ncl_tb.push_back(child);
+  IdentifierStruct *I = new IdentifierStruct();
+  I->name = name;
+  I->is_atomic = is_atomic;
+  I->is_array = is_array;
+  I->datatype = datatype;
+  I->scopeLevel = scopeLevel;
+  for (auto a : dims)
+    I->dimensions.push_back(a);
+  this->i_struct.push_back(I);
+}
+
+template <class T>
+void NCLTable<T>::pop_ncltable(){
+  int count = 0;
+  for(auto i : this->i_tb->i_struct){
+    if(i->scopeLevel == scopeLevel) count++;
+  }
+  this->i_tb->i_struct.erase(this->i_tb->i_struct.end() - count,this->i_tb->i_struct.end());
 }
 
 // If we have a NCL table object then we can perform the following
 // NCLTable<T> obj;
-// Add a nested scope -> obj.add_ncltable()
-// Add a type attribute to scope -> obj.i_tb.add_variable()
+// Add a nested scope -> obj.add_ncltable() -> then the temporary scope variable is added 
+// When we exit out of the scope we call this pop_ncl table function which erases all the current state elements
 
-/*-----------------------------------------------------------------------------Start Table Functions-----------------------------------------------------------------------------*/
-void StartTable::add_ncltable(StartTable *parent)
-{
-  NCLTable<StartTable> *child = new NCLTable<StartTable>;
-  child->p_tb = parent;
-  this->ncl_tb.push_back(child);
-}
-
-// If we have a Start Table object then we can perform the following
-// StartTable obj;
-// Add a method to its scope -> obj.add_ncltable()
-// Add a type attribute to start scope -> obj.i_tb.add_variable()
-// Adding nested scope to another ncl table -> obj.ncl_table[i].add_ncltable()
-
-/*-----------------------------------------------------------------------------Function Table Functions-----------------------------------------------------------------------------*/
-template <class T>
-void FunctionTable<T>::add_ncltable(FunctionTable<T> *parent)
-{
-  NCLTable<FunctionTable<T> > *child = new NCLTable<FunctionTable<T> >();
-  child->p_tb = parent;
-  this->ncl_tb.push_back(child);
-}
-
-// If we have a Start Table object then we can perform the following
-// FunctionTable<T> obj;
-// Add a type attribute to start scope -> obj.i_tb.add_variable()
-// Adding nested scope to another ncl table -> obj.ncl_table[i].add_ncltable()
-
-/*-----------------------------------------------------------------------------Task Table Functions-----------------------------------------------------------------------------*/
-void TaskTable::add_ncltable(TaskTable *parent)
-{
-  NCLTable<TaskTable> *child;
-  child->p_tb = parent;
-  this->ncl_tb.push_back(child);
-}
-
-// If we have a Start Table object then we can perform the following
-// TaskTable<T> obj;
-// Add a type attribute to start scope -> obj.i_tb.add_variable()
-// Adding nested scope to another ncl table -> obj.ncl_table[i].add_ncltable()
