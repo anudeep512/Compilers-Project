@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string>
 #include "bison.tab.h"
+#include "semantics.hpp"
+#include "errors.hpp"
+#include "symbol_table.hpp"
 
 extern int yyparse();
 extern FILE * yyin ;

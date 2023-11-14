@@ -1,21 +1,26 @@
 .vscode/
-lex_test.l
-bison_test.y
-testcases_temp/
-token_output/
-parsed_output/
-ex.o
-lex.yy.c
-y.output
-y.tab.c
-y.tab.h
-main.o
-main_temp.cpp
-bash_test.sh
-main_temp.o
-bison.tab.h
-bison.tab.c 
-exe
-bison.output
-
-
+PHASE - 2/lex_test.l
+PHASE - 2/bison_test.y
+PHASE - 2/testcases_temp/
+PHASE - 2/token_output/
+PHASE - 2/parsed_output/
+PHASE - 2/ex.o
+PHASE - 2/lex.yy.c
+PHASE - 2/y.output
+PHASE - 2/y.tab.c
+PHASE - 2/y.tab.h
+PHASE - 2/main.o
+PHASE - 2/main_temp.cpp
+PHASE - 2/bash_test.sh
+PHASE - 2/main_temp.o
+PHASE - 2/bison.tab.h
+PHASE - 2/bison.tab.c 
+PHASE - 2/exe
+PHASE - 2/bison.output
+PHASE-3/bash.sh
+PHASE-3/bison.output
+PHASE-3/bison.tab.c
+PHASE-3/bison.tab.h
+PHASE-3/ex.o
+PHASE-3/main.o
+PHASE-3/lex.yy.c
