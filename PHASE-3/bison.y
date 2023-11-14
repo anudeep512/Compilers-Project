@@ -167,17 +167,18 @@ atomicArray : AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.att
 
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
-
+            
 simpleDatatype : nonAtomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
                | atomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
-               | NUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+               | NUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
                | ATOMIC AUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
                ; 
 arrayDatatype  : nonAtomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | atomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | ARRAY NARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | atomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = true;}
+               | ARRAY NARRUDATATYPE  {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;}
                ;
+
 
 declarationStmt : simpleDatatype simpleList {/*Here should make insertion to symtab, for all the vecotrlist and simpleDatatype attributes*/ id_vec.clear();}
                 | arrayDatatype arrayList
