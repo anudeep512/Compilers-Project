@@ -114,7 +114,11 @@ all_ops: arithmetic_op
       | ARROW
       ;
 
-constants: INTEGERLITERAL | CHARACTERLITERAL | FLOATLITERAL | BOOLEANLITERAL | STRINGLITERAL
+constants: INTEGERLITERAL {$$.intVal = yylval.attr.intVal;}
+           | CHARACTERLITERAL {$$.charVal = yylval.attr.charVal;}
+           | FLOATLITERAL {$$.decVal = yylval.attr.decVal;}
+           | BOOLEANLITERAL {$$.boolVal = yylval.attr.charVal;}
+           | STRINGLITERAL {$$.stringVal = yylval.attr.stringVal;}
            ;
 
 next : RHS all_ops next 
@@ -164,9 +168,16 @@ atomicArray : AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.att
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
 
-simpleDatatype : nonAtomicSimple | atomicSimple | NUDATATYPE | ATOMIC AUDATATYPE;
-
-arrayDatatype  : nonAtomicArray | atomicArray | ARRAY NARRUDATATYPE | ATOMIC ARRAY AARRUDATATYPE;
+simpleDatatype : nonAtomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
+               | atomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+               | NUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+               | ATOMIC AUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+               ; 
+arrayDatatype  : nonAtomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | atomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | ARRAY NARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               ;
 
 declarationStmt : simpleDatatype simpleList {/*Here should make insertion to symtab, for all the vecotrlist and simpleDatatype attributes*/ id_vec.clear();}
                 | arrayDatatype arrayList
