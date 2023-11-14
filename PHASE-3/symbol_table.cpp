@@ -319,7 +319,7 @@ void TypeTable::add_method(string name, int num_param, string return_type)
 template <class T>
 void NCLTable<T>::add_ncltable(NCLTable<T> *parent)
 {
-  NCLTable<NCLTable<T>> *child = new NCLTable<NCLTable<T>>();
+  NCLTable<NCLTable<T> > *child = new NCLTable<NCLTable<T> >();
   child->p_tb = parent;
   this->ncl_tb.push_back(child);
 }
@@ -347,7 +347,7 @@ void StartTable::add_ncltable(StartTable *parent)
 template <class T>
 void FunctionTable<T>::add_ncltable(FunctionTable<T> *parent)
 {
-  NCLTable<FunctionTable<T>> *child = new NCLTable<FunctionTable<T>>();
+  NCLTable<FunctionTable<T> > *child = new NCLTable<FunctionTable<T> >();
   child->p_tb = parent;
   this->ncl_tb.push_back(child);
 }

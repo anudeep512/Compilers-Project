@@ -7,25 +7,5 @@
 bool is_coercible(string dt1, string dt2, string op);
 bool assignment_check(string dt1, string dt2);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif
 

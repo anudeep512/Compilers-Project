@@ -67,6 +67,7 @@ public:
   {
     i_tb = new IdentifierTable<GlobalTable>();
     p_tb = NULL;
+    s_tb = new StartTable() ;
     i_tb->p_tb = this;
   }
   void add_function(GlobalTable *parent, string id_name, int param_count, string retr_type);
@@ -80,8 +81,8 @@ template <class T>
 class NCLTable
 {
 public:
-  IdentifierTable<NCLTable<T>> *i_tb;
-  vector<NCLTable<NCLTable<T>> *> ncl_tb;
+  IdentifierTable<NCLTable<T> > *i_tb;
+  vector<NCLTable<NCLTable<T> > *> ncl_tb;
   T *p_tb;
   NCLTable()
   {
@@ -102,8 +103,8 @@ public:
   int num_param;      // number of parameters
   string return_type; // (number/decimal/letter/text/user-defined/ arrays)
 
-  IdentifierTable<FunctionTable<T>> *i_tb;     // pointer to identifier table (both parameters & varaiables in this table)
-  vector<NCLTable<FunctionTable<T>> *> ncl_tb; // pointer to NCL Tables
+  IdentifierTable<FunctionTable<T> > *i_tb;     // pointer to identifier table (both parameters & varaiables in this table)
+  vector<NCLTable<FunctionTable<T>  > *> ncl_tb; // pointer to NCL Tables
   T *p_tb;                                     // Parent pointer
   FunctionTable()
   {

@@ -3,17 +3,46 @@
   #include <string>
   #include <vector>
   #include<fstream>
-
+  using namepsace std;
   extern int yylex();
   extern int yylineno;
   extern FILE * yyout;
   void yyerror(std::string s);
   char *dt_state; // Datatype state
   char *t_state; // Type i.e., class state
-  std::vector<char *> id_vec;
-  std::vector<int> dim_vec;
+  vector<char *> id_vec;
+  vector<vector<int> > dim_vec;
+  GlobalTable * global_ptr = new GlobalTable();
+  IdentifierTable * i_tb ;
+  // Gives Pointer to current Start Table
+  StartTable * s_tb ;
+  // Gives Pointer to current function table in type
+  FunctionTable<TypeTable> * f_tb_type ;
+  // Gives Pointer to current function table in global
+  FunctionTable<GlobalTable> * f_tb_global ;
+  // Gives Pointer to current type table
+  TypeTable * c_tb ;
+  // Gives Pointer to current task table
+  TaskTable * t_tb ;
+  // Used to define about scope where the variables are declared 
+  // 1 -> Global
+  // 2 -> Function
+  // 3 -> Task
+  // 4 -> Method/ When type entry is done
+  // 5 -> NCL Table -> On hold for now
+  // 6 -> Start
+  int scopeType = 0;
+  // To keep track of scope level in the cuurrent scope
+  int scopeLevel = 0;
+  // To keep track of the number of functions encountered until now
+  int funcCountGlobal = 0;
+  // Keeping track of number of functions encountered in the type
+  int funcCountType = 0;
+  // Used to keep track of number of classes created
+  int typesCount = 0;
+  // Used to keep track number of tasks created
+  int taskCount = 0;
 %}
-
 
 %union 
 {
@@ -30,6 +59,13 @@
               bool boolVal;
               char* stringVal;
               char* token;
+              // 1 -> Global
+              // 2 -> Function
+              // 3 -> Task
+              // 4 -> Method
+              // 5 -> NCL Table
+              int scopeType; // For declaration of the variable
+
        }attr;
 }
 
@@ -89,11 +125,39 @@ logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
 begin :
-      | startdec begin
-      | declaration begin
-      | function begin
-      | task begin
-      | type_declaration begin
+      |       
+       {
+              s_tb = global_pt->s_tb ;
+              scopeType = 6;
+       } 
+       startdec {s_tb = NULL;scopeType = 0;} begin
+      | 
+       {
+              scopeType = 1;
+       }
+       declaration {scopeType = 0;} begin
+      | 
+       {
+              f_tb_global = new FunctionTable<GlobalTable>();
+              global_ptr->f_tb.push_back(f_tb_global);
+              scopeType = 2;
+       } 
+       function {scopeType = 0;f_tb_global = NULL;funcCountGlobal++;} begin
+      | 
+      {       
+              t_tb = new TaskTable();
+              global_ptr->t_tb.push_back(t_tb);
+              funcCountType = 0;
+              scopeType = 3;
+      } 
+      task {scopeType = 0;t_tb = NULL;taskCount++;} begin
+      | 
+      {
+              c_tb = new TypeTable();
+              global_ptr->c_tb.push_back(c_tb);
+              scopeType = 4;
+      }
+       type_declaration {scopeType = 0;c_tb = NULL;TypesCount++;} begin
       ;
 
 
@@ -179,11 +243,34 @@ arrayDatatype  : nonAtomicArray  {$$.datatype = $1.datatype; $$.is_array = true;
                | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
                ;
 
-declarationStmt : simpleDatatype simpleList {/*Here should make insertion to symtab, for all the vecotrlist and simpleDatatype attributes*/ id_vec.clear();}
+declarationStmt : simpleDatatype simpleList 
+                {
+                     int count = 0;
+                     // Insertion to symbol Table is done now
+                     for(auto i : id_vec){
+                            if(scopeType == 1){
+                                   if(search_identifier(global_ptr, $1.));
+                                   global_ptr->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 2){
+                                   global_ptr->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 3){
+                                   global_ptr->t_tb[taskCount]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            else if(scopeType == 6){
+                                   global_ptr->s_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            count++;
+                     }
+                     id_vec.clear();
+                     dim_vec.clear();
+                }
                 | arrayDatatype arrayList
                 ;
 
-simpleList: IDENTIFIER {$1.ID = yylval.attr.ID; id_vec.push_back($1.ID);}
+simpleList: IDENTIFIER 
+              {
+                     $1.ID = yylval.attr.ID; id_vec.push_back($1.ID);
+              }
           | simpleList COMMA IDENTIFIER {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID);}
           | IDENTIFIER EQ RHS {$1.ID = yylval.attr.ID; id_vec.push_back($1.ID); /*There should be a type check for RHS and dt_state*/}
           | simpleList COMMA IDENTIFIER EQ RHS {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID); /*There should be a type check for RHS and dt_state*/}
@@ -192,22 +279,18 @@ simpleList: IDENTIFIER {$1.ID = yylval.attr.ID; id_vec.push_back($1.ID);}
 arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
-                     dim_vec.clear();
               }
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
-                     dim_vec.clear();
           }
           | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
-                     dim_vec.clear();
           }
           | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
-                     dim_vec.clear();
           }
           ;
 
@@ -471,11 +554,18 @@ declaration_t : declarationStmt_t SEMICOLON { fprintf(yyout, " : declaration sta
             ;
 
 declarationStmt_t : simpleDatatype simpleList {/*Insert in the typetable of the t_state full vectorlist. is_array,is_atomic attr false, datatype will be there*/ 
-                     for(int i = 0; i <id_vec.size(); i++)
-                     {
-                            std::cout << id_vec[i] << " " << dt_state << " " << t_state << "\n";
+                     int count = 0;
+                     // Insertion to symbol Table is done now
+                     for(auto i : id_vec){
+                            if(scopeType == 4){
+
+                                   f_tb_type->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            count++;
                      }
-                     id_vec.clear();}
+                     id_vec.clear();
+                     dim_vec.clear();
+              }
                 | arrayDatatype arrayList
                 ;
 
@@ -483,7 +573,10 @@ methods: methods method
        | 
        ;
 
-method: func_decl SCOPEOPEN method_body SCOPECLOSE ;
+method: {
+           t_tb->add_method(); /** Need to Complete **/
+           f_tb_type = t_tb->f_tb[funcCountType];
+       } func_decl SCOPEOPEN method_body {funcCountType++;} SCOPECLOSE ;
 
 
 method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;
