@@ -3,6 +3,7 @@
   #include <string>
   #include <vector>
   #include<fstream>
+  #include <climits>
   using namepsace std;
   extern int yylex();
   extern int yylineno;
@@ -111,13 +112,28 @@
 %left COMMA
 
 
-%type<attr> constants nonAtomicSimple atomicSimple nonAtomicArray atomicArray simpleDatatype arrayDatatype simpleList arrayList declaration_t array_inValues dimlist
-
+%type<attr> all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration declarationStmt simpleDatatype arrayDatatype simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement when_default analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments file_name input nextip stringvalues output opstring nextop func_args args func_return func_decl atomic_func_decl func_body func_scope func_statements task taskscope statement statements access id startdec start type_declaration type_scope declaration_t declarationStmt_t methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body sleep task_invoke return_statement arith_operand get_invoke function 
 
 %start begin
 
 %%
-all_datatypes: NUDATATYPE | AUDATATYPE | NARRUDATATYPE | AARRUDATATYPE| NBOOL | NDEC | NNUM | NTEXT | NLET | ABOOL | ADEC | ALET | ATEXT | ANUM | nonAtomicArray | atomicArray ;
+all_datatypes: NUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | AUDATATYPE     {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | NARRUDATATYPE  {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;}
+             | AARRUDATATYPE  {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;}
+             | NBOOL          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | NDEC           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | NNUM           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | NTEXT          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | NLET           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+             | ABOOL          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ADEC           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ALET           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ATEXT          {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ANUM           {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;} 
+             | nonAtomicArray 
+             | atomicArray 
+             ;
 expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
 comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
 arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
@@ -163,7 +179,7 @@ begin :
 
 /* RHS */
 
-E : 
+E : {;}
 | SQUAREOPEN arr_access SQUARECLOSE
 ;
 
@@ -178,11 +194,11 @@ all_ops: arithmetic_op
       | ARROW
       ;
 
-constants: INTEGERLITERAL {$$.intVal = yylval.attr.intVal;}
-           | CHARACTERLITERAL {$$.charVal = yylval.attr.charVal;}
-           | FLOATLITERAL {$$.decVal = yylval.attr.decVal;}
-           | BOOLEANLITERAL {$$.boolVal = yylval.attr.charVal;}
-           | STRINGLITERAL {$$.stringVal = yylval.attr.stringVal;}
+constants: INTEGERLITERAL      {$$.intVal = yylval.attr.intVal;}
+           | CHARACTERLITERAL  {$$.charVal = yylval.attr.charVal;}
+           | FLOATLITERAL      {$$.decVal = yylval.attr.decVal;}
+           | BOOLEANLITERAL    {$$.boolVal = yylval.attr.charVal;}
+           | STRINGLITERAL     {$$.stringVal = yylval.attr.stringVal;}
            ;
 
 next : RHS all_ops next 
@@ -199,31 +215,31 @@ RHS :	constants
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
-nonAtomicSimple : NNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-                | NDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-                | NBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-                | NLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-                | NTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-                | NVOID {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+nonAtomicSimple : NNUM   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NDEC   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NBOOL  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NLET   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NTEXT  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+                | NVOID  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
                 ;
-atomicSimple : ANUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;} 
-             | ADEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
-             | ABOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
-             | ALET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
-             | ATEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+atomicSimple : ANUM   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;} 
+             | ADEC   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ABOOL  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ALET   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
+             | ATEXT  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = true;}
              ;
 
-nonAtomicArray : NARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | NARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | NARRBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
-               | NARRLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | NARRTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+nonAtomicArray : NARRNUM   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRDEC   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRBOOL  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = false; $$.is_atomic = false;}
+               | NARRLET   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRTEXT  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
                ; 
-atomicArray : AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
-            | AARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
-            | AARRBOOL {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
-            | AARRLET {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
-            | AARRTEXT {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+atomicArray : AARRNUM   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRDEC   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRBOOL  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRLET   {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+            | AARRTEXT  {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
             ;
 
 
@@ -231,16 +247,16 @@ atomicArray : AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.att
 
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
-
-simpleDatatype : nonAtomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
-               | atomicSimple {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
-               | NUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+            
+simpleDatatype : nonAtomicSimple   {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
+               | atomicSimple      {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
+               | NUDATATYPE        {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = false;}
                | ATOMIC AUDATATYPE {$$.datatype = $1.datatype; $$.is_array = false; $$.is_atomic = true;}
                ; 
-arrayDatatype  : nonAtomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | atomicArray  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | ARRAY NARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
-               | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+arrayDatatype  : nonAtomicArray              {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | atomicArray                 {$$.datatype = $1.datatype; $$.is_array = true; $$.is_atomic = true;}
+               | ARRAY NARRUDATATYPE         {$$.datatype = $2.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | ATOMIC ARRAY AARRUDATATYPE  {$$.datatype = $3.datatype; $$.is_array = true; $$.is_atomic = true;}
                ;
 
 declarationStmt : simpleDatatype simpleList 
@@ -294,10 +310,10 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
           }
           ;
 
-array_inValues: INTEGERLITERAL {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
+array_inValues: INTEGERLITERAL            {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
 
-dimlist : dimlist COMMA array_inValues {dim_vec.push_back($3.intVal);}
-        | array_inValues {dim_vec.push_back($3.intVal);}
+dimlist : dimlist COMMA array_inValues    {dim_vec.push_back($3.intVal);}
+        | array_inValues                  {dim_vec.push_back($1.intVal);}
         ;
 
 LHS : IDENTIFIER
@@ -364,17 +380,21 @@ when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional
 
  /*DEFAULT STATEMENT (occurs only once)*/
 when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN statements SCOPECLOSE 
-            | 
+            | {;}
             ;  
 
-analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM ;
+analysis_arrays: NARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | NARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = false;}
+               | AARRDEC {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+               | AARRNUM {dt_state = yylval.attr.datatype; $$.datatype = yylval.attr.datatype; $$.is_array = true; $$.is_atomic = true;}
+               ;
 
  /*ANALYSIS STATEMENT*/
 analyze_label : STRINGLITERAL | IDENTIFIER ; 
 
 analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arrays COLON analysis_arrays analyze_syntax SEMICOLON { fprintf(yyout, " : analyze statement");  } ; ;
 
-analyze_syntax   : COLON analysis_arrays analyze_syntax | ;
+analyze_syntax   : COLON analysis_arrays analyze_syntax | {;};
 
 /*calls*/
 
@@ -408,7 +428,7 @@ sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : s
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
           | ARROW IDENTIFIER
-          |
+          | {;}
           ;
 
 input : IP file_name COLON IDENTIFIER nextip
@@ -427,8 +447,8 @@ stringvalues : STRINGLITERAL
             ;
 
 /* Return */
-return_statement : RETURN RHS SEMICOLON { fprintf(yyout, " : return statement"); } ;
-                 | RETURN NVOID SEMICOLON { fprintf(yyout, " : return statement"); } ;
+return_statement : RETURN RHS SEMICOLON    {$$.datatype = $2.datatype; $$.is_atomic = $2.is_atomic; $$.is_array = $2.is_array; fprintf(yyout, " : return statement"); } ;
+                 | RETURN NVOID SEMICOLON  {$$.datatype = $2.datatype; $$.is_atomic = $2.is_atomic; $$.is_array = $2.is_array; fprintf(yyout, " : return statement"); } ;
 
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
@@ -441,34 +461,34 @@ opstring : stringvalues nextop
          ;
 
 nextop : HASH stringvalues nextop
-       |
+       | {;}
        ;
 
 
 /*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
-function:         func_decl func_body | atomic_func_decl func_body;
+function:         func_decl func_body {/*Type check for $1.datatype, $2.datatype*/printf("%s %s", $1.datatype, $2.datatype);} | atomic_func_decl func_body;
 
 func_args:        all_datatypes IDENTIFIER | func_args COMMA all_datatypes IDENTIFIER ;
 
 args: func_args | NULL_ARGS ;
 
-func_return : nonAtomic_datatypes
-            | NUDATATYPE
+func_return : nonAtomic_datatypes   {$$.datatype = $1.datatype ; $$.is_array = $1.is_array; $$.is_atomic = $1.is_atomic;}
+            | NUDATATYPE            {$$.datatype = $1.datatype ; $$.is_array = false; $$.is_atomic = false;}
             ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); } 
+func_decl :       FUNC IDENTIFIER COLON args COLON func_return             {$$.datatype = $6.datatype ; $$.is_array = $6.is_array; fprintf(yyout, " : function declaration statement"); } 
                  ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return { fprintf(yyout, " : function declaration statement"); }
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return   {$$.datatype = $7.datatype ; $7.is_array = $7.is_array; fprintf(yyout, " : function declaration statement"); }
                      ;
 
-func_body : SCOPEOPEN func_statements SCOPECLOSE;
+func_body : SCOPEOPEN func_statements SCOPECLOSE{$$.datatype = $2.datatype;};
 
 func_scope: declaration
           | log
           | task_invoke
           | func_invoke2
           | loop
-          | return_statement
+          | return_statement {$$.datatype = $1.datatype;}
           | conditional
           | analyze_statement
           | input | output    | sleep
@@ -476,8 +496,8 @@ func_scope: declaration
           | method_invoke2
           ;
 
-func_statements: func_scope func_statements
-               | 
+func_statements: func_scope func_statements {$$.datatype = $1.datatype;}
+               | {;}
                ;
 
 /* Task declaration and implemenatation scope */
@@ -493,7 +513,7 @@ taskscope: declaration taskscope
         | SCOPEOPEN taskscope SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke2 taskscope
-        | 
+        | {;}
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -514,7 +534,7 @@ statement: declaration
           ;
 
 statements: statement statements
-          | 
+          | {;}
           ;
           
           
@@ -540,7 +560,7 @@ start: declaration start
      | SCOPEOPEN start SCOPECLOSE start
      | sleep start
      | method_invoke2 start
-     |
+     | {;}
      ;
 
 /* TYPE DEFINITION */
@@ -548,7 +568,7 @@ start: declaration start
 type_declaration: TYPE TYPENAME { $2.datatype = yylval.attr.datatype; t_state = $2.datatype; /* Create type table function */ fprintf(yyout, " : type declaration statement"); } SCOPEOPEN type_scope methods SCOPECLOSE
                 ;
 
-type_scope: declaration_t {/*Here, we have to push_back to the vector of type with name dt_state*/} type_scope |  ;
+type_scope: declaration_t {/*Here, we have to push_back to the vector of type with name dt_state*/} type_scope |  {;};
 
 declaration_t : declarationStmt_t SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
@@ -570,7 +590,7 @@ declarationStmt_t : simpleDatatype simpleList {/*Insert in the typetable of the 
                 ;
 
 methods: methods method
-       | 
+       | {;}
        ;
 
 method: {
@@ -608,7 +628,7 @@ method_statements: declaration
                  ;
 
 method_body: method_statements method_body
-           |
+           | {;}
            ;
            
 %%
