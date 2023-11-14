@@ -17,6 +17,8 @@
 #define PREDICATE_ERROR 10 // Occurs when the perdicate evaluates to String 
 #define NUMBER_OF_PARAM_MISMATCH 11
 #define TASK_NOT_FOUND 12
+#define REDECLARATION_OF_FUNCTION 13
+#define RETURN_TYPE_ERROR 14
 // Redeclaration error
 // Variable not found
 // Array out of bounds
