@@ -16,7 +16,6 @@
   char *dt_state; // Datatype state
   char *t_state; // Type i.e., class state
   vector<char *> id_vec;
-  vector<vector<int> > dim_vec;
   GlobalTable * g_tb = new GlobalTable();
   // Gives Pointer to current Start Table
   StartTable * s_tb = NULL ;
@@ -56,6 +55,11 @@
   int typesCount = 0;
   // Used to keep track number of tasks created
   int taskCount = 0;
+
+  IdentifierStruct *args_tracker = new args_tracker();
+  std::vector<char *>invoke_vec;
+  std::vector<IdentifierStruct> args_vec;
+  std::vector<std::vector<int>> dim_vec = {{}};
 %}
 
 %union 
@@ -218,13 +222,13 @@ next : RHS all_ops next
 	| RHS 				
 	;
 
-RHS :	constants
-    | T
-    | TID
-    | get_invoke | method_invoke | in_stmt
-    | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
-    | ROUNDOPEN RHS ROUNDCLOSE
-    | NEG ROUNDOPEN RHS ROUNDCLOSE
+RHS :	constants {$$.datatype = $1.datatype;}
+    | T {$$.datatype = $1.datatype;}
+    | TID {$$.datatype = "number";}
+    | get_invoke {$$.datatype = "decimal";} | method_invoke {$$.datatype = $1.datatype;} | in_stmt {$$.datatype = $1.datatype;}
+    | ROUNDOPEN RHS all_ops next ROUNDCLOSE {$$.datatype = "will be replaced by iscoercible function";}
+    | ROUNDOPEN RHS ROUNDCLOSE {$$.datatype = $2.datatype;}
+    | NEG ROUNDOPEN RHS ROUNDCLOSE {$$.datatype = $3.datatype;}
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
@@ -315,30 +319,12 @@ simpleList: IDENTIFIER
           | simpleList COMMA IDENTIFIER EQ RHS {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID); /*There should be a type check for RHS and dt_state*/}
           ;
 
-arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-               /* {
-                     $1.ID = yylval.attr.ID;
-                     id_vec.push_back($1.ID);
-                     dim_vec.push_back({});
-              } */
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
-           /* {
-                     $3.ID = yylval.attr.ID;
-                     id_vec.push_back($3.ID);
-                     dim_vec.push_back({});
-          } */
-          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
-           /* {
-                     $1.ID = yylval.attr.ID;
-                     id_vec.push_back($1.ID);
-                     dim_vec.push_back({});
-          } */
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
-          /* {
-                     $3.ID = yylval.attr.ID;
-                     id_vec.push_back($3.ID);
-                     dim_vec.push_back({});
-          } */
+push_empty_rule : {dim_vec.push_back({});};
+
+arrayList : IDENTIFIER SQUAREOPEN dimlist push_empty_rule SQUARECLOSE
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist push_empty_rule SQUARECLOSE
+          | IDENTIFIER SQUAREOPEN dimlist push_empty_rule SQUARECLOSE EQ RHS 
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist push_empty_rule SQUARECLOSE EQ RHS 
           ;
 
 array_inValues: INTEGERLITERAL            {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
@@ -434,14 +420,21 @@ analyze_syntax   : COLON analysis_arrays analyze_syntax | {;};
 func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
              ;
 
-func_invoke: INVOKE IDENTIFIER COLON arguments COLON
-           | INVOKE IDENTIFIER COLON NULL_ARGS COLON
+func_invoke: INVOKE IDENTIFIER COLON arguments COLON { invoke_vec.insert(invoke_vec.begin(), $2.ID);/*Call that function, after it's use, we will clear, so I am proceeding with clear*/ 
+                     // for(int i = 0; i < invoke_vec.size(); i++)
+                     // {
+                     //        //std::cout << invoke_vec[i] << " " << yylineno << " ";
+                     // }
+                     // //std::cout << "\n";
+                      invoke_vec.clear();}
+           | INVOKE IDENTIFIER COLON NULL_ARGS COLON {invoke_vec.insert(invoke_vec.begin(), $2.ID); invoke_vec.push_back("null"); /*Check*/ invoke_vec.clear();}
           ;
 
 
-arguments : arguments COMMA RHS
-          | RHS
+arguments : arguments COMMA RHS {invoke_vec.push_back($3.datatype);}
+          | RHS {invoke_vec.push_back($1.datatype);}
           ;
+
 
 
 /*Task call using Make Parallel*/
@@ -497,39 +490,39 @@ nextop : HASH stringvalues nextop
 
 
 /*FUNCTION DECLARATION AND IMPLEMENTATION SCOPE*/
-function:         func_decl func_body {/*Type check for $1.datatype, $2.datatype*/printf("%s %s", $1.datatype, $2.datatype);} | atomic_func_decl func_body;
+function:         func_decl func_body | atomic_func_decl func_body {/*Check for matching datatypes of $1.datatype, $2.datatype*/};
 
-func_args:        all_datatypes IDENTIFIER {printf("%s\n", $2.ID);}
-         | func_args COMMA all_datatypes IDENTIFIER 
-         ;
+func_args:        all_datatypes IDENTIFIER {args_tracker->name = $2.ID; args_tracker->datatype = $1.datatype; args_tracker->is_array = $1.is_array; args_tracker->is_atomic = $1.is_atomic; args_vec.push_back(args_tracker);}
+         | func_args COMMA all_datatypes IDENTIFIER {args_tracker->name = $4.ID; args_tracker->datatype = $3.datatype; args_tracker->is_array = $3.is_array; args_tracker->is_atomic = $3.is_atomic; args_vec.push_back(args_tracker);};
 
-args: func_args | NULL_ARGS ;
+args: func_args {for(auto i: args_vec){cout << i.name << " ";}cout << "\n";}
+    | NULL_ARGS /*No need to push anything to the i_tb of the f_tb in this case so leaving empty*/;
 
-func_return : nonAtomic_datatypes   {$$.datatype = $1.datatype ; $$.is_array = $1.is_array; $$.is_atomic = $1.is_atomic;}
-            | NUDATATYPE            {$$.datatype = $1.datatype ; $$.is_array = false; $$.is_atomic = false;}
+func_return : nonAtomic_datatypes   {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype ; $$.is_array = $1.is_array; $$.is_atomic = $1.is_atomic;}
+            | NUDATATYPE            {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype ; $$.is_array = false; $$.is_atomic = false;}
             ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON func_return             {$$.datatype = $6.datatype ; $$.is_array = $6.is_array; fprintf(yyout, " : function declaration statement"); } 
+func_decl :       FUNC IDENTIFIER COLON args {/*By now name + arguments will be in args_vec. Do args check here*/} COLON func_return {dt_state = yylval.attr.datatype; $$.datatype = $6.datatype ; $$.is_array = $6.is_array; fprintf(yyout, " : function declaration statement"); } 
                  ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return   {$$.datatype = $7.datatype ; $7.is_array = $7.is_array; fprintf(yyout, " : function declaration statement"); }
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args {/*By now name + arguments will be in args_vec. Do args check here*/} COLON func_return   {dt_state = yylval.attr.datatype; $$.datatype = $7.datatype ; $7.is_array = $7.is_array; fprintf(yyout, " : function declaration statement"); }
                      ;
 
-func_body : SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;} SCOPECLOSE /*{$$.datatype = $2.datatype;}*/;
+func_body : SCOPEOPEN func_statements SCOPECLOSE{dt_state = yylval.attr.datatype; $$.datatype = $2.datatype;};
 
 func_scope: declaration
           | log
           | task_invoke
           | func_invoke2
           | loop
-          | return_statement {$$.datatype = $1.datatype;}
+          | return_statement {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype;}
           | conditional
           | analyze_statement
           | input | output    | sleep
-          | SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;} SCOPECLOSE
+          | SCOPEOPEN func_statements SCOPECLOSE
           | method_invoke2
           ;
 
-func_statements: func_scope func_statements {$$.datatype = $1.datatype;}
+func_statements: func_scope func_statements {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype;}
                | {;}
                ;
 
@@ -571,7 +564,7 @@ statements: statement statements
           ;
           
           
-access : IDENTIFIER ARROW id;
+access : IDENTIFIER ARROW id {$$.datatype = dt_state;};
 id     : IDENTIFIER
        | id ARROW IDENTIFIER
        ;
