@@ -3,7 +3,7 @@
   #include <unordered_set>
   #include <string>
   #include "bison.tab.h"
-
+  #include "errors.hpp"
   extern FILE* fp;
 
   int chkType = 0; // to track if the encountered token is type or not

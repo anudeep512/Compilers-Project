@@ -90,9 +90,9 @@ public:
     s_tb = new StartTable() ;
     i_tb->p_tb = this;
   }
-  void add_function(GlobalTable *parent, string id_name, int param_count, string retr_type);
-  void add_task(GlobalTable *parent, string id_name, int param_count, string retr_type);
-  void add_type(GlobalTable *parent, string id_name);
+  void add_function(GlobalTable *parent, string name,vector<IdentifierStruct> args , string retr_type);
+  void add_task(GlobalTable *parent, string name, int num_param, string retr_type);
+  void add_type(GlobalTable *parent, string name);
   void add_start(GlobalTable *parent);
 };
 
@@ -160,7 +160,7 @@ bool search_type_table_attributes_redeclaration(TypeTable * c_tb, string id);
 bool search_function_redeclaration(GlobalTable * g_tb, string id, vector<IdentifierStruct> args_vec);
 bool search_task_redeclaration(GlobalTable * g_tb, string id);
 bool search_type_redeclaration(GlobalTable * g_tb, string id);
-bool search_method_redeclaration(TypeTable * c_tb, string id, vector<IdentifierStruct> args_vec); // Pending
+bool search_method_redeclaration(TypeTable * c_tb, string id, vector<IdentifierStruct> args_vec);
 
 /* Search Functions */
 bool search_global_table_attribute(GlobalTable *g_tb, string id, bool is_array);

@@ -35,7 +35,8 @@
   NCLTable<FunctionTable<GlobalTable> > * ncl_function = NULL;
   // Gives pointer to Task Tables NCL Table
   NCLTable<TaskTable> * ncl_task = NULL;
-  
+  // Keeping track of number of start 
+  int startCount = 0;
   // Used to define about scope where the variables are declared 
   // 1 -> Global
   // 2 -> Start
@@ -56,7 +57,7 @@
   // Used to keep track number of tasks created
   int taskCount = 0;
 
-  IdentifierStruct *args_tracker = new args_tracker();
+  IdentifierStruct *args_tracker = new IdentifierStruct();
   std::vector<char *>invoke_vec;
   std::vector<IdentifierStruct> args_vec;
   std::vector<std::vector<int>> dim_vec = {{}};
@@ -160,7 +161,11 @@ nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 begin :
       |       
        {
-              s_tb = g_tb->s_tb ;
+              startCount++ ;
+              if(startCount > 1){
+                     cout << "Multiple Start Declared at line: " << yylineno << endl ;
+                     return 1 ;
+              }
               scopeType = 2;
        } 
        startdec {s_tb = NULL;scopeType = 0;} begin
@@ -171,23 +176,16 @@ begin :
        declaration {scopeType = 0;} begin
       | 
        {
-              m_tb = new FunctionTable<GlobalTable>();
-              g_tb->f_tb.push_back(m_tb);
               scopeType = 2;
        } 
        function {scopeType = 0;m_tb = NULL;funcCountGlobal++;} begin
       | 
       {       
-              t_tb = new TaskTable();
-              g_tb->t_tb.push_back(t_tb);
-              funcCountType = 0;
               scopeType = 3;
       } 
       task {scopeType = 0;t_tb = NULL;taskCount++;} begin
       | 
       {
-              c_tb = new TypeTable();
-              g_tb->c_tb.push_back(c_tb);
               scopeType = 4;
       }
        type_declaration {scopeType = 0;c_tb = NULL;typesCount++;} begin
@@ -447,8 +445,6 @@ for_loop: FOR SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fpri
  /*WHILE LOOP*/
 while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;} SCOPECLOSE;
 
-
-
 /*CONDITIONAL STATEMENT*/
 conditional: when_statement when_default;
 
@@ -557,7 +553,13 @@ function:         func_decl func_body | atomic_func_decl func_body {/*Check for 
 func_args:        all_datatypes IDENTIFIER {args_tracker->name = $2.ID; args_tracker->datatype = $1.datatype; args_tracker->is_array = $1.is_array; args_tracker->is_atomic = $1.is_atomic; args_vec.push_back(args_tracker);}
          | func_args COMMA all_datatypes IDENTIFIER {args_tracker->name = $4.ID; args_tracker->datatype = $3.datatype; args_tracker->is_array = $3.is_array; args_tracker->is_atomic = $3.is_atomic; args_vec.push_back(args_tracker);};
 
-args: func_args {for(auto i: args_vec){cout << i.name << " ";}cout << "\n";}
+args: func_args {
+       for(auto i: args_vec)
+       {
+              cout << i.name << " ";
+       }
+              cout << "\n";
+       }
     | NULL_ARGS /*No need to push anything to the i_tb of the f_tb in this case so leaving empty*/;
 
 func_return : nonAtomic_datatypes   {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype ; $$.is_array = $1.is_array; $$.is_atomic = $1.is_atomic;}
@@ -653,8 +655,18 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE TYPENAME { $2.datatype = yylval.attr.datatype; t_state = $2.datatype; /* Create type table function */ fprintf(yyout, " : type declaration statement"); } SCOPEOPEN {scopeLevel++;} type_scope methods {scopeLevel--;} SCOPECLOSE
-                ;
+type_declaration: TYPE TYPENAME { 
+              $2.datatype = yylval.attr.datatype; 
+              t_state = $2.datatype;
+              /* Create type table function */ fprintf(yyout, " : type declaration statement"); 
+              if(search_type_redeclaration(g_tb,$2.ID)){
+                     printError(yylineno,TYPE_REDECLARATION);
+                     return 1;
+              }
+              g_tb->add_type(g_tb, $2.ID);
+              t_tb = g_tb->t_tb[g_tb->t_tb.size()-1];
+              } SCOPEOPEN {scopeLevel++;} type_scope methods {scopeLevel--;} SCOPECLOSE
+              ;
 
 type_scope: declaration_t {/*Here, we have to push_back to the vector of type with name dt_state*/} type_scope |  {;};
 

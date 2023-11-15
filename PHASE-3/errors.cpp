@@ -26,6 +26,8 @@ void printError(int lineNumber, int errorType){
     errorStr = "Number of parameters to function call didn't match: " ;
   }else if(errorType == TASK_NOT_FOUND){
     errorStr = "Task not found at line: " ;
+  }else if(errorType == TYPE_REDECLARATION){
+    errorStr = "Type redeclaration at line: " ;
   }
 
   cout << errorStr << lineNumber << endl ;

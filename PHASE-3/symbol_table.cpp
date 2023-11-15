@@ -252,14 +252,18 @@ bool search_method(TypeTable * t_tb , vector<string> &method_check)
 /*-----------------------------------------------------------------------------Global Table Functions-----------------------------------------------------------------------------*/
 
 // This function is used to add a new function into the vector f_tb of global table
-void GlobalTable::add_function(GlobalTable *parent, string name, int num_param, string return_type)
+void GlobalTable::add_function(GlobalTable *parent, string name,vector<IdentifierStruct> args, string return_type)
 {
 
   FunctionTable<GlobalTable> *F_struct = new FunctionTable<GlobalTable>();
+  
   F_struct->name = name;
-  F_struct->num_param = num_param;
+  F_struct->num_param = args.size();
   F_struct->return_type = return_type;
   F_struct->p_tb = parent;
+  for(int i = 0;i<args.size();i++){
+    F_struct->i_tb->add_variable(args[i].name,args[i].is_atomic,args[i].is_array,args[i].datatype,args[i].dimensions);
+  }
   this->f_tb.push_back(F_struct);
 }
 

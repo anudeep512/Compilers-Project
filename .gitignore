@@ -26,3 +26,5 @@ PHASE-3/lex.yy.c
 PHASE-3/testcases/
 PHASE-3/parsed_output/
 PHASE-3/token_output/
+PHASE-3/bash.sh
+
