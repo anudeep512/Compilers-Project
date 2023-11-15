@@ -56,7 +56,7 @@
   // Used to keep track number of tasks created
   int taskCount = 0;
 
-  IdentifierStruct *args_tracker = new args_tracker();
+  IdentifierStruct *args_tracker = new IdentifierStruct();
   std::vector<char *>invoke_vec;
   std::vector<IdentifierStruct> args_vec;
   std::vector<std::vector<int>> dim_vec = {{}};
@@ -557,7 +557,7 @@ function:         func_decl func_body | atomic_func_decl func_body {/*Check for 
 func_args:        all_datatypes IDENTIFIER {args_tracker->name = $2.ID; args_tracker->datatype = $1.datatype; args_tracker->is_array = $1.is_array; args_tracker->is_atomic = $1.is_atomic; args_vec.push_back(args_tracker);}
          | func_args COMMA all_datatypes IDENTIFIER {args_tracker->name = $4.ID; args_tracker->datatype = $3.datatype; args_tracker->is_array = $3.is_array; args_tracker->is_atomic = $3.is_atomic; args_vec.push_back(args_tracker);};
 
-args: func_args {for(auto i: args_vec){cout << i.name << " ";}cout << "\n";}
+args: func_args {for(auto i: args_vec){cout << i.name << " ";}cout << "\n"; delete(args_tracker); args_tracker = new IdentifierStruct();}
     | NULL_ARGS /*No need to push anything to the i_tb of the f_tb in this case so leaving empty*/;
 
 func_return : nonAtomic_datatypes   {dt_state = yylval.attr.datatype; $$.datatype = $1.datatype ; $$.is_array = $1.is_array; $$.is_atomic = $1.is_atomic;}
