@@ -6,8 +6,6 @@ void printError(int lineNumber, int errorType){
     errorStr = "Redeclaration error at line: ";
   }else if(errorType == VARIABLE_NOT_FOUND){
     errorStr = "Variable not found error at line: ";
-  }else if(errorType == ARRAY_OUT_OF_BOUNDS){
-    errorStr = "Array access out of bounds at line: ";
   }else if(errorType = TYPE_NOT_FOUND){
     errorStr = "Type was not found at line: ";
   }else if(errorType == FUNCTION_NOT_FOUND){

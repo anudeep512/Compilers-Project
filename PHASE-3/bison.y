@@ -286,16 +286,32 @@ declarationStmt : simpleDatatype simpleList
                                    g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 2){ // Start table addition
                                    // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(s_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
                                    s_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 4){ // Function table addition
                                    // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(f_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
                                    f_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
                             else if(scopeType == 5){ // Task table addition
                                    // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(t_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
                                    t_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }else if(scopeType == 6){ // Method table addition
                                    // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(m_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
                                    m_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
                             count++;
@@ -304,6 +320,52 @@ declarationStmt : simpleDatatype simpleList
                      dim_vec.clear();
                 }
                 | arrayDatatype arrayList
+                {
+                     int count = 0;
+                     // Insertion to Symbol Table is done now
+                     for(auto i : id_vec){
+                            if(scopeType == 1){ // Global Table addition
+                                   // if(search_identifier(g_tb, $1.)); commented, should complte else throwing error
+                                   if(search_global_table(g_tb, i)) {
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 2){ // Start table addition
+                                   // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(s_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   s_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 4){ // Function table addition
+                                   // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(f_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   f_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            else if(scopeType == 5){ // Task table addition
+                                   // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(t_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   t_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 6){ // Method table addition
+                                   // Search if already exists in the current scope
+                                   if(search_current_scope_redeclaration(m_tb->ncl_tb,i)){
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   m_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            count++;
+                     }
+                     id_vec.clear();
+                     dim_vec.clear();
+                }
                 ;
 
 simpleList: IDENTIFIER 
@@ -608,13 +670,37 @@ declaration_t : declarationStmt_t SEMICOLON { fprintf(yyout, " : declaration sta
 
 declarationStmt_t : simpleDatatype simpleList {/*Insert in the typetable of the t_state full vectorlist. is_array,is_atomic attr false, datatype will be there*/ 
                      int count = 0;
-                     // Insertion to symbol Table is done now
-
+                     // Insertion to Symbol Table is done now
+                     for(auto i : id_vec){
+                            if(scopeType == 3){ // Type Table addition
+                                   if(search_type_table(t_tb, i)) {
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   t_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            count++;
+                     }
                      id_vec.clear();
                      dim_vec.clear();
               }
-                | arrayDatatype arrayList
-                ;
+                | arrayDatatype arrayList {/*Insert in the typetable of the t_state full vectorlist. is_array,is_atomic attr false, datatype will be there*/ 
+                     int count = 0;
+                     // Insertion to Symbol Table is done now
+                     for(auto i : id_vec){
+                            if(scopeType == 3){ // Type Table addition
+                                   if(search_type_table(t_tb, i)) {
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
+                                   t_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }
+                            count++;
+                     }
+                     id_vec.clear();
+                     dim_vec.clear();
+              }
+              ;
 
 methods: methods method
        | {;}

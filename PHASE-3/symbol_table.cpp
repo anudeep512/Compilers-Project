@@ -11,104 +11,100 @@ extern int yylineno;
 extern int scopeLevel ;
 /*-----------------------------------------------------------------------------SEARCH FUNCTIONS-----------------------------------------------------------------------------*/
 // This function is used to search for identifier in any scope given the pointer to that scope table
+
 template <class T>
-bool search_identifier_out(T *curr_ptr, string id, bool is_array, vector<int> dims)
-{
-  for (auto i : curr_ptr->i_tb->i_struct)
-  {
-    if (i->name == id && is_array == false)
-      return true;
-    else if (i->name == id && is_array == true)
-    {
-      if (dims.size() <= i->dimensions.size())
-      {
-        for (int j = 0; j < dims.size(); j++)
-        {
-          if (dims[j] >= i->dimensions[j])
-          {
-            // printError(yylineno, ARRAY_OUT_OF_BOUNDS);
-            return false;
-          }
-        }
-        return true;
-      }
-      else
-      {
-        // printError(yylineno, ARRAY_OUT_OF_BOUNDS);
-        return false;
-      }
-    }
+bool search_current_scope_redeclaration(NCLTable<T> * ncl_tb, string id){
+  for(auto i : ncl_tb->i_tb->i_struct){
+    if(i->name == id && i->scopeLevel == scopeLevel) return true ;
   }
-  if (curr_ptr->p_tb == NULL)
-  {
-    // printError(yylineno, VARIABLE_NOT_FOUND);
-    return false;
-  }
-  else
-    return search_identifier(curr_ptr->p_tb, id);
+  else return false ;
 }
 
 // This Function is used to search if the Given identifier is already defined in the scope of current declared variable
-bool search_global_table(GlobalTable * cur_ptr, string id){
-  for(auto i: cur_ptr->i_tb->i_struct){
+bool search_global_table_attributes_redeclaration(GlobalTable * g_tb, string id){
+  for(auto i: g_tb->i_tb->i_struct){
     if(i->name == id) return true;
   }
   return false ;
 }
 
-
-
-
-
-template <class T>
-bool search_identifier_out_for_error(T *curr_ptr, string id)
-{
-  for (auto i : curr_ptr->i_tb->i_struct)
-  {
-    if (i->name == id)
-      return false;
+// This function is used to search identifier given type table pointer
+bool search_type_table_attributes_redeclaration(TypeTable * c_tb, string id){
+  for(auto i: c_tb->i_tb->i_struct){
+    if(i->name == id) return true;
   }
-  if (curr_ptr->p_tb == NULL)
-  {
-    // printError(yylineno, VARIABLE_NOT_FOUND);
-    return true;
-  }
-  else return search_identifier_out_for_error(curr_ptr->p_tb, id);
+  return false ;
 }
 
-bool search_attribute_type(GlobalTable *global_ptr, string id, string class_name, bool is_array, vector<int> dims)
-{
-
-  for (auto k : global_ptr->c_tb)
-  {
-    if (k->name == class_name)
-    {
-      for (auto i : k->i_tb->i_struct)
-      {
-        if (i->name == id && is_array == false)
-          return true;
-        else if (i->name == id && is_array == true)
-        {
-          if (dims.size() <= i->dimensions.size())
-          {
-            for (int j = 0; j < dims.size(); j++)
-            {
-              if (dims[j] >= i->dimensions[j])
-              {
-                // printError(yylineno, ARRAY_OUT_OF_BOUNDS);
-                return false;
-              }
-            }
-            return true;
-          }
-          else
-          {
-            // printError(yylineno, TYPE_ATTR_NOT_FOUND);
-            return false;
-          }
+// This Function is used to search if the Given currently declared function is already defined or not
+bool search_function_redeclaration(GlobalTable * g_tb, string id, vector<IdentifierStruct > args_vec){
+  for(auto i: g_tb->f_tb){
+    int count = 0;
+    if(i->name == id && args_vec.size() == i->num_param){
+      for(int j = 0;j<args_vec.size();j++){
+        if(i->i_tb->i_struct[j]->datatype == args_vec[j].datatype){
+          count++;
         }
       }
     }
+    if(count == i->num_param) return true ;
+  }
+  return false ;
+}
+
+bool search_task_redeclaration(GlobalTable * g_tb, string id){
+  for(auto i: g_tb->t_tb){
+    if(i->name == id){
+      return true ;
+    }
+  }
+  return false ;
+}
+
+bool search_type_redeclaration(GlobalTable * g_tb, string id){
+  for(auto i: g_tb->c_tb){
+    if(i->name == id){
+      return true ;
+    }
+  }
+  return false ;
+}
+
+// This Function is used to search if the Given currently declared method already exists or not in the class
+bool search_method_redeclaration(TypeTable * c_tb, string id, vector<IdentifierStruct > args_vec){
+  for(auto i: c_tb->m_tb){
+    int count = 0;
+    if(i->name == id && args_vec.size() == i->num_param){
+      for(int j = 0;j<args_vec.size();j++){
+        if(i->i_tb->i_struct[j]->datatype == args_vec[j].datatype){
+          count++;
+        }
+      }
+    }
+    if(count == i->num_param) return true ;
+  }
+  return false ;
+}
+
+
+bool search_global_table_attribute(GlobalTable *g_tb, string id, bool is_array)
+{
+  for (auto k : g_tb->i_tb->i_struct)
+  {
+    if ( k->name == id && k->is_array == is_array)
+    {
+      return true ;
+    }
+  }
+  return false;
+}
+
+bool search_type_attribute(TypeTable *t_tb, string id, bool is_array)
+{
+  for (auto i : t_tb->i_tb->i_struct)
+  {
+    if (i->name == id && i->is_array == is_array)
+      return true;
   }
   return false;
 }
@@ -116,20 +112,21 @@ bool search_attribute_type(GlobalTable *global_ptr, string id, string class_name
 // func_check is a vector where
 // func_check[0] = function name
 // func_check[i] = arguments data type -> for i >= 2
-bool search_func_identifier(GlobalTable *global_ptr, vector<string> &func_check)
+bool search_function(GlobalTable *g_tb, vector<string> &func_check)
 {
   string func_name = func_check[0];
 
-  for (auto i : global_ptr->f_tb)
+  for (auto i : g_tb->f_tb)
   {
     if (i->name == func_name)
     {
+      if (func_check[1] == "null")
+        return true;
       if ((func_check.size() - 1) != i->num_param)
       {
         break;
       }
-      if (func_check[1] == "null")
-        return true;
+
       int a = 1;
       for (auto j : i->i_tb->i_struct)
       {
@@ -155,13 +152,15 @@ bool search_func_identifier(GlobalTable *global_ptr, vector<string> &func_check)
 // func_check is a vector where
 // func_check[0] = function name
 // func_check[i] = arguments data type -> for i >= 1
-bool search_task_identifier(GlobalTable *global_ptr, vector<string> &task_check)
+bool search_task(GlobalTable *g_tb, vector<string> &task_check)
 {
   string task_name = task_check[0];
-  for (auto i : global_ptr->t_tb)
+  for (auto i : g_tb->t_tb)
   {
     if (i->name == task_name)
     {
+      if (task_check[1] == "null")
+        return true;
       if ((task_check.size() - 1) != i->num_param)
       {
         // printError(yylineno, NUMBER_OF_PARAM_MISMATCH);
@@ -197,9 +196,9 @@ bool search_task_identifier(GlobalTable *global_ptr, vector<string> &task_check)
     -  Whenever an attribute is accessed, check if there is an attribute with that identifier
     -  Whenever a class method is accessed, search of there is a function with that name and those parameters
 */
-bool search_type_idenitifer(GlobalTable *global_ptr, string id)
+bool search_type(GlobalTable *g_tb, string id)
 {
-  for (auto i : global_ptr->c_tb)
+  for (auto i : g_tb->c_tb)
   {
     if (i->name == id)
       return true;
@@ -210,18 +209,15 @@ bool search_type_idenitifer(GlobalTable *global_ptr, string id)
 
 // Global Functions -> Functions
 // Class Functions -> Methods
-bool search_method(GlobalTable *global_ptr, string class_name, vector<string> &method_check)
+bool search_method(TypeTable * t_tb , vector<string> &method_check)
 {
   string method = method_check[0];
-
-  for (auto k : global_ptr->c_tb)
-  {
-    if (k->name == class_name)
-    {
-      for (auto i : k->m_tb)
+      for (auto i : t_tb->m_tb)
       {
         if (i->name == method)
         {
+      if (method_check[1] == "null")
+        return true;
           // For Handling function overloading
           if (method_check.size() - 1 != i->num_param)
           {
@@ -250,9 +246,6 @@ bool search_method(GlobalTable *global_ptr, string class_name, vector<string> &m
       }
       // printError(yylineno, METHOD_NOT_FOUND);
       return false;
-    }
-  }
-  return false;
 }
 
 /*-----------------------------------------------------------------------------ADD FUNCTIONS-----------------------------------------------------------------------------*/

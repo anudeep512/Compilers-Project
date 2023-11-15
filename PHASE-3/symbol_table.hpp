@@ -148,28 +148,32 @@ public:
   }
 };
 
-// Global Search Function for an identifier
-// Use -> if the identifier name string is sent as input then outputs if it is present or not->
-// We need to send info of type = function/ task/ variable declaration->
-// We should even mention if the identifier which we are using is assigned with the keyword in or not, then the search is changed according to that
+/* Redeclaration error search functions */
 template <class T>
-bool search_identifier_out(T *cur_ptr, string id, bool is_array, vector<int> dims);
+bool search_current_scope_redeclaration(NCLTable<T> * ncl_tb, string id);
 
-bool search_global_table(GlobalTable *cur_ptr, string id);
+// For Global Table and Type Table 
+// attributes Global Table -> Global Variable declarations
+// attributes Type Table -> Class attributes
+bool search_global_table_attributes_redeclaration(GlobalTable * g_tb, string id);
+bool search_type_table_attributes_redeclaration(TypeTable * c_tb, string id);
+bool search_function_redeclaration(GlobalTable * g_tb, string id, vector<IdentifierStruct> args_vec);
+bool search_task_redeclaration(GlobalTable * g_tb, string id);
+bool search_type_redeclaration(GlobalTable * g_tb, string id);
+bool search_method_redeclaration(TypeTable * c_tb, string id, vector<IdentifierStruct> args_vec); // Pending
 
+/* Search Functions */
+bool search_global_table_attribute(GlobalTable *g_tb, string id, bool is_array);
 
-template <class T>
-bool search_identifier_out_for_error(T *cur_ptr, string id);
+bool search_type_attribute(TypeTable *t_tb, string id, string class_name, bool is_array, vector<int> dims);
 
-bool search_func_identifier(GlobalTable *global_ptr, vector<string> &func_check);
+bool search_function(GlobalTable *g_tb, vector<string> &func_check);
 
-bool search_task_identifier(GlobalTable *global_ptr, vector<string> &task_check);
+bool search_task(GlobalTable *g_tb, vector<string> &task_check);
 
-bool search_attribute_type(GlobalTable *global_ptr, string id, string class_name, bool is_array, vector<int> dims);
+bool search_type(GlobalTable *g_tb, string id);
 
-bool search_type_idenitifer(GlobalTable *g_ptr, string id);
-
-bool search_method(GlobalTable *global_ptr, string class_name, vector<string> &method_check);
+bool search_method(TypeTable * t_tb, vector<string> &method_check);
 
 #endif
 
