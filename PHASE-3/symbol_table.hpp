@@ -121,7 +121,7 @@ class TypeTable
 public:
   string name;
   IdentifierTable<TypeTable> *i_tb;
-  vector<FunctionTable<TypeTable> *> f_tb;
+  vector<FunctionTable<TypeTable> *> m_tb;
   GlobalTable *p_tb;
   TypeTable()
   {
@@ -154,6 +154,9 @@ public:
 // We should even mention if the identifier which we are using is assigned with the keyword in or not, then the search is changed according to that
 template <class T>
 bool search_identifier_out(T *cur_ptr, string id, bool is_array, vector<int> dims);
+
+bool search_global_table(GlobalTable *cur_ptr, string id);
+
 
 template <class T>
 bool search_identifier_out_for_error(T *cur_ptr, string id);

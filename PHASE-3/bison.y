@@ -21,9 +21,9 @@
   // Gives Pointer to current Start Table
   StartTable * s_tb = NULL ;
   // Gives Pointer to current function table in type
-  FunctionTable<TypeTable> * f_tb = NULL;
+  FunctionTable<TypeTable> * m_tb = NULL;
   // Gives Pointer to current function table in global
-  FunctionTable<GlobalTable> * m_tb = NULL ;
+  FunctionTable<GlobalTable> * f_tb = NULL ;
   // Gives Pointer to current type table
   TypeTable * c_tb = NULL;
   // Gives Pointer to current task table
@@ -31,9 +31,9 @@
   // Gives pointer to Start Tables NCL Table
   NCLTable<StartTable> * ncl_start = NULL ;
   // Gives pointer to Method Tables NCL Table
-  NCLTable<FunctionTable<TypeTable> > * ncl_type = NULL;
+  NCLTable<FunctionTable<TypeTable> > * ncl_method = NULL;
   // Gives pointer to Function Tables NCL Table
-  NCLTable<FunctionTable<GlobalTable> > * ncl_global = NULL;
+  NCLTable<FunctionTable<GlobalTable> > * ncl_function = NULL;
   // Gives pointer to Task Tables NCL Table
   NCLTable<TaskTable> * ncl_task = NULL;
   
@@ -157,7 +157,7 @@ begin :
       |       
        {
               s_tb = g_tb->s_tb ;
-              scopeType = 6;
+              scopeType = 2;
        } 
        startdec {s_tb = NULL;scopeType = 0;} begin
       | 
@@ -277,16 +277,26 @@ declarationStmt : simpleDatatype simpleList
                      int count = 0;
                      // Insertion to Symbol Table is done now
                      for(auto i : id_vec){
-                            if(scopeType == 1){
+                            if(scopeType == 1){ // Global Table addition
                                    // if(search_identifier(g_tb, $1.)); commented, should complte else throwing error
+                                   if(search_global_table(g_tb, i)) {
+                                          printError(yylineno,REDECLARATION_ERROR);
+                                          return 1;
+                                   }
                                    g_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
-                            }else if(scopeType == 2){
-                                   g_tb->f_tb[funcCountGlobal]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
-                            }else if(scopeType == 3){
-                                   g_tb->t_tb[taskCount]->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 2){ // Start table addition
+                                   // Search if already exists in the current scope
+                                   s_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 4){ // Function table addition
+                                   // Search if already exists in the current scope
+                                   f_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
-                            else if(scopeType == 6){
-                                   g_tb->s_tb->i_tb->add_variable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            else if(scopeType == 5){ // Task table addition
+                                   // Search if already exists in the current scope
+                                   t_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
+                            }else if(scopeType == 6){ // Method table addition
+                                   // Search if already exists in the current scope
+                                   m_tb->ncl_tb->add_ncltable(i,$1.is_atomic, $2.is_array, $1.datatype, dim_vec[count]);
                             }
                             count++;
                      }
@@ -305,26 +315,30 @@ simpleList: IDENTIFIER
           | simpleList COMMA IDENTIFIER EQ RHS {$3.ID = yylval.attr.ID; id_vec.push_back($3.ID); /*There should be a type check for RHS and dt_state*/}
           ;
 
-arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
+arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+               /* {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
                      dim_vec.push_back({});
-              }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE {
+              } */
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
+           /* {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
                      dim_vec.push_back({});
-          }
-          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
+          } */
+          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS
+           /* {
                      $1.ID = yylval.attr.ID;
                      id_vec.push_back($1.ID);
                      dim_vec.push_back({});
-          }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS {
+          } */
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+          /* {
                      $3.ID = yylval.attr.ID;
                      id_vec.push_back($3.ID);
                      dim_vec.push_back({});
-          }
+          } */
           ;
 
 array_inValues: INTEGERLITERAL            {$1.intVal = yylval.attr.intVal; $$.intVal = $1.intVal;} | IDENTIFIER {$$.intVal = INT_MAX;};
@@ -606,10 +620,7 @@ methods: methods method
        | {;}
        ;
 
-method: {
-       //     t_tb->add_method(); /** Need to Complete **/
-       //     f_tb_type = t_tb->f_tb[funcCountType];
-       } func_decl SCOPEOPEN {scopeLevel++;} method_body {funcCountType++;scopeLevel--;} SCOPECLOSE ;
+method: func_decl SCOPEOPEN {scopeLevel++;} method_body {funcCountType++;scopeLevel--;} SCOPECLOSE ;
 
 
 method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;

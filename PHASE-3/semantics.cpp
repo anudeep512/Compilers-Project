@@ -5,18 +5,68 @@
 // This is required in semantic analysis for typechecking
 // We don't have operator overloading 
 // We even don't have move operator and = operation
-bool is_coercible(string dt1, string dt2, string op){
-  if(op == "#") return true ; // Resultant expression is changed to string
-  if(dt1 == "text" && dt2 =="text" && (op == ">" || op == "<" || op == "<=" || op == ">=" || op == "==" || op == "!=")){
-    return true ;
+string is_coercible(string dt1, string dt2, string op){
+  if(op == "#" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool" || dt1 == "text") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool" || dt2 == "text")){ 
+    return "text" ; // Resultant expression is changed to string
   }
-  else if(dt1 != "text" && dt2 != "text" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op =="&&" || op == "||" || op == ">" || op == "<" || op == "<=" || op == ">=" || op == "==" || op == "!=")){
-    return true ;
+  string res = dt1 + dt2 ;
+  if(dt1 == "texttext" && (op == ">" || op == "<" || op == "<=" || op == ">=" || op == "==" || op == "!=")){
+    return "bool" ;
+  }else if(res == "numbernumber" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%")){
+    return "number";
+  }else if(res == "numbernumber" && (op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" )){
+    return "bool" ;
+  }else if(res == "decimaldecimal" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^")){
+    return "decimal";
+  }else if(res == "decimaldecimal" && (op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" )){
+    return "bool" ;
+  }else if(res == "boolbool" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%")){
+    return "number";
+  }else if(res == "boolbool" && (op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" )){
+    return "bool";
+  }else if(res == "letterletter" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%")){
+    return "number";
+  }else if(res == "letterletter" && (op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" )){
+    return "bool";
   }
-  else if(dt1 == "number" && dt2 == "number" && op == "%"){
-    return true ;
+  else if((res == "numberbool" || res == "boolnumber") && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%")){
+    return "number" ;
   }
-  return false ;
+  else if((res == "numberbool" || res == "boolnumber")&&(op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" )){
+    return "bool";
+  }
+  else if((res == "numberdecimal")||(res == "decimalnumber") && ((op == "/" || op == "*" || op == "+" || op == "-" || op == "^"))){
+    return "decimal";
+  }
+  else if((res=="numberdecimal"||res=="decimalnumber") && ((op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" ))){
+    return "bool" ;
+  }
+  else if((res == "numberletter")||(res == "letternumber") && ((op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%"))){
+    return "number";
+  }
+  else if((res=="numberletter"||res=="letternumber") && ((op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" ))){
+    return "bool" ;
+  }
+  else if((res == "booldecimal")||(res == "decimalbool") && ((op == "/" || op == "*" || op == "+" || op == "-" || op == "^"))){
+    return "decimal";
+  }
+  else if((res=="booldecimal"||res=="decimalbool") && ((op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" ))){
+    return "bool" ;
+  }
+  else if((res == "boolletter")||(res == "letterbool") && ((op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%"))){
+    return "number";
+  }
+  else if((res=="boolletter"||res=="letterbool") && ((op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" ))){
+    return "bool" ;
+  }
+  else if((res == "decimalletter")||(res == "letterdecimal") && ((op == "/" || op == "*" || op == "+" || op == "-" || op == "^"))){
+    return "decimal";
+  }
+  else if((res=="decimalletter"||res=="letterdecimal") && ((op =="&&" || op == "||" || op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=" ))){
+    return "bool" ;
+  }
+  
+  return "wrong" ;
 }
 
 bool assignment_check(string dt1 , string dt2){

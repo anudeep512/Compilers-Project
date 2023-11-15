@@ -23,3 +23,6 @@ PHASE-3/bison.tab.h
 PHASE-3/ex.o
 PHASE-3/main.o
 PHASE-3/lex.yy.c
+PHASE-3/testcases/
+PHASE-3/parsed_output/
+PHASE-3/token_output/

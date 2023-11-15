@@ -48,6 +48,18 @@ bool search_identifier_out(T *curr_ptr, string id, bool is_array, vector<int> di
     return search_identifier(curr_ptr->p_tb, id);
 }
 
+// This Function is used to search if the Given identifier is already defined in the scope of current declared variable
+bool search_global_table(GlobalTable * cur_ptr, string id){
+  for(auto i: cur_ptr->i_tb->i_struct){
+    if(i->name == id) return true;
+  }
+  return false ;
+}
+
+
+
+
+
 template <class T>
 bool search_identifier_out_for_error(T *curr_ptr, string id)
 {
@@ -206,7 +218,7 @@ bool search_method(GlobalTable *global_ptr, string class_name, vector<string> &m
   {
     if (k->name == class_name)
     {
-      for (auto i : k->f_tb)
+      for (auto i : k->m_tb)
       {
         if (i->name == method)
         {
@@ -327,7 +339,7 @@ void TypeTable::add_method(string name, int num_param, string return_type)
   F_struct->num_param = num_param;
   F_struct->return_type = return_type;
 
-  this->f_tb.push_back(F_struct);
+  this->m_tb.push_back(F_struct);
 }
 
 // If we have a Type table object then we can perform the following
