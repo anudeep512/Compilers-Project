@@ -1,0 +1,58 @@
+func factorial : number b: number 
+<<
+    number res = 1, i;
+   
+    for [(i = 1 )| (i<= b )| (i += 1) ]
+    <<
+        res *= i;
+    >>
+
+    return res;  
+>>
+
+
+func add: number a, number b: number
+<<
+    number c = (a + b);
+    return c;
+>>
+
+func add: decimal a, number b: number
+<<
+    decimal c = (a + b); $$ RHS error
+    return c;
+>>
+
+$$ function overloading
+func add: decimal a, decimal b: decimal
+<<
+    decimal c = (a + b);
+    <<
+        number x = (a - b);
+        c = (x + 2*b); $$ should update the c value in this scope, is it updating?
+    >>
+    return c;
+>>
+
+task parallelFact: null
+<<
+    number thr = tid;
+    invoke factorial:thr: ;
+>>
+
+
+start << 
+    number n = 10;
+    array number num[n];
+
+    for [ number i = 0 | (i < n) | i += 1] <<
+        num[i] = i ;
+    >>
+
+    make parallel parallelFact: 5 : 2 : null: ;
+
+    number res1 = invoke add: 10, num[1]: ;
+
+    decimal res2 = invoke add: 10.3, 2.3: ; $$ function overloading
+
+>>

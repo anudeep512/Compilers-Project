@@ -17,13 +17,4 @@ PHASE - 2/bison.tab.h
 PHASE - 2/bison.tab.c 
 PHASE - 2/exe
 PHASE - 2/bison.output
-PHASE-3/bison.output
-PHASE-3/bison.tab.c
-PHASE-3/bison.tab.h
-PHASE-3/ex.o
-PHASE-3/main.o
-PHASE-3/lex.yy.c
-PHASE-3/parsed_output/
-PHASE-3/token_output/
-PHASE-3/bash.sh
-
+PHASE-3/
