@@ -10,7 +10,7 @@
 extern int yyparse();
 extern FILE * yyin ;
 extern FILE * yyout ;
-FILE * fp;
+FILE * fp, *fcode;
 
 int main(int argc, char ** argv) {
 
@@ -26,6 +26,10 @@ int main(int argc, char ** argv) {
   std::string outputParsedPath = std::string("./parsed_output/")+argv[1]+".parsed";
   yyout = fopen(outputParsedPath.c_str(),"w");
 
+  // Code Generation
+  std::string outputCodePath = std::string("./code_output/")+argv[1]+".code";
+  fcode = fopen(outputCodePath.c_str(),"w");
+  
   int i=yyparse();
 
   return 0 ;
