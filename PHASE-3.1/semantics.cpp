@@ -19,6 +19,18 @@ to_string_vec(std::vector<char*> vec)
    return ans;
 }
 
+std::vector<std::string> to_string_vec(std::vector<char *> vec)
+{
+    std::vector<std::string> ans;
+    
+    for(auto i : vec)
+    {
+        ans.push_back(std::string(i));
+    }
+    
+    return ans;
+}
+
 string is_coercible_rhs(string dt1, string dt2, string op){
   if(op == "#" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool" || dt1 == "text") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool" || dt2 == "text")){ 
     return "text" ; // Resultant expression is changed to string
