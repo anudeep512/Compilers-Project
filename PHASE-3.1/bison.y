@@ -407,14 +407,15 @@ atomicArray : AARRNUM
 
 
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
-errorStatements: IDENTIFIER simpleList| ATOMIC IDENTIFIER simpleList| ARRAY IDENTIFIER arrayList| ATOMIC ARRAY IDENTIFIER arrayList;
+errorDatatypes: IDENTIFIER| ATOMIC IDENTIFIER| ARRAY IDENTIFIER| ATOMIC ARRAY IDENTIFIER;
 
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
-            | errorStatements SEMICOLON {/Write error here/}
+            | errorDatatypes IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};
             ;
 
-declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
-            ;
+
+/* declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
+            ; */
 
 simpleDatatype : nonAtomicSimple 
                      {
@@ -937,6 +938,7 @@ func_return : nonAtomic_datatypes
               $$.is_array = $1.is_array; 
               /*Atomic is not needed*/
             }
+            | IDENTIFIER {{printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};}
             ;
 
 func_decl :       FUNC IDENTIFIER COLON args COLON func_return 
