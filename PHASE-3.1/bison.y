@@ -407,6 +407,11 @@ atomicArray : AARRNUM
 
 
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
+errorStatements: IDENTIFIER simpleList| ATOMIC IDENTIFIER simpleList| ARRAY IDENTIFIER arrayList| ATOMIC ARRAY IDENTIFIER arrayList;
+
+declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
+            | errorStatements SEMICOLON {/Write error here/}
+            ;
 
 declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
             ;
