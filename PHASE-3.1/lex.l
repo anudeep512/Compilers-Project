@@ -483,6 +483,20 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
  /*COMMENTS*/
 {COMMENTS} ;
 
+{SINGLE_LINE_COMMENT} {
+  yytext[0] = '/';
+  yytext[1] = '/';
+  fprintf(yycode,"%s",yytext);
+  }
+
+{MULTI_LINE_COMMENT} {
+  yytext[0] = '$';
+  yytext[1] = '*';
+  yytext[yyleng-1] = '$';
+  yytext[yyleng-2] = '*';
+  fprintf(yycode,"%s",yytext);
+}
+
  /*OTHER TOKENS*/
 . {
 	fprintf(fp,"Lex Error in line: %d\n Error is: %s\n",yylineno,yytext);

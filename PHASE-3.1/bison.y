@@ -43,7 +43,7 @@
            float decVal; // If encountered a decimal constant, will store value here
            char charVal; // If encountered a character constant, will store value here
            bool boolVal; // If encountered a boolean constant, will store value here
-           bool stringVal; // If encountered a string constant, will store value here
+           char *stringVal; // If encountered a string constant, will store value here
            char *token; // If encountered a token string like for/while, will store value here
        }attr;
 }
@@ -1264,7 +1264,7 @@ methods: methods method
 
 method: func_decl_m SCOPEOPEN method_body {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE ;
 
-func_decl_m : FUNC IDENTIFIER COLON {scopeLevel++;} args COLON func_return 
+func_decl_m : FUNC IDENTIFIER{fprintf(fpcpp,"%s",$2.token)}  COLON {fprintf(fpcpp,"(")} {scopeLevel++;} args COLON {fprintf(fpcpp,")")} func_return 
               { 
               /*
               Add args as they are encountered in the IDENTIFIER TABLE, 
@@ -1275,11 +1275,11 @@ func_decl_m : FUNC IDENTIFIER COLON {scopeLevel++;} args COLON func_return
               } 
               ;
 
-method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement"); }  ;
+method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");  fprintf(fpcpp,"%s",$2.token)} ;
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON method_args COLON 
+method_invoke : INVOKE id ARROW{fprintf(fpcpp."%s",$3,token)} IDENTIFIER{fprintf(fpcpp,"%s",$4.token)} COLON {fprintf(fpcpp,"(");} method_args COLON {fprintf(fpcpp,")");}
               {
                      /* 
                      Type check: $2.datatype should be a class, and $4.ID should be a function 
@@ -1291,30 +1291,30 @@ method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON method_args COLON
                      */
               arg_dat.clear();
               }
-              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
+              /*| INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
               {
                      /*
                      Currently the t_state variable contains the datatype of id (i.e., $3). 
                      CHECK: is $3.datatype among a type set, CHECK if the IDENTIFIER, i.e, $5.ID is 
                      in the methods table whose type i t_state. If yes, then check for arguements
                      */
-              }
+              }*/
               ;
 
-in_stmt : IN ARROW IDENTIFIER 
+in_stmt : IN{fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$2.token)} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
        {
               /*
               In this check if $3.datatype = last element in the type set
               */
        }
-       | INVOKE IN ARROW IDENTIFIER COLON arguments COLON 
+       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token)} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} arguments COLON {fprintf(fpcpp,")");}
        {
               /*
               In this check if $4.ID exists in the methods table whose class is last element in the types_set
                + TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
        }
-       | INVOKE IN ARROW IDENTIFIER COLON NULL_ARGS COLON 
+       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token)} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} NULL_ARGS COLON {fprintf(fpcpp,")");}
        {
               /*
               In this check if $4.ID exists in the methods table whose class is last element in the types_set + 
@@ -1338,7 +1338,7 @@ method_statements: declaration
                  | method_invoke2
                  ;
 /* Return */
-return_statement_m : RETURN RHS SEMICOLON 
+return_statement_m : RETURN{fprintf(fpcpp,"%s",$1.token);} RHS SEMICOLON {fprintf(fpcpp,"%s",$3.token);}
               { 
                      $$.datatype = $2.datatype; 
                      $$.is_array = $2.is_array; 
@@ -1350,7 +1350,7 @@ return_statement_m : RETURN RHS SEMICOLON
                      */
                      fprintf(yyout, " : return statement"); 
               } ;
-              | RETURN NVOID SEMICOLON 
+              | RETURN {fprintf(fpcpp,"%s",$1.token);}  NVOID SEMICOLON {fprintf(fpcpp,"%s",$3.token);}
               { 
                      $$.datatype = $2.datatype; 
                      $$.is_array = $2.is_array; 
