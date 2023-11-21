@@ -89,7 +89,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement when_default analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body
+%type<attr> return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body
 
 
 %start begin
@@ -478,7 +478,7 @@ arrayDatatype  : nonAtomicArray
 
 declarationStmt : simpleDatatype  
                      {
-                            printf("%s\n",$1.datatype);
+                            // printf("%s\n",$1.datatype);
                             dt_state = ($1.datatype);
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
@@ -599,7 +599,7 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                                    return 1;
                             }
 
-                            i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
+                            i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
 
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
@@ -706,6 +706,12 @@ log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");
 
 g: IDENTIFIER EQ RHS 
        {
+              if(i_tb.searchDeclaration($1.ID)){
+                     printError(yylineno,VARIABLE_REDECLARATION_ERROR);
+              }
+              if(/* Do type check with RHS */ true){
+                     i_tb.addVariable($1.ID,dt_state,atomic_state, array_state);
+              }
               /*
               Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -713,6 +719,12 @@ g: IDENTIFIER EQ RHS
        }
  | g COMMA IDENTIFIER EQ RHS 
        {
+              if(i_tb.searchDeclaration($3.ID)){
+                     printError(yylineno,VARIABLE_REDECLARATION_ERROR);
+              }
+              if(/* Do type check with RHS */ true){
+                     i_tb.addVariable($3.ID,dt_state,atomic_state, array_state);
+              }
               /*
               Insert in Normal IDENTIFIER TABLE $2.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -732,8 +744,15 @@ both_assignment: assignment_statement
                      NO NEED TO DO ANYTHING, THE ASSIGNMENT STATEMENT RULE TAKES CARE
                      */
                 }
-                | simpleDatatype g 
+                | simpleDatatype {
+                            // printf("%s\n",$1.datatype);
+                            dt_state = ($1.datatype);
+                            array_state = $1.is_array;
+                            atomic_state = $1.is_atomic;
+                     }
+                     g 
                 {
+                     dt_state = NULL ;
                      /*
                      NO NEED TO DO ANYTHING, THE g STATEMENT RULE TAKES CARE
                      */
@@ -778,29 +797,36 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 
 
 /*CONDITIONAL STATEMENT*/
-conditional: when_statement when_default;
+conditional: when_statement;
 
 /*WHEN STATEMENT*/
 when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE
-       | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       } SCOPECLOSE extend 
+       ;
+extend : ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE
-       ;
-
- /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       } SCOPECLOSE extend 
+       | DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE 
        | {;}
-       ;  
+       ;
+
+ /*DEFAULT STATEMENT (occurs only once)*/
+/* when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE 
+       | {;}
+       ;   */
 
 analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM 
               {
@@ -1057,6 +1083,11 @@ statement: declaration
           | func_invoke2
           | task_invoke
           | analyze_statement
+          | SCOPEOPEN {scopeLevel++;} statements
+          {
+              i_tb.deleteVariables();
+              scopeLevel--;
+          } SCOPECLOSE
           | output
           | sleep
           | BREAK SEMICOLON
@@ -1097,7 +1128,7 @@ id     : IDENTIFIER
        
 /* START DEFINAITON */
 
-startdec: START { 
+startdec: START { //////////////////////////////// COMPLETED ///////////////////////////////
        fprintf(yyout, " : start declaration statement");
        scopeLevel++;
        startCount++;
