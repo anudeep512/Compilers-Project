@@ -111,6 +111,7 @@ void VariableTable::addVariable(string name, string datatype, bool is_atomic, bo
   add.name = name;
   add.is_array = is_array;
   add.is_atomic = is_atomic;
+  cout << scopeLevel << endl ;
   add.scopelevel = scopeLevel;
   this->i_tb.push_back(add);
 }
@@ -124,7 +125,7 @@ void VariableTable::deleteVariables(){
   this->i_tb.erase(this->i_tb.end() - counter, this->i_tb.end());
 }
 
-string VariableTable::searchVariable(string name){
+string VariableTable::searchVariable(string name){  
   for(int i = this->i_tb.size() - 1; i >= 0; i--){
     if(this->i_tb[i].name == name) return this->i_tb[i].datatype ;
   }

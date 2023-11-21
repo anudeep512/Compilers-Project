@@ -446,6 +446,7 @@ arrayDatatype  : nonAtomicArray
                      }
               | atomicArray 
                      {
+                            
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
@@ -465,60 +466,50 @@ arrayDatatype  : nonAtomicArray
                      }
               ;
 
-declarationStmt : simpleDatatype simpleList 
+declarationStmt : simpleDatatype  
+                     {
+                            printf("%s\n",$1.datatype);
+                            dt_state = ($1.datatype);
+                            array_state = $1.is_array;
+                            atomic_state = $1.is_atomic;
+                     } simpleList
+                | arrayDatatype  
                      {
                             dt_state = ($1.datatype);
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
-                     }
-                | arrayDatatype arrayList 
-                     {
-                            dt_state = ($1.datatype);
-                            array_state = $1.is_array;
-                            atomic_state = $1.is_atomic;
-                     }
+                     } arrayList
                 ;
 
-simpleList: IDENTIFIER 
+simpleList: IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
-                     cout << "hii" << endl ;
                             $1.datatype = (dt_state);
-                     cout << "hii" << endl ;
                             $1.is_array = array_state;
                             $1.is_atomic = atomic_state;
-                            // cout << "Current Scope: "<< scopeLevel << endl ;
                             if(i_tb.searchDeclaration($1.ID)){
                                    printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                                    return 1;
                             }
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
-                            /*
-                            Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
-                            atomic_state, Scope Level
-                            */
+                            i_tb.print();
               }
-          | simpleList COMMA IDENTIFIER 
+          | simpleList COMMA IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
                             $3.is_atomic = atomic_state;
-                            // cout << "Current Scope: "<< scopeLevel << endl ;
                             if(i_tb.searchDeclaration($3.ID)){
                                    printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                                    return 1;
                             }
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
-                            /*
-                            Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
-                            Scope Level
-                            */
+                            i_tb.print();
               }
           | IDENTIFIER EQ RHS 
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
                             $1.is_atomic = atomic_state;
-                            // cout << "Current Scope: "<< scopeLevel << endl ;
                             if(i_tb.searchDeclaration($1.ID)){
                                    printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                                    return 1;
@@ -526,6 +517,7 @@ simpleList: IDENTIFIER
                             if(/* DO LHS RHS check*/ true) ;
 
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
+                            i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state,
                             atomic_state, Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and
@@ -537,7 +529,6 @@ simpleList: IDENTIFIER
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
                             $3.is_atomic = atomic_state;
-                            // cout << "Current Scope: "<< scopeLevel << endl ;
                             if(i_tb.searchDeclaration($3.ID)){
                                    printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                                    return 1;
@@ -545,6 +536,7 @@ simpleList: IDENTIFIER
                             if(/* DO LHS RHS check*/ true) ;
 
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
+                            i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                             Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -552,7 +544,7 @@ simpleList: IDENTIFIER
               }
           ;
 
-arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -563,12 +555,13 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             }
 
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
+                            i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                             Scope Level
                             */
               }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -579,7 +572,7 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             }
 
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
-
+                            i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
                             atomic_state, Scope Level
