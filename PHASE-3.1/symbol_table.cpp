@@ -111,7 +111,7 @@ void VariableTable::addVariable(string name, string datatype, bool is_atomic, bo
   add.name = name;
   add.is_array = is_array;
   add.is_atomic = is_atomic;
-  cout << scopeLevel << endl ;
+  // cout << scopeLevel << endl ;
   add.scopelevel = scopeLevel;
   this->i_tb.push_back(add);
 }
