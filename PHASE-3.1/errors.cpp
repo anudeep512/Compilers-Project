@@ -2,8 +2,8 @@
 
 void printError(int lineNumber, int errorType){
   string errorStr = ""; 
-  if(errorType == REDECLARATION_ERROR){
-    errorStr = "Redeclaration error at line: ";
+  if(errorType == VARIABLE_REDECLARATION_ERROR){
+    errorStr = "Variable Redeclaration error at line: ";
   }else if(errorType == VARIABLE_NOT_FOUND){
     errorStr = "Variable not found error at line: ";
   }else if(errorType = TYPE_NOT_FOUND){

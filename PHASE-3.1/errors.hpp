@@ -4,7 +4,7 @@
 #include "semantics.hpp"
 #include "symbol_table.hpp"
 
-#define REDECLARATION_ERROR 1
+#define VARIABLE_REDECLARATION_ERROR 1
 #define VARIABLE_NOT_FOUND 2
 #define TYPE_NOT_FOUND 3
 #define FUNCTION_NOT_FOUND 4
@@ -16,10 +16,17 @@
 #define PREDICATE_ERROR 10 // Occurs when the perdicate evaluates to String 
 #define NUMBER_OF_PARAM_MISMATCH 11
 #define TASK_NOT_FOUND 12
-#define REDECLARATION_OF_FUNCTION 13
+#define FUNCTION_REDECLARATION_ERROR 13
 #define RETURN_TYPE_ERROR 14
 #define IN_SCOPE_ERROR 15 
 #define TYPE_REDECLARATION 16
+#define TASK_REDECLARATION_ERROR 17
+#define TYPE_ATTR_REDECLARATION 18
+#define START_ERROR 19
+/*
+  start error -> > 1 starts or 0 start
+*/
+#define START_ERROR 18 
 // Redeclaration error
 // Variable not found
 // Array out of bounds

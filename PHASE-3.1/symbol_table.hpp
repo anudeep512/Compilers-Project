@@ -22,6 +22,7 @@ typedef struct {
 typedef struct {
   string name ;
   vector<string> arguments ;
+  vector<int> is_array ;
   string return_datatype ;
   bool is_array_return_datatype ;
   bool is_function_atomic;
@@ -63,8 +64,8 @@ public:
 class FunctionTable{
 public:
   vector<function_table_row> f_tb ;
-  void addFunction(string name, vector<string> arguments, string return_datatype, bool is_array_return_datatype, bool is_function_atomic);
-  string searchFunction(string name, vector<string> arguments);
+  void addFunction(string name, vector<string> arguments, vector<int> is_array,string return_datatype, bool is_array_return_datatype, bool is_function_atomic);
+  string searchFunction(string name, vector<string> arguments, vector<int> is_array);
   void print();
 };
 
@@ -82,6 +83,7 @@ public:
   void addVariable(string name, string datatype, bool is_atomic, bool is_array); // Scope Level is setted automatically
   void deleteVariables(); // Delete all the variables in the current before exiting it
   string searchVariable(string name); // Start traversing from below and return its datatype 
+  bool searchDeclaration(string name);
   void print();
 };
 
@@ -89,7 +91,7 @@ class AttributeTable{
 public:
   vector<attribute_table_row> i_tb ;
   void addVariable(string name, string type,string datatype, bool is_atomic, bool is_array);
-  string searchAttribute(string name); // Starts traversing from below and returns the variable datatype
+  string searchAttribute(string name, string type); // Starts traversing from below and returns the variable datatype
   void print();
 };
 

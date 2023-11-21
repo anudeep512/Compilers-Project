@@ -45,19 +45,20 @@ void MethodTable::print(){
 
 /* -------------------------------------------------------- FUNCTION TABLE ----------------------------------------------------- */
 
-void FunctionTable::addFunction(string name, vector<string> arguments, string return_datatype, bool is_array_return_datatype, bool is_function_atomic){
+void FunctionTable::addFunction(string name, vector<string> arguments, vector<int> is_array, string return_datatype, bool is_array_return_datatype, bool is_function_atomic){
   function_table_row add ;
   add.arguments = arguments;
   add.is_array_return_datatype = is_array_return_datatype;
   add.is_function_atomic = is_function_atomic ;
   add.name = name ;
+  add.is_array = is_array ;
   add.return_datatype = return_datatype ;
   this->f_tb.push_back(add);
 }
 
-string FunctionTable::searchFunction(string name, vector<string> arguments){
+string FunctionTable::searchFunction(string name, vector<string> arguments, vector<int> is_array){
   for(int i = this->f_tb.size() - 1 ; i>=0 ; i-- ){
-    if(this->f_tb[i].name == name && arguments == this->f_tb[i].arguments){
+    if(this->f_tb[i].name == name && arguments == this->f_tb[i].arguments && is_array[i] == this->f_tb[i].is_array[i]){
       return this->f_tb[i].return_datatype ;
     }
   }
@@ -116,7 +117,7 @@ void VariableTable::addVariable(string name, string datatype, bool is_atomic, bo
 
 void VariableTable::deleteVariables(){
   int counter = 0;
-  for(int i = this->i_tb.size() - 1; i >= 0; i++){
+  for(int i = this->i_tb.size() - 1; i >= 0; i--){
     if(this->i_tb[i].scopelevel == scopeLevel) counter++;
     else break;
   } 
@@ -124,11 +125,19 @@ void VariableTable::deleteVariables(){
 }
 
 string VariableTable::searchVariable(string name){
-  for(int i = this->i_tb.size() - 1; i >= 0; i++){
+  for(int i = this->i_tb.size() - 1; i >= 0; i--){
     if(this->i_tb[i].name == name) return this->i_tb[i].datatype ;
   }
   return "" ;
 }
+
+bool VariableTable::searchDeclaration(string name){
+  for(int i = this->i_tb.size() - 1; i >= 0;i--){
+    if(this->i_tb[i].name == name && this->i_tb[i].scopelevel== scopeLevel) return true ;
+  }
+  return false ;
+}
+
 
 void VariableTable::print(){
   for(auto i: this->i_tb){
@@ -148,9 +157,9 @@ void AttributeTable::addVariable(string name, string type,string datatype, bool 
   this->i_tb.push_back(add);
 }
 
-string AttributeTable::searchAttribute(string name){
-  for(int i = this->i_tb.size() - 1; i >= 0; i++){
-    if(this->i_tb[i].name == name) return this->i_tb[i].datatype ;
+string AttributeTable::searchAttribute(string name, string type){
+  for(int i = this->i_tb.size() - 1; i >= 0; i--){
+    if(this->i_tb[i].name == name && this->i_tb[i].type == type) return this->i_tb[i].datatype ;
   }
   return "" ;
 }
@@ -170,7 +179,7 @@ void TypeTable::addType(string type){
 }
 
 bool TypeTable::searchType(string name){
-  for(int i = this->c_tb.size() - 1; i >= 0; i++){
+  for(int i = this->c_tb.size() - 1; i >= 0; i--){
     if(this->c_tb[i].name == name) return true ;
   }
   return false ;
