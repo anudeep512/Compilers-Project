@@ -925,12 +925,12 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON arith_expr COLON arith_expr COLON a
 get_invoke : GET ARROW TIME ;
 
 /*SLEEP STATEMENT*/
-sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
-       | SLEEP ROUNDOPEN INTEGERLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : sleep statement");  };
+sleep : SLEEP {fprintf(fpcpp,"usleep");}ROUNDOPEN {fprintf(fpcpp,"%s",$2.token);}FLOATLITERAL{fprintf(fpcpp,"%s",$3.token);} ROUNDCLOSE{fprintf(fpcpp,"%s",$4.token);} SEMICOLON {fprintf(fpcpp,"%s",$5.token); fprintf(yyout, " : sleep statement");  };
+       | SLEEP {fprintf(fpcpp,"usleep");} ROUNDOPEN {fprintf(fpcpp,"%s",$2.token);} INTEGERLITERAL {fprintf(fpcpp,"%s",$3.token);}ROUNDCLOSE {fprintf(fpcpp,"%s",$4.token);}SEMICOLON {fprintf(fpcpp,"%s",$5.token); fprintf(yyout, " : sleep statement");  };
 
 /* Grammar Rules for Input and Output*/
-file_name : ARROW STRINGLITERAL
-          | ARROW IDENTIFIER
+file_name : ARROW {fprintf(fpcpp,"%s",$1.token);} STRINGLITERAL {fprintf(fpcpp,"%s",$2.token)}
+          | ARROW {fprintf(fpcpp,"%s",$1.token);}IDENTIFIER {fprintf(fpcpp,"%s",$2.token);}
           | {;}
           ;
 
@@ -945,13 +945,13 @@ nextip : COMMA IDENTIFIER nextip
      }
     ;
 
-stringvalues : STRINGLITERAL 
-             | IDENTIFIER
+stringvalues : STRINGLITERAL {fprintf(fpcpp,"%s",$1.token);} 
+             | IDENTIFIER {fprintf(fpcpp,"%s",$1.token);}
             ;
 
 /* Return */
-return_statement : RETURN RHS SEMICOLON { $$.datatype = $2.datatype; $$.is_array = $2.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/fprintf(yyout, " : return statement"); } ;
-                 | RETURN NVOID SEMICOLON { $$.datatype = $2.datatype; $$.is_array = $2.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/ fprintf(yyout, " : return statement"); } ;
+return_statement : RETURN {fprintf(fpcpp,"%s",$1.token);} RHS SEMICOLON {fprintf(fpcpp,"%s",$3.token); $$.datatype = $2.datatype; $$.is_array = $2.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/fprintf(yyout, " : return statement"); } ;
+                 | RETURN {fprintf(fpcpp,"%s",$1.token);} NVOID SEMICOLON {fprintf(fpcpp,"%s",$3.token); $$.datatype = $2.datatype; $$.is_array = $2.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/ fprintf(yyout, " : return statement"); } ;
 
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
@@ -974,13 +974,13 @@ function: func_decl func_body
         | atomic_func_decl func_body
         ;
 
-func_args: all_datatypes IDENTIFIER 
+func_args: all_datatypes IDENTIFIER {fprintf(fpcpp,"%s",$2.token);}
        {
               decl_arg_dat.push_back(($1.ID));
               decl_arg_is_array.push_back($1.is_array);
               i_tb.addVariable($2.ID, $1.datatype, $1.is_atomic, $1.is_array);
        } /*SHOULD COME BACK and see the order they are getting stored in*/
-       | func_args COMMA all_datatypes IDENTIFIER 
+       | func_args COMMA {fprintf(fpcpp,"%s",$2.token);} all_datatypes IDENTIFIER {fprintf(fpcpp,"%s",$4.token);}
        {
               i_tb.addVariable($4.ID, $3.datatype, $3.is_atomic, $3.is_array);
               decl_arg_is_array.push_back($3.is_array);
@@ -1007,7 +1007,7 @@ func_return : nonAtomic_datatypes
             | IDENTIFIER {{printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};}
             ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON func_return 
+func_decl :       FUNC {fprintf(fpcpp,"%s",$6.token);}IDENTIFIER {fprintf(fpcpp,"%s",$2.token);}COLON {fprintf(fpcpp,"{");}args COLON {fprintf(fpcpp,"}");} func_return 
               { 
                      /*
                      Add args as they are encountered in the id_table, IN FUNCTIONS TABLE, name of the function
@@ -1023,7 +1023,7 @@ func_decl :       FUNC IDENTIFIER COLON args COLON func_return
                      
               } 
               ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return 
+atomic_func_decl :   ATOMIC FUNC {fprintf(fpcpp,"%s",$7.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}COLON {fprintf(fpcpp,"(");}args COLON {fprintf(fpcpp,")");}func_return 
                      { 
                             /*
                             Add args as they are encountered in the id_table, decl_arg_dats will be ready, return_type
@@ -1039,11 +1039,12 @@ atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return
                      }
                      ;
 
-func_body : SCOPEOPEN {scopeLevel++;} func_statements 
+func_body : SCOPEOPEN {fprintf(fpcpp,"{"; scopeLevel++;} func_statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE;
+       } SCOPECLOSE {fprintf(fpcpp,"}");}
+       ;
 
 func_scope: declaration
           | log
@@ -1054,11 +1055,11 @@ func_scope: declaration
           | conditional
           | analyze_statement
           | input | output    | sleep
-          | SCOPEOPEN {scopeLevel++;} func_statements 
+          | SCOPEOPEN {fprintf(fpcpp,"{");scopeLevel++;} func_statements 
           {
               i_tb.deleteVariables();
               scopeLevel--;
-          } SCOPECLOSE
+          } SCOPECLOSE {fprintf(fpcpp,"}");}
           | method_invoke2
           ;
 
@@ -1067,11 +1068,11 @@ func_statements: func_scope func_statements
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER{fprintf(fpcpp,"%s",$2.token);} COLON {fprintf(fpcpp,"(");scopeLevel++;} args { fprintf(fpcpp,"}");fprintf(yyout, " : task declaration statement"); } SCOPEOPEN{fprintf(fpcpp,"%s",$5.token);} taskscope 
+task: TASK {fprintf(fpcpp,"void ");}IDENTIFIER{fprintf(fpcpp,"%s",$2.token);} COLON {fprintf(fpcpp,"( int tid, ");scopeLevel++;} args { fprintf(fpcpp,"}");fprintf(yyout, " : task declaration statement"); } SCOPEOPEN{fprintf(fpcpp,"{");} taskscope 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE{fprintf(fpcpp,"%s",$7.token);}
+       } SCOPECLOSE{fprintf(fpcpp,"}");}
     ;
 
 taskscope: declaration taskscope
@@ -1080,11 +1081,11 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | SCOPEOPEN {fprintf(fpcpp,"%s",$1.token);scopeLevel++;} taskscope 
+        | SCOPEOPEN {fprintf(fpcpp,"{");scopeLevel++;} taskscope 
         {
               i_tb.deleteVariables();
               scopeLevel--;
-        } SCOPECLOSE {fprintf(fpcpp,"%s",$3.token);}taskscope
+        } SCOPECLOSE {fprintf(fpcpp,"}");}taskscope
         | sleep taskscope
         | method_invoke2 taskscope
         | {;}
