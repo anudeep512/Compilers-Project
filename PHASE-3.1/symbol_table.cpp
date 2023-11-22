@@ -34,6 +34,7 @@ string MethodTable::searchMethod(string type, string name, vector<string> argume
 }
 
 void MethodTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i : this->m_tb){
     cout << i.is_function_atomic << " " << i.type << "::" << i.name << " - " ;
     for(auto j : i.arguments){
@@ -66,6 +67,7 @@ string FunctionTable::searchFunction(string name, vector<string> arguments, vect
 }
 
 void FunctionTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i : this->f_tb){
     cout << i.is_function_atomic << " " << i.name << " - " ;
     for(auto j : i.arguments){
@@ -94,6 +96,7 @@ bool TaskTable::searchTask(string name, vector<string> arguments){
 }
 
 void TaskTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i : this->t_tb){
     cout << i.name << " - " ;
     for(auto j : i.arguments){
@@ -141,6 +144,7 @@ bool VariableTable::searchDeclaration(string name){
 
 
 void VariableTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i: this->i_tb){
     cout << i.name << " " << i.datatype << " ,is_array: " << i.is_array << " ,is_atomic: " <<i.is_atomic << " ,scopeLevel: " << i.scopelevel << endl ;
   }
@@ -166,6 +170,7 @@ string AttributeTable::searchAttribute(string name, string type){
 }
 
 void AttributeTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i: this->i_tb){
     cout << "Type: " << i.type << " , " << i.name << " , " << i.datatype << " ,is_array: " << i.is_array << " ,is_atomic: " << i.is_atomic << endl ;
   }
@@ -187,6 +192,7 @@ bool TypeTable::searchType(string name){
 }
 
 void TypeTable::print(){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
   for(auto i : this->c_tb){
     cout << i.name << endl ;
   }
