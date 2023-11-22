@@ -45,7 +45,7 @@ BOOLIT ("true"|"false")
 FLOATLIT -?[0-9]+"."[0-9]+
 
 /* Character Constant */
-CHARACTERLIT '(\\.|[^\\'])+'
+CHARACTERLIT '(\\.|[^\\'])?'
 
 /* String Constant */
 STRINGLIT	\"(\\.|[^\\"])*\"
@@ -93,9 +93,8 @@ NEWLINE [\n]
 
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
-MULTI_LINE_COMMENT         "$*"([^"*$"]|[\n])*"*$" 
+MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$" 
 COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
-
 
 %%
 

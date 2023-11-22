@@ -407,8 +407,7 @@ method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE IDENTIFIER ARROW IDENTIFIER COLON method_args COLON 
-              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON
+method_invoke : INVOKE id ARROW IDENTIFIER COLON method_args COLON
               ;
 
 in_stmt : IN ARROW IDENTIFIER
