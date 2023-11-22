@@ -199,7 +199,11 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
-begin :
+begin : {
+       if(startCount < 1){
+              printError(yylineno,START_ERROR_LESS);
+       }
+       }
       | startdec begin
       | declaration begin
       | function begin
@@ -740,7 +744,11 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE 
+for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE 
        {
               /*
               RHS.datatype is coercible with boolean?
@@ -752,7 +760,11 @@ for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQ
        };
 
  /*WHILE LOOP*/
-while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE 
+while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE 
        {
               /*
               RHS.datatype is coercible with boolean?
@@ -769,14 +781,26 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 conditional: when_statement when_default;
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE
-              | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE
-              ;
+when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE
+       | when_statement ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE
+       ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
-when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE 
-            | {;}
-            ;  
+when_default: DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE 
+       | {;}
+       ;  
 
 analysis_arrays: NARRDEC | NARRNUM | AARRDEC | AARRNUM 
               {
@@ -973,7 +997,11 @@ atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return
                      }
                      ;
 
-func_body : SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE;
+func_body : SCOPEOPEN {scopeLevel++;} func_statements 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE;
 
 func_scope: declaration
           | log
@@ -984,7 +1012,11 @@ func_scope: declaration
           | conditional
           | analyze_statement
           | input | output    | sleep
-          | SCOPEOPEN {scopeLevel++;} func_statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE
+          | SCOPEOPEN {scopeLevel++;} func_statements 
+          {
+              i_tb.deleteVariables();
+              scopeLevel--;
+          } SCOPECLOSE
           | method_invoke2
           ;
 
@@ -993,7 +1025,11 @@ func_statements: func_scope func_statements
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON {scopeLevel++;} args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE
+task: TASK IDENTIFIER COLON {scopeLevel++;} args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE
     ;
 
 taskscope: declaration taskscope
@@ -1002,7 +1038,11 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | SCOPEOPEN {scopeLevel++;} taskscope {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE taskscope
+        | SCOPEOPEN {scopeLevel++;} taskscope 
+        {
+              i_tb.deleteVariables();
+              scopeLevel--;
+        } SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke2 taskscope
         | {;}
@@ -1045,22 +1085,31 @@ id     : IDENTIFIER
        | id ARROW IDENTIFIER 
        {
               t_state = ($1.datatype); 
-              /*Type check that t_state is existing in the types_set, and it has an attribute named $3.ID*/ 
-              /*After the check is done, we are supposed to update the t_state to the last identifier type*/ 
+              /*
+                     Type check that t_state is existing in the types_set, and it has an attribute named $3.ID
+              */ 
+              /*
+                     After the check is done, we are supposed to update the t_state to the last identifier type
+              */ 
               t_state = $3.datatype;
        }
        ;
        
 /* START DEFINAITON */
 
-startdec: START SCOPEOPEN {
+startdec: START { 
+       fprintf(yyout, " : start declaration statement");
        scopeLevel++;
        startCount++;
-       if(startCount > 1){
-              printError(yylineno, START_ERROR);
-              return 1;    
-       }
-       } start {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE 
+              if(startCount > 1){
+                     printError(yylineno, START_ERROR_MORE);
+                     return 1;    
+              }
+       } SCOPEOPEN start
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE 
        ;
 
 start: declaration start
@@ -1072,7 +1121,11 @@ start: declaration start
      | analyze_statement start
      | output start
      | input start
-     | SCOPEOPEN {scopeLevel++;} start SCOPECLOSE {scopeLevel--;i_tb.deleteVariables();} start
+     | SCOPEOPEN {scopeLevel++;} start 
+     {
+       i_tb.deleteVariables();
+       scopeLevel--;
+     } SCOPECLOSE start
      | sleep start
      | method_invoke2 start
      | {;}
@@ -1090,7 +1143,12 @@ type_declaration: TYPE TYPENAME
                      curr_type = ($2.ID);
                      fprintf(yyout, " : type declaration statement"); 
 
-              } SCOPEOPEN {scopeLevel++;} type_scope methods {scopeLevel--;curr_type = NULL ;i_tb.deleteVariables();} SCOPECLOSE
+              } SCOPEOPEN {scopeLevel++;} type_scope methods 
+              {
+                     i_tb.deleteVariables();
+                     scopeLevel--;
+                     curr_type = NULL ;
+              } SCOPECLOSE
               ;
 
 type_scope: declaration_t type_scope | {;} ;
@@ -1262,7 +1320,11 @@ methods: methods method
        | {;}
        ;
 
-method: func_decl_m SCOPEOPEN method_body {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE ;
+method: func_decl_m SCOPEOPEN method_body 
+       {
+              i_tb.deleteVariables();
+              scopeLevel--;
+       } SCOPECLOSE ;
 
 func_decl_m : FUNC IDENTIFIER{fprintf(fpcpp,"%s",$2.token)}  COLON {fprintf(fpcpp,"(")} {scopeLevel++;} args COLON {fprintf(fpcpp,")")} func_return 
               { 
@@ -1334,7 +1396,11 @@ method_statements: declaration
                  | input
                  | output
                  | sleep
-                 | SCOPEOPEN {scopeLevel++;} method_statements {scopeLevel--;i_tb.deleteVariables();} SCOPECLOSE
+                 | SCOPEOPEN {scopeLevel++;} method_statements 
+                 {
+                     i_tb.deleteVariables();
+                     scopeLevel--;
+                 } SCOPECLOSE
                  | method_invoke2
                  ;
 /* Return */

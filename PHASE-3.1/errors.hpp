@@ -14,7 +14,6 @@
 #define TYPE_ERROR_RHS_LHS 8
 #define LEVEL_ERROR 9 // Need to look into this might be handled in RHS error
 #define PREDICATE_ERROR 10 // Occurs when the perdicate evaluates to String 
-#define NUMBER_OF_PARAM_MISMATCH 11
 #define TASK_NOT_FOUND 12
 #define FUNCTION_REDECLARATION_ERROR 13
 #define RETURN_TYPE_ERROR 14
@@ -22,11 +21,12 @@
 #define TYPE_REDECLARATION 16
 #define TASK_REDECLARATION_ERROR 17
 #define TYPE_ATTR_REDECLARATION 18
-#define START_ERROR 19
+#define START_ERROR_LESS 19
+#define START_ERROR_MORE 20
+
 /*
   start error -> > 1 starts or 0 start
 */
-#define START_ERROR 18 
 // Redeclaration error
 // Variable not found
 // Array out of bounds
