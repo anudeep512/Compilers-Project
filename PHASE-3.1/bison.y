@@ -193,10 +193,10 @@ all_datatypes: NUDATATYPE
               }
              ;
 
-expression_op: ASSN_DIV | ASSN_EXPONENT | ASSN_MODULO | ASSN_MUL | INCR | DECR ;
-comparison_op: LT | GT | GTEQ | LTEQ | NOT_EQ | EQUAL_TWO ;
-arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
-logical_op: AND | OR ;
+expression_op: ASSN_DIV { fprintf(fpcpp, "%s", $1); } | ASSN_EXPONENT | ASSN_MODULO { fprintf(fpcpp, "%s", $1); } | ASSN_MUL { fprintf(fpcpp, "%s", $1); } | INCR { fprintf(fpcpp, "%s", $1); } | DECR { fprintf(fpcpp, "%s", $1); } ;
+comparison_op: LT { fprintf(fpcpp, "%s", $1); } | GT { fprintf(fpcpp, "%s", $1); } | GTEQ { fprintf(fpcpp, "%s", $1); } | LTEQ { fprintf(fpcpp, "%s", $1); } | NOT_EQ { fprintf(fpcpp, "%s", $1); } | EQUAL_TWO { fprintf(fpcpp, "%s", $1); } ;
+arithmetic_op: ADD { fprintf(fpcpp, "%s", $1); } | SUB { fprintf(fpcpp, "%s", $1); } | MUL { fprintf(fpcpp, "%s", $1); } | DIV { fprintf(fpcpp, "%s", $1); } | MODULO { fprintf(fpcpp, "%s", $1); } | EXPONENT  ;
+logical_op: AND { fprintf(fpcpp, "%s", $1); } | OR { fprintf(fpcpp, "%s", $1); } ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
 
@@ -216,18 +216,18 @@ begin : {
 /* RHS */
 
 E : {;}
-| SQUAREOPEN arr_access SQUARECLOSE
+| SQUAREOPEN { fprintf(fpcpp, "%s", $1); } arr_access SQUARECLOSE { fprintf(fpcpp, "%s", $3); }
 ;
 
-T : IDENTIFIER E 
+T : IDENTIFIER { fprintf(fpcpp, "%s", $1.ID); } E 
   | func_invoke
   ;
 
 all_ops: arithmetic_op
       | comparison_op
       | logical_op
-      | HASH
-      | ARROW
+      | HASH { fprintf(fpcpp, "<<"); }
+      | ARROW { fprintf(fpcpp, "%s", $1); }
       ;
 
 constants: INTEGERLITERAL 
@@ -275,9 +275,9 @@ RHS :	constants
     | T
     | TID { fprintf(fpcpp, "%s", $1.token);}
     | get_invoke | method_invoke | in_stmt
-    | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
-    | ROUNDOPEN RHS ROUNDCLOSE
-    | NEG ROUNDOPEN RHS ROUNDCLOSE
+    | ROUNDOPEN { fprintf(fpcpp, "%s", $1); } RHS all_ops next ROUNDCLOSE { fprintf(fpcpp, "%s", $5); } 
+    | ROUNDOPEN { fprintf(fpcpp, "%s", $1); } RHS ROUNDCLOSE { fprintf(fpcpp, "%s", $3); }
+    | NEG { fprintf(fpcpp, "!"); } ROUNDOPEN { fprintf(fpcpp, "%s", $2); } RHS ROUNDCLOSE { fprintf(fpcpp, "%s", $4); }
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
@@ -419,8 +419,8 @@ atomicArray : AARRNUM
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 errorDatatypes: IDENTIFIER| ATOMIC IDENTIFIER| ARRAY IDENTIFIER| ATOMIC ARRAY IDENTIFIER;
 
-declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); fprintf(fpcpp, "%s%s", $1, $2); }
-            | errorDatatypes IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};
+declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); fprintf(fpcpp, "%s", $2); }
+            | errorDatatypes IDENTIFIER  {printf("TYPE NOT DECLARED, %d\n", yylineno); fprintf(fpcpp, "%s", $2); return 1;};
             ;
 
 
@@ -525,7 +525,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
 
                             fprintf(fpcpp, "%s%s", $2, $3.ID);
               }
-          | IDENTIFIER EQ RHS 
+          | IDENTIFIER EQ { fprintf(fpcpp, "%s%s", $1.ID, $2); } RHS 
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -544,9 +544,8 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             RHS.datatype
                             */
 
-                            fprintf(fpcpp, "%s%s", $1.ID, $2);
               }
-          | simpleList COMMA IDENTIFIER EQ RHS 
+          | simpleList COMMA IDENTIFIER EQ { fprintf(fpcpp, "%s%s%s", $2, $3.ID, $4); } RHS 
               {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -563,12 +562,10 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                             Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
                             */
-
-                            fprintf(fpcpp, "%s%s%s", $2, $3.ID, $4);
               }
           ;
 
-arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
+arrayList : IDENTIFIER SQUAREOPEN { fprintf(fpcpp, "%s%s", $1.ID, $2); } dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -584,8 +581,9 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                             Scope Level
                             */
+                            fprintf(fpcpp, "%s", $4);
               }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
+          | arrayList COMMA IDENTIFIER SQUAREOPEN {fprintf(fpcpp, "%s%s%s", $1, $2.ID, $3); }dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -601,8 +599,11 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
                             atomic_state, Scope Level
                             */
+                            
+                            fprintf(fpcpp, "%s", $4);
+
               }
-          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+          | IDENTIFIER SQUAREOPEN { fprintf(fpcpp, "%s%s", $1.ID, $2); } dimlist SQUARECLOSE EQ { fprintf(fpcpp, "%s%s", $4, $5); } RHS 
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -619,8 +620,10 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                             Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
                             */
+              
+
               }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+          | arrayList COMMA IDENTIFIER SQUAREOPEN { fprintf(fpcpp, "%s%s%s", $2, $3.ID, $4); }dimlist SQUARECLOSE EQ { fprintf(fpcpp, "%s%s", $6, $7); } RHS 
               {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -639,11 +642,11 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
               }
           ;
 
-array_inValues: INTEGERLITERAL {$$.intVal = $1.intVal;}
-              | IDENTIFIER {$$.intVal = INT_MAX;}
+array_inValues: INTEGERLITERAL {$$.intVal = $1.intVal;  fprintf(fpcpp, "%d", $1.intVal); }
+              | IDENTIFIER {$$.intVal = INT_MAX; fprintf(fpcpp, "%s", $1.ID); }
               ;
 
-dimlist : dimlist COMMA array_inValues
+dimlist : dimlist COMMA { fprintf(fpcpp, "%s", $2); } array_inValues
         | array_inValues
         ;
 
@@ -654,8 +657,10 @@ LHS : IDENTIFIER
               Search for identifier, get it's attributes, 
               store in $1.datatype, $1.is_array, $1.is_atomic
               */
+
+              fprintf(fpcpp, "%s", $1.ID);
        }
-    | IDENTIFIER SQUAREOPEN arr_access SQUARECLOSE 
+    | IDENTIFIER SQUAREOPEN { fprintf(fpcpp, "%s%s", $1, $2); } arr_access SQUARECLOSE 
                  {
                      /*
                      Search for identifier, get it's attributes, store
@@ -664,6 +669,7 @@ LHS : IDENTIFIER
                      /*
                      If is_array of Identifier is false, then semantic error
                      */
+                     fprintf(fpcpp, "%s", $4);
                  }
     | access 
     {
@@ -677,13 +683,13 @@ arr_access: exprlist
           ;
 
 exprlist: arith_expr
-         | exprlist COMMA arith_expr
+         | exprlist COMMA { fprintf(fpcpp, "%s", $2); } arith_expr
          ;
 
-arith_operand: IDENTIFIER
-              | INTEGERLITERAL
-              | FLOATLITERAL
-              | ROUNDOPEN arith_expr ROUNDCLOSE
+arith_operand: IDENTIFIER { fprintf(fpcpp, "%s", $1.ID); } 
+              | INTEGERLITERAL { fprintf(fpcpp, "%d", $1.intVal); } 
+              | FLOATLITERAL { fprintf(fpcpp, "%f", $1.decVal); } 
+              | ROUNDOPEN { fprintf(fpcpp, "%s", $1); }  arith_expr ROUNDCLOSE { fprintf(fpcpp, "%s", $3); }  
               ;
 
 arith_expr: arith_expr arithmetic_op arith_operand
@@ -691,7 +697,7 @@ arith_expr: arith_expr arithmetic_op arith_operand
           ;
 
  /*ASSIGNMENT STATEMENT*/
-assignment_statement: LHS EQ RHS 
+assignment_statement: LHS EQ { fprintf(fpcpp, "%s", $2); }  RHS 
                      {
 
                             /*
@@ -710,15 +716,15 @@ expression_statement: LHS expression_op RHS
                      }
                     ;
 exprrr: expression_statement
-      | ROUNDOPEN expression_statement ROUNDCLOSE
+      | ROUNDOPEN { fprintf(fpcpp, "%s", $1); }  expression_statement ROUNDCLOSE { fprintf(fpcpp, "%s", $3); } 
       ;
 
 //for logging
-log: assignment_statement SEMICOLON { fprintf(yyout, " : assignment statement");  }
-    | expression_statement SEMICOLON { fprintf(yyout, " : expression statement");  }
+log: assignment_statement SEMICOLON { fprintf(fpcpp, "%s", $2); fprintf(yyout, " : assignment statement");  }
+    | expression_statement SEMICOLON { fprintf(fpcpp, "%s", $2);  fprintf(yyout, " : expression statement");  }
     ;
 
-g: IDENTIFIER EQ RHS 
+g: IDENTIFIER EQ { fprintf(fpcpp, "%s%s", $1.ID, $2); }  RHS 
        {
               if(i_tb.searchDeclaration($1.ID)){
                      printError(yylineno,VARIABLE_REDECLARATION_ERROR);
@@ -730,10 +736,8 @@ g: IDENTIFIER EQ RHS
               Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
               */
-
-              fprintf(fpcpp, "%s%s", $1, $2);
        }
- | g COMMA IDENTIFIER EQ RHS 
+ | g COMMA IDENTIFIER EQ { fprintf(fpcpp, "%s%s%s", $2, $3.ID, $4); }  RHS 
        {
               if(i_tb.searchDeclaration($3.ID)){
                      printError(yylineno,VARIABLE_REDECLARATION_ERROR);
@@ -754,12 +758,7 @@ both_assignment: assignment_statement
                      NO NEED TO DO ANYTHING, THE ASSIGNMENT STATEMENT RULE TAKES CARE
                      */
               }
-                | ROUNDOPEN assignment_statement ROUNDCLOSE 
-                {
-                     /*
-                     NO NEED TO DO ANYTHING, THE ASSIGNMENT STATEMENT RULE TAKES CARE
-                     */
-                }
+                | ROUNDOPEN { fprintf(fpcpp, "%s", $1); }  assignment_statement ROUNDCLOSE { fprintf(fpcpp, "%s", $3); } 
                 | simpleDatatype {
                             // printf("%s\n",$1.datatype);
                             dt_state = ($1.datatype);
@@ -769,9 +768,6 @@ both_assignment: assignment_statement
                      g 
                 {
                      dt_state = NULL ;
-                     /*
-                     NO NEED TO DO ANYTHING, THE g STATEMENT RULE TAKES CARE
-                     */
                 }
                 ;
 
@@ -779,12 +775,13 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements 
+for_loop: FOR {scopeLevel++; fprintf(fpcpp, "%s", $1); } SQUAREOPEN { fprintf(fpcpp, "("); }  both_assignment PIPE { fprintf(fpcpp, ";"); }  RHS PIPE { fprintf(fpcpp, ";"); }  exprrr SQUARECLOSE  { { fprintf(fpcpp, ")"; } fprintf(yyout, " : loop statement");} SCOPEOPEN { fprintf(fpcpp, "{", $9); } statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE 
        {
+              fprintf(fpcpp, "}");
               /*
               RHS.datatype is coercible with boolean?
               */
@@ -795,7 +792,7 @@ for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQ
        };
 
  /*WHILE LOOP*/
-while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements 
+while_loop: REPEAT { fprintf(fpcpp, "while"); }  SQUAREOPEN { fprintf(fpcpp, "("); }  RHS SQUARECLOSE  { fprintf(fpcpp, "}");  fprintf(yyout, " : loop statement");} SCOPEOPEN { fprintf(fpcpp, "{");  scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -808,6 +805,7 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
               NO NEED TO DO ANYTHING EXCEPT SCOPES, THE PREDICATES ARE
               TAKEN CARE BY ABOVE RULES
               */
+              { fprintf(fpcpp, "}"); } 
        };
 
 
@@ -816,22 +814,26 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 conditional: when_statement;
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+when_statement: WHEN { fprintf(fpcpp, "if"); } SQUAREOPEN {  fprintf(fpcpp, "(");  } RHS SQUARECLOSE {  fprintf(fpcpp, ")");  fprintf(yyout, " : conditional statement");  } SCOPEOPEN {  fprintf(fpcpp, "{");  scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE extend 
+       } SCOPECLOSE {
+               fprintf(fpcpp, "}"); 
+       } extend 
        ;
-extend : ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+extend : ELSE_WHEN { fprintf(fpcpp, "else if"); } SQUAREOPEN { fprintf(fpcpp, "("); } RHS SQUARECLOSE {  fprintf(fpcpp, "}");  fprintf(yyout, " : conditional statement");  } SCOPEOPEN {  fprintf(fpcpp, "{");  scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE extend 
-       | DEFAULT { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+       } SCOPECLOSE {
+               fprintf(fpcpp, "}"); 
+       } extend 
+       | DEFAULT {  fprintf(fpcpp, "else");  fprintf(yyout, " : conditional statement");  } SCOPEOPEN {  fprintf(fpcpp, "{");  scopeLevel++;} statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE 
+       } SCOPECLOSE { fprintf(fpcpp, "}"); }
        | {;}
        ;
 
@@ -877,10 +879,10 @@ analyze_syntax   : COLON analysis_arrays analyze_syntax |
 
 // RHS:  RHS;
 
-func_invoke2 : func_invoke SEMICOLON { fprintf(yyout, " : call statement");  }
+func_invoke2 : func_invoke SEMICOLON {  fprintf(fpcpp, ";");  fprintf(yyout, " : call statement");  }
              ;
 
-func_invoke: INVOKE IDENTIFIER COLON arguments COLON 
+func_invoke: INVOKE IDENTIFIER { fprintf(fpcpp, "%s", $2.ID); } COLON { fprintf(fpcpp, "("); } arguments { fprintf(fpcpp, ")"); } 
        {
               /*
               BY here list of arg_dat (list of arguement's datatypes) will be ready. 
@@ -888,7 +890,7 @@ func_invoke: INVOKE IDENTIFIER COLON arguments COLON
               */
               arg_dat.clear();
        }
-           | INVOKE IDENTIFIER COLON NULL_ARGS COLON 
+           | INVOKE IDENTIFIER { fprintf(fpcpp, "%s", $2.ID); } COLON { fprintf(fpcpp, "("); } NULL_ARGS COLON { fprintf(fpcpp, ")"); } 
            {
               /*
               For all functions with name as $2.ID, type check if arguements are null
@@ -898,7 +900,7 @@ func_invoke: INVOKE IDENTIFIER COLON arguments COLON
           ;
 
 
-arguments : arguments COMMA RHS 
+arguments : arguments COMMA { fprintf(fpcpp, ","); }  RHS 
           {
               arg_dat.push_back(($3.datatype));
           }

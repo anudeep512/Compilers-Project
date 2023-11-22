@@ -25,4 +25,5 @@ PHASE-3.1/lex.yy.c
 PHASE-3.1/bison.tab.h
 PHASE-3.1/bison.tab.c
 PHASE-3.1/bison.output
-PHASE-3.1/
+PHASE-3.1/ex.o
+PHASE-3.1/main.o
