@@ -20,7 +20,7 @@
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
 KEYWORD_3               "start"|"return"|"type"|"atomic"|"array"|"in"|"func"|"invoke"|"ip"|"op" 
-KEYWORD 			      {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
+KEYWORD 			          {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
 /*DATATYPES*/
@@ -93,7 +93,7 @@ NEWLINE [\n]
 
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
-MULTI_LINE_COMMENT         "$*"([^"*$"]|[\n])*"*$" 
+MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
 COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
 
 
@@ -481,12 +481,11 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
  /*COMMENTS*/
-{COMMENTS} ;
 
 {SINGLE_LINE_COMMENT} {
   yytext[0] = '/';
   yytext[1] = '/';
-  fprintf(yycode,"%s",yytext);
+  fprintf(fpcpp,"%s",yytext);
   }
 
 {MULTI_LINE_COMMENT} {
@@ -494,7 +493,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   yytext[1] = '*';
   yytext[yyleng-1] = '$';
   yytext[yyleng-2] = '*';
-  fprintf(yycode,"%s",yytext);
+  fprintf(fpcpp,"%s",yytext);
 }
 
  /*OTHER TOKENS*/

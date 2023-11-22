@@ -1051,11 +1051,11 @@ func_statements: func_scope func_statements
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON {scopeLevel++;} args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope 
+task: TASK IDENTIFIER{fprintf(fpcpp,"%s",$2.token);} COLON {fprintf(fpcpp,"(");scopeLevel++;} args { fprintf(fpcpp,"}");fprintf(yyout, " : task declaration statement"); } SCOPEOPEN{fprintf(fpcpp,"%s",$5.token);} taskscope 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE
+       } SCOPECLOSE{fprintf(fpcpp,"%s",$7.token);}
     ;
 
 taskscope: declaration taskscope
@@ -1064,11 +1064,11 @@ taskscope: declaration taskscope
         | loop taskscope
         | func_invoke2 taskscope
         | output taskscope
-        | SCOPEOPEN {scopeLevel++;} taskscope 
+        | SCOPEOPEN {fprintf(fpcpp,"%s",$1.token);scopeLevel++;} taskscope 
         {
               i_tb.deleteVariables();
               scopeLevel--;
-        } SCOPECLOSE taskscope
+        } SCOPECLOSE {fprintf(fpcpp,"%s",$3.token);}taskscope
         | sleep taskscope
         | method_invoke2 taskscope
         | {;}
@@ -1083,15 +1083,15 @@ statement: declaration
           | func_invoke2
           | task_invoke
           | analyze_statement
-          | SCOPEOPEN {scopeLevel++;} statements
+          | SCOPEOPEN {fprintf(fpcpp,"{"); scopeLevel++;} statements
           {
               i_tb.deleteVariables();
               scopeLevel--;
-          } SCOPECLOSE
+          } SCOPECLOSE{fprintf(fpcpp,"}");}
           | output
           | sleep
-          | BREAK SEMICOLON
-          | CONTINUE SEMICOLON
+          | BREAK SEMICOLON {fprintf(fpcpp,"%s",$2.token);}
+          | CONTINUE SEMICOLON {fprintf(fpcpp,"%s",$2.token);}
           | input
           | method_invoke2
           ;
@@ -1101,19 +1101,19 @@ statements: statement statements
           ;
           
           
-access : IDENTIFIER ARROW id 
+access : IDENTIFIER{fprintf(fpcpp,"%s",$1.token);} ARROW {fprintf(fpcpp,"%s",$2.token);}id 
        {
               /*$1.datatype should be from an existing class*/ 
               t_state = ($1.datatype);
        }
        ;
 
-id     : IDENTIFIER
+id     : IDENTIFIER {fprintf(fpcpp,"%s",$1.token);}
         {
               t_state = ($1.datatype); 
               $$.datatype = ($1.datatype);
        }
-       | id ARROW IDENTIFIER 
+       | id ARROW{fprintf(fpcpp,"%s",$2.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
        {
               t_state = ($1.datatype); 
               /*
@@ -1130,17 +1130,18 @@ id     : IDENTIFIER
 
 startdec: START { //////////////////////////////// COMPLETED ///////////////////////////////
        fprintf(yyout, " : start declaration statement");
+       fprintf(fpcpp,"%s",$1.token);
        scopeLevel++;
        startCount++;
               if(startCount > 1){
                      printError(yylineno, START_ERROR_MORE);
                      return 1;    
               }
-       } SCOPEOPEN start
+       } SCOPEOPEN {fprintf(fpcpp,"%s",$2.token);} start
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE 
+       } SCOPECLOSE {fprintf(fpcpp,"%s",$4.token);}
        ;
 
 start: declaration start
@@ -1152,11 +1153,11 @@ start: declaration start
      | analyze_statement start
      | output start
      | input start
-     | SCOPEOPEN {scopeLevel++;} start 
+     | SCOPEOPEN {fprintf(fpcpp,"%s",$1.token); scopeLevel++;} start 
      {
        i_tb.deleteVariables();
        scopeLevel--;
-     } SCOPECLOSE start
+     } SCOPECLOSE{fprintf(fpcpp,"%s",$3.token)} start
      | sleep start
      | method_invoke2 start
      | {;}
@@ -1164,7 +1165,7 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE TYPENAME 
+type_declaration: TYPE{fprintf(fpcpp,"class");} TYPENAME {fprintf(fpcpp,"%s",$2.token);} 
               { 
                      // types_set.insert($2.token); 
                      if(c_tb.searchType($2.ID)){
@@ -1174,17 +1175,17 @@ type_declaration: TYPE TYPENAME
                      curr_type = ($2.ID);
                      fprintf(yyout, " : type declaration statement"); 
 
-              } SCOPEOPEN {scopeLevel++;} type_scope methods 
+              } SCOPEOPEN {fprintf(fpcpp,"%s",$3.token); scopeLevel++;} type_scope methods 
               {
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
-              } SCOPECLOSE
+              } SCOPECLOSE {fprintf(fpcpp,"%s",$6.token);} 
               ;
 
 type_scope: declaration_t type_scope | {;} ;
 
-declaration_t : declarationStmt_t SEMICOLON 
+declaration_t : declarationStmt_t SEMICOLON {fprintf(fpcpp,"%s",$2.token);} 
               { 
                      fprintf(yyout, " : declaration statement"); 
               }
@@ -1204,7 +1205,7 @@ declarationStmt_t : simpleDatatype simpleList_t
                      }
                 ;
 
-simpleList_t: IDENTIFIER 
+simpleList_t: IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} 
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1221,7 +1222,7 @@ simpleList_t: IDENTIFIER
                             be the last one from the types_Set
                             */
                      }
-          | simpleList COMMA IDENTIFIER 
+              | simpleList COMMA{fprintf(fpcpp,"%s",$2.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);} 
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1237,7 +1238,7 @@ simpleList_t: IDENTIFIER
                             be the last one from the types_Set
                             */
                      }
-          | IDENTIFIER EQ RHS 
+              | IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} EQ {fprintf(fpcpp,"%s",$2.token);} RHS 
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1255,7 +1256,7 @@ simpleList_t: IDENTIFIER
                             dt_state and RHS.datatype
                             */
                      }
-          | simpleList COMMA IDENTIFIER EQ RHS 
+              | simpleList COMMA {fprintf(fpcpp,"%s",$2.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);} EQ {fprintf(fpcpp,"%s",$4.token);} RHS 
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1275,7 +1276,7 @@ simpleList_t: IDENTIFIER
                      }
           ;
 
-arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+arrayList_t : IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} SQUAREOPEN{fprintf(fpcpp,"%s",$2.token);} dimlist SQUARECLOSE {fprintf(fpcpp,"%s",$4.token);}
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1292,7 +1293,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             last one from the types_Set atomic_state
                             */
                      }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+              | arrayList COMMA{fprintf(fpcpp,"%s",$2.token);} IDENTIFIER{fprintf(fpcpp,"%s",$3.token);} SQUAREOPEN {fprintf(fpcpp,"%s",$4.token);}dimlist SQUARECLOSE {fprintf(fpcpp,"%s",$6.token);}
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1310,7 +1311,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             will be the last one from the types_Set
                             */
                      }
-          | IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+              |IDENTIFIER {fprintf(fpcpp,"%s",$1.token);}SQUAREOPEN  fprintf(fpcpp,"%s",$2.token);} dimlist SQUARECLOSE fprintf(fpcpp,"%s",$4.token);} EQ fprintf(fpcpp,"%s",$5.token);} RHS 
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1328,7 +1329,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             the last one from the types_Set + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
                             */
                      }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+              | arrayList COMMA fprintf(fpcpp,"%s",$2.token);}IDENTIFIER fprintf(fpcpp,"%s",$3.token);}SQUAREOPEN fprintf(fpcpp,"%s",$4.token);}dimlist SQUARECLOSE fprintf(fpcpp,"%s",$5.token);}EQ fprintf(fpcpp,"%s",$6.token);}RHS 
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1351,13 +1352,13 @@ methods: methods method
        | {;}
        ;
 
-method: func_decl_m SCOPEOPEN method_body 
+method: func_decl_m SCOPEOPEN{fprintf(fpcpp,"{");} method_body 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE ;
+       } SCOPECLOSE {fprintf(fpcpp,"}");};
 
-func_decl_m : FUNC IDENTIFIER{fprintf(fpcpp,"%s",$2.token)}  COLON {fprintf(fpcpp,"(")} {scopeLevel++;} args COLON {fprintf(fpcpp,")")} func_return 
+func_decl_m : FUNC {fprintf(fpcpp,"%s ",$6.token);}IDENTIFIER{fprintf(fpcpp,"%s",$2.token);}  COLON {fprintf(fpcpp,"(");scopeLevel++;} args COLON {fprintf(fpcpp,")");} func_return 
               { 
               /*
               Add args as they are encountered in the IDENTIFIER TABLE, 
@@ -1368,11 +1369,11 @@ func_decl_m : FUNC IDENTIFIER{fprintf(fpcpp,"%s",$2.token)}  COLON {fprintf(fpcp
               } 
               ;
 
-method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");  fprintf(fpcpp,"%s",$2.token)} ;
+method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");  fprintf(fpcpp,"%s",$2.token);} ;
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE id ARROW{fprintf(fpcpp."%s",$3,token)} IDENTIFIER{fprintf(fpcpp,"%s",$4.token)} COLON {fprintf(fpcpp,"(");} method_args COLON {fprintf(fpcpp,")");}
+method_invoke : INVOKE id ARROW{fprintf(fpcpp."%s",$3.token);} IDENTIFIER{fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} method_args COLON {fprintf(fpcpp,")");}
               {
                      /* 
                      Type check: $2.datatype should be a class, and $4.ID should be a function 
@@ -1394,20 +1395,20 @@ method_invoke : INVOKE id ARROW{fprintf(fpcpp."%s",$3,token)} IDENTIFIER{fprintf
               }*/
               ;
 
-in_stmt : IN{fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$2.token)} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
+in_stmt : IN{fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$2.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
        {
               /*
               In this check if $3.datatype = last element in the type set
               */
        }
-       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token)} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} arguments COLON {fprintf(fpcpp,")");}
+       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token);} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} arguments COLON {fprintf(fpcpp,")");}
        {
               /*
               In this check if $4.ID exists in the methods table whose class is last element in the types_set
                + TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
        }
-       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token)} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} NULL_ARGS COLON {fprintf(fpcpp,")");}
+       | INVOKE IN {fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$3.token);} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} NULL_ARGS COLON {fprintf(fpcpp,")");}
        {
               /*
               In this check if $4.ID exists in the methods table whose class is last element in the types_set + 
@@ -1427,11 +1428,11 @@ method_statements: declaration
                  | input
                  | output
                  | sleep
-                 | SCOPEOPEN {scopeLevel++;} method_statements 
+                 | SCOPEOPEN {fprintf(fpcpp,"{");scopeLevel++;} method_statements 
                  {
                      i_tb.deleteVariables();
                      scopeLevel--;
-                 } SCOPECLOSE
+                 } SCOPECLOSE {fprintf(fpcpp,"}");}
                  | method_invoke2
                  ;
 /* Return */
