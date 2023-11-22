@@ -9,7 +9,7 @@
   #include <string.h>
   extern int yylex();
   extern int yylineno;
-  extern FILE * yyout;
+  extern FILE * yyout, *fpcpp;
   void yyerror(std::string s);
   char * dt_state ;
   int array_state;
@@ -43,7 +43,7 @@
            float decVal; // If encountered a decimal constant, will store value here
            char charVal; // If encountered a character constant, will store value here
            bool boolVal; // If encountered a boolean constant, will store value here
-           char *stringVal; // If encountered a string constant, will store value here
+           bool stringVal; // If encountered a string constant, will store value here
            char *token; // If encountered a token string like for/while, will store value here
        }attr;
 }
@@ -199,6 +199,7 @@ arithmetic_op: ADD | SUB | MUL | DIV | MODULO | EXPONENT ;
 logical_op: AND | OR ;
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
+
 begin : {
        if(startCount < 1){
               printError(yylineno,START_ERROR_LESS);
@@ -233,30 +234,35 @@ constants: INTEGERLITERAL
        {
               $$.datatype = "number"; 
               $$.intVal = $1.intVal;
+              fprintf(fpcpp,"%d", $1.intVal);
        }
 
      | CHARACTERLITERAL 
               {
                      $$.datatype = "letter"; 
                      $$.charVal = $1.charVal;
+                     fprintf(fpcpp, "%c", $1.charVal);
               }
 
       | FLOATLITERAL 
               {
                      $$.datatype = "decimal"; 
                      $$.decVal = $1.decVal;
+                     fprintf(fpcpp, "%f", $1.decVal);
               }
 
       | BOOLEANLITERAL 
         {
                $$.datatype = "bool"; 
                $$.boolVal = $1.boolVal;
+               fprintf(fpcpp, "%d", $1.boolVal);
         }
 
        | STRINGLITERAL 
        {
               $$.datatype = "text"; 
               $$.stringVal = $1.stringVal;
+              fprintf(fpcpp, "%s", $1.stringVal);
        }
 
       ;
@@ -267,7 +273,7 @@ next : RHS all_ops next
 
 RHS :	constants
     | T
-    | TID
+    | TID { fprintf(fpcpp, "%s", $1.token);}
     | get_invoke | method_invoke | in_stmt
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE 
     | ROUNDOPEN RHS ROUNDCLOSE
@@ -413,7 +419,7 @@ atomicArray : AARRNUM
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 errorDatatypes: IDENTIFIER| ATOMIC IDENTIFIER| ARRAY IDENTIFIER| ATOMIC ARRAY IDENTIFIER;
 
-declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
+declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); fprintf(fpcpp, "%s%s", $1, $2); }
             | errorDatatypes IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};
             ;
 
@@ -502,6 +508,8 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             }
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
                             i_tb.print();
+
+                            fprintf(fpcpp, "%s", $1.ID);
               }
           | simpleList COMMA IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
@@ -514,6 +522,8 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             }
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
                             i_tb.print();
+
+                            fprintf(fpcpp, "%s%s", $2, $3.ID);
               }
           | IDENTIFIER EQ RHS 
               {
@@ -533,6 +543,8 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             atomic_state, Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and
                             RHS.datatype
                             */
+
+                            fprintf(fpcpp, "%s%s", $1.ID, $2);
               }
           | simpleList COMMA IDENTIFIER EQ RHS 
               {
@@ -551,6 +563,8 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                             Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
                             */
+
+                            fprintf(fpcpp, "%s%s%s", $2, $3.ID, $4);
               }
           ;
 
@@ -716,6 +730,8 @@ g: IDENTIFIER EQ RHS
               Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
               */
+
+              fprintf(fpcpp, "%s%s", $1, $2);
        }
  | g COMMA IDENTIFIER EQ RHS 
        {
@@ -1385,14 +1401,14 @@ method_invoke : INVOKE id ARROW{fprintf(fpcpp."%s",$3.token);} IDENTIFIER{fprint
                      */
               arg_dat.clear();
               }
-              /*| INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
+              | INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
               {
                      /*
                      Currently the t_state variable contains the datatype of id (i.e., $3). 
                      CHECK: is $3.datatype among a type set, CHECK if the IDENTIFIER, i.e, $5.ID is 
                      in the methods table whose type i t_state. If yes, then check for arguements
                      */
-              }*/
+              }
               ;
 
 in_stmt : IN{fprintf(fpcpp,"this");} ARROW {fprintf(fpcpp,"%s",$2.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
@@ -1436,7 +1452,7 @@ method_statements: declaration
                  | method_invoke2
                  ;
 /* Return */
-return_statement_m : RETURN{fprintf(fpcpp,"%s",$1.token);} RHS SEMICOLON {fprintf(fpcpp,"%s",$3.token);}
+return_statement_m : RETURN RHS SEMICOLON 
               { 
                      $$.datatype = $2.datatype; 
                      $$.is_array = $2.is_array; 
@@ -1448,7 +1464,7 @@ return_statement_m : RETURN{fprintf(fpcpp,"%s",$1.token);} RHS SEMICOLON {fprint
                      */
                      fprintf(yyout, " : return statement"); 
               } ;
-              | RETURN {fprintf(fpcpp,"%s",$1.token);}  NVOID SEMICOLON {fprintf(fpcpp,"%s",$3.token);}
+              | RETURN NVOID SEMICOLON 
               { 
                      $$.datatype = $2.datatype; 
                      $$.is_array = $2.is_array; 
@@ -1470,3 +1486,4 @@ method_body: method_statements method_body
 void yyerror(std::string s){
   std::cout << "Syntax Error: " << s << " at line number - " << yylineno << std::endl;
 }
+
