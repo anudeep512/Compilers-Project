@@ -585,7 +585,7 @@ arrayList : IDENTIFIER {fprintf(fpcpp, "%s", $1.ID);} SQUAREOPEN { fprintf(fpcpp
                             */
                             fprintf(fpcpp, "%s", $6);
               }
-          | arrayList COMMA {fprintf(fpcpp, "%s", $2);} IDENTIFIER {fprintf(fpcpp, "%s", $4.ID);} SQUAREOPEN {fprintf(fpcpp, "%s", $5); }dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
+          | arrayList COMMA {fprintf(fpcpp, "%s", $2);} IDENTIFIER {fprintf(fpcpp, "%s", $4.ID);} SQUAREOPEN {fprintf(fpcpp, "%s", $6); }dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $4.datatype = (dt_state);
                             $4.is_array = array_state;
@@ -605,7 +605,7 @@ arrayList : IDENTIFIER {fprintf(fpcpp, "%s", $1.ID);} SQUAREOPEN { fprintf(fpcpp
                             fprintf(fpcpp, "%s", $9);
 
               }
-          | IDENTIFIER {fprintf(fpcpp, "%s", $1.ID);} SQUAREOPEN { fprintf(fpcpp, "%s", $3); } dimlist SQUARECLOSE {fprintf(fpcpp, "%s", $6);} EQ { fprintf(fpcpp, "%s", $7); } RHS 
+          | IDENTIFIER {fprintf(fpcpp, "%s", $1.ID);} SQUAREOPEN { fprintf(fpcpp, "%s", $3); } dimlist SQUARECLOSE {fprintf(fpcpp, "%s", $6);} EQ { fprintf(fpcpp, "%s", $8); } RHS 
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -777,7 +777,7 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR {scopeLevel++; fprintf(fpcpp, "%s", $1); } SQUAREOPEN { fprintf(fpcpp, "("); }  both_assignment PIPE { fprintf(fpcpp, ";"); }  RHS PIPE { fprintf(fpcpp, ";"); }  exprrr SQUARECLOSE  { fprintf(fpcpp, ")"; fprintf(yyout, " : loop statement");} SCOPEOPEN { fprintf(fpcpp, "{"); } statements 
+for_loop: FOR {scopeLevel++; fprintf(fpcpp, "%s", $1); } SQUAREOPEN { fprintf(fpcpp, "("); }  both_assignment PIPE { fprintf(fpcpp, ";"); }  RHS PIPE { fprintf(fpcpp, ";"); }  exprrr SQUARECLOSE  { fprintf(fpcpp, ")"); fprintf(yyout, " : loop statement");} SCOPEOPEN { fprintf(fpcpp, "{"); } statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -935,7 +935,7 @@ sleep : SLEEP {fprintf(fpcpp,"usleep");} ROUNDOPEN {fprintf(fpcpp,"%s",$3.token)
        | SLEEP {fprintf(fpcpp,"usleep");} ROUNDOPEN {fprintf(fpcpp,"%s",$3.token);} INTEGERLITERAL {fprintf(fpcpp,"%s",$5.token);} ROUNDCLOSE {fprintf(fpcpp,"%s",$7.token);} SEMICOLON {fprintf(fpcpp,"%s",$9.token); fprintf(yyout, " : sleep statement");  };
 
 /* Grammar Rules for Input and Output*/
-file_name : ARROW {fprintf(fpcpp,"%s",$1.token);} STRINGLITERAL {fprintf(fpcpp,"%s",$3.token)}
+file_name : ARROW {fprintf(fpcpp,"%s",$1.token);} STRINGLITERAL {fprintf(fpcpp,"%s",$3.token);}
           | ARROW {fprintf(fpcpp,"%s",$1.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
           | {;}
           ;
@@ -944,8 +944,8 @@ input : IP file_name COLON IDENTIFIER nextip
       ;
 
 /*SCAN STATEMENT*/
-nextip : COMMA IDENTIFIER {fprintf(fpcpp,"%s",$2.token)} nextip
-     | SEMICOLON {fprintf(fpcpp,"%s",$1.token)}
+nextip : COMMA IDENTIFIER {fprintf(fpcpp,"%s",$2.token);} nextip
+     | SEMICOLON {fprintf(fpcpp,"%s",$1.token);}
      { 
       fprintf(yyout, " : scan statement");
      }
@@ -1013,7 +1013,7 @@ func_return : nonAtomic_datatypes
             | IDENTIFIER {{printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};}
             ;
 
-func_decl :       FUNC {fprintf(fpcpp,"%s",$10.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);} COLON {fprintf(fpcpp,"{");} args COLON {fprintf(fpcpp,"}");} func_return 
+func_decl :       FUNC IDENTIFIER { fprintf(fpcpp,"%s",$2.datatype); fprintf(fpcpp,"%s",$2.token);} COLON {fprintf(fpcpp,"{");} args COLON {fprintf(fpcpp,"}");} func_return 
               { 
                      /*
                      Add args as they are encountered in the id_table, IN FUNCTIONS TABLE, name of the function
@@ -1029,7 +1029,7 @@ func_decl :       FUNC {fprintf(fpcpp,"%s",$10.token);} IDENTIFIER {fprintf(fpcp
                      
               } 
               ;
-atomic_func_decl :   ATOMIC FUNC {fprintf(fpcpp,"%s",$11.token);} IDENTIFIER {fprintf(fpcpp,"%s",$4.token);} COLON {fprintf(fpcpp,"(");} args COLON {fprintf(fpcpp,")");} func_return 
+atomic_func_decl :   ATOMIC FUNC IDENTIFIER { fprintf(fpcpp,"%s",$3.datatype); fprintf(fpcpp,"%s",$3.token);} COLON {fprintf(fpcpp,"(");} args COLON {fprintf(fpcpp,")");} func_return 
                      { 
                             /*
                             Add args as they are encountered in the id_table, decl_arg_dats will be ready, return_type
@@ -1045,7 +1045,7 @@ atomic_func_decl :   ATOMIC FUNC {fprintf(fpcpp,"%s",$11.token);} IDENTIFIER {fp
                      }
                      ;
 
-func_body : SCOPEOPEN {fprintf(fpcpp,"{"; scopeLevel++;} func_statements 
+func_body : SCOPEOPEN { fprintf(fpcpp,"{"); scopeLevel++;} func_statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -1335,7 +1335,7 @@ arrayList_t : IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} SQUAREOPEN {fprintf(fpc
                             will be the last one from the types_Set
                             */
                      }
-              |IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} SQUAREOPEN  {fprintf(fpcpp,"%s",$3.token);} dimlist SQUARECLOSE fprintf(fpcpp,"%s",$6.token);} EQ {fprintf(fpcpp,"%s",$8.token);} RHS 
+              |IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} SQUAREOPEN  {fprintf(fpcpp,"%s",$3.token);} dimlist SQUARECLOSE {fprintf(fpcpp,"%s",$6.token);} EQ {fprintf(fpcpp,"%s",$8.token);} RHS 
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1382,7 +1382,7 @@ method: func_decl_m SCOPEOPEN {fprintf(fpcpp,"{");} method_body
               scopeLevel--;
        } SCOPECLOSE {fprintf(fpcpp,"}");};
 
-func_decl_m : FUNC {fprintf(fpcpp,"%s ",$10.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}  COLON {fprintf(fpcpp,"(");scopeLevel++;} args COLON {fprintf(fpcpp,")");} func_return 
+func_decl_m : FUNC IDENTIFIER { fprintf(fpcpp,"%s",$2.datatype); fprintf(fpcpp,"%s",$2.token);}  COLON {fprintf(fpcpp,"(");scopeLevel++;} args COLON {fprintf(fpcpp,")");} func_return 
               { 
               /*
               Add args as they are encountered in the IDENTIFIER TABLE, 
@@ -1397,7 +1397,7 @@ method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE id ARROW {fprintf(fpcpp."%s",$3.token);} IDENTIFIER {fprintf(fpcpp,"%s",$5.token);} COLON {fprintf(fpcpp,"(");} method_args COLON {fprintf(fpcpp,")");}
+method_invoke : INVOKE id ARROW {fprintf(fpcpp,"%s",$3.token);} IDENTIFIER {fprintf(fpcpp,"%s",$5.token);} COLON {fprintf(fpcpp,"(");} method_args COLON {fprintf(fpcpp,")");}
               {
                      /* 
                      Type check: $2.datatype should be a class, and $4.ID should be a function 
@@ -1452,7 +1452,7 @@ method_statements: declaration
                  | input
                  | output
                  | sleep
-                 | SCOPEOPEN {fprintf(fpcpp,"{");scopeLevel++;} method_statements 
+                 | SCOPEOPEN {fprintf(fpcpp,"{"); scopeLevel++;} method_statements 
                  {
                      i_tb.deleteVariables();
                      scopeLevel--;
@@ -1460,7 +1460,7 @@ method_statements: declaration
                  | method_invoke2
                  ;
 /* Return */
-return_statement_m : RETURN {fprintf(fpcpp,"%s ",$1.token)} RHS SEMICOLON  {fprintf(fpcpp,"%s",$4.token)}
+return_statement_m : RETURN {fprintf(fpcpp,"%s ",$1.token);} RHS SEMICOLON  {fprintf(fpcpp,"%s",$4.token);}
               { 
                      $$.datatype = $3.datatype; 
                      $$.is_array = $3.is_array; 
@@ -1472,7 +1472,7 @@ return_statement_m : RETURN {fprintf(fpcpp,"%s ",$1.token)} RHS SEMICOLON  {fpri
                      */
                      fprintf(yyout, " : return statement"); 
               } ;
-              | RETURN {fprintf(fpcpp,"%s ",$1.token)} NVOID SEMICOLON {fprintf(fpcpp,"%s",$4.token)}
+              | RETURN {fprintf(fpcpp,"%s ",$1.token);} NVOID SEMICOLON {fprintf(fpcpp,"%s",$4.token);}
               { 
                      $$.datatype = $3.datatype; 
                      $$.is_array = $3.is_array; 
