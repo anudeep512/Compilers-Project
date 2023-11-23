@@ -279,6 +279,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*CONSTANTS*/
 {INTEGERLIT} {
+  yylval.attr.is_array = false;
+  yylval.attr.is_atomic = false;
   yylval.attr.intVal = std::stoi(strdup(yytext));
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
@@ -286,6 +288,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
 {CHARACTERLIT} {
+  yylval.attr.is_array = false;
+  yylval.attr.is_atomic = false;
   yylval.attr.charVal = yytext[2];
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
@@ -293,6 +297,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
 {STRINGLIT} {
+  yylval.attr.is_array = false;
+  yylval.attr.is_atomic = false;
   yylval.attr.stringVal = strdup(yytext);
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
@@ -300,6 +306,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
 {FLOATLIT} {
+  yylval.attr.is_array = false;
+  yylval.attr.is_atomic = false;
   yylval.attr.decVal = std::stof(strdup(yytext));
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
@@ -307,6 +315,8 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
 {BOOLIT} {
+  yylval.attr.is_array = false;
+  yylval.attr.is_atomic = false;
   if(!strcmp(yytext, "true"))
   {
     yylval.attr.boolVal = true;

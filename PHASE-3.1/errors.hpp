@@ -23,7 +23,7 @@
 #define TYPE_ATTR_REDECLARATION 18
 #define START_ERROR_LESS 19
 #define START_ERROR_MORE 20
-
+#define METHOD_REDECLARATION_ERROR 21
 /*
   start error -> > 1 starts or 0 start
 */

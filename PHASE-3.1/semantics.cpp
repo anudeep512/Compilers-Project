@@ -5,20 +5,15 @@
 // This is required in semantic analysis for typechecking
 // We don't have operator overloading 
 // We even don't have move operator and = operation
-std::vector<std::string>
-
-to_string_vec(std::vector<char*> vec)
+vector<string> to_string_vec(vector<char*> vec)
 {
-   std::vector<std::string> ans;
-   
-   for(auto i : vec)
-   {
-      ans.push_back(std::string(i));
-   }
-   
-   return ans;
+  vector<string> ans;
+  for(auto i : vec)
+  {
+    ans.push_back(string(i));
+  }
+  return ans;
 }
-
 
 string is_coercible_rhs(string dt1, string dt2, string op){
   if(op == "#" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool" || dt1 == "text") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool" || dt2 == "text")){ 
@@ -81,24 +76,69 @@ string is_coercible_rhs(string dt1, string dt2, string op){
     return "bool" ;
   }
   
-  return "wrong" ;
+  return "" ;
 }
 
-bool assignment_check(string dt1 , string dt2){
-  if(dt1 == "text" && dt2 == "text") {
-    return true ;
-  }
-  else if(dt1 != "text" && dt2 != "text" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool")){
-    return true ;
+bool is_primitive(string dt){
+  if(dt != "text" && dt != "letter" && dt != "number" && dt != "decimal" && dt != "bool"){
+    return false ;
   }
 
+  return true ;
+}
+
+
+// flag = 0 : = 
+// flag = 1 : Remaining 
+bool assignment(string dt1 , string dt2, int flag){
+if(flag == 0){
+    if(dt1 == dt2){
+      return true ;
+    }
+    if(dt1 == "text" && dt2 == "text") {
+      return true ;
+    }
+    else if(dt1 != "text" && dt2 != "text" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool")){
+      return true ;
+    }
+}else {
+    if(!is_primitive(dt1)){
+      return false;
+    }
+    if(!is_primitive(dt2)){
+      return false ;
+    } 
+    if(dt1 == "text" || dt2 == "text"){
+      return false ;
+    }
+    if((dt1 ==  "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool")){
+      return true ;
+    }
+}
   return false ;
 }
 
-// given 2 datatypes we get output as the resultant datatype of conversion
-// i.e., for type checking 
-string is_coercible_simple(string dt1, string dt2){
-
+// This function can be used to check the relation between two datatypes
+bool compatibility(string dt1, string dt2){
+  if(dt1 == dt2) return true ;
+  if((dt1 == "text" && dt2 != "text") || (dt1 != "text" && dt2 == "text")){
+    return false;
+  }
+  string s1 = dt1 + dt2 ;
+  if(s1 == "numberdecimal" || s1 == "decimalnumber"){
+    return true ;
+  }else if(s1 == "numberbool" || s1 == "boolnumber"){
+    return true ;
+  }else if(s1 == "numberletter" || s1 == "letternumber"){
+    return true ;
+  }else if(s1 == "decimalbool" || s1 == "booldecimal"){
+    return true ;
+  }else if(s1 == "decimalletter" || s1 == "letterdecimal"){
+    return true ;
+  }else if(s1 == "boolletter" || s1 == "letterbool"){
+    return true ;
+  }
+  return false ;
 }
 
 

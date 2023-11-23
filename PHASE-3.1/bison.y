@@ -16,10 +16,12 @@
   int atomic_state;
   char * t_state ;
   char * curr_type ;
-  std::vector<char *> arg_dat; // used during invokes, will be sent to searching funcs
   std::vector<char *> decl_arg_dat; // used at declarations, will be sent to adding functions
   std::vector<int> decl_arg_is_array ;
-//   std::unordered_set<char *> types_set;
+  std::vector<int> decl_arg_is_atomic ;
+  std::vector<char *> arg_dat; // used during invokes, will be sent to searching funcs
+  std::vector<int> arg_is_array ;
+  std::vector<int> arg_is_atomic ;
   MethodTable m_tb ;
   FunctionTable f_tb ;
   TaskTable t_tb ;
@@ -89,7 +91,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body
+%type<attr> func_args return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body
 
 
 %start begin
@@ -413,7 +415,7 @@ atomicArray : AARRNUM
 /* DECLARATION STATEMENT : Only Declaration + Assignment */
 errorDatatypes: IDENTIFIER| ATOMIC IDENTIFIER| ARRAY IDENTIFIER| ATOMIC ARRAY IDENTIFIER;
 
-declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
+declaration : declarationStmt SEMICOLON { i_tb.print();fprintf(yyout, " : declaration statement"); }
             | errorDatatypes IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};
             ;
 
@@ -501,7 +503,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                                    return 1;
                             }
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
-                            i_tb.print();
+                            // i_tb.print();
               }
           | simpleList COMMA IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
@@ -513,7 +515,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                                    return 1;
                             }
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
-                            i_tb.print();
+                            // i_tb.print();
               }
           | IDENTIFIER EQ RHS 
               {
@@ -527,7 +529,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             if(/* DO LHS RHS check*/ true) ;
 
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
-                            i_tb.print();
+                            // i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state,
                             atomic_state, Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and
@@ -546,7 +548,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             if(/* DO LHS RHS check*/ true) ;
 
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
-                            i_tb.print();
+                            // i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                             Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -565,7 +567,7 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                             }
 
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array);
-                            i_tb.print();
+                            // i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                             Scope Level
@@ -582,7 +584,7 @@ arrayList : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////
                             }
 
                             i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array);
-                            i_tb.print();
+                            // i_tb.print();
                             /*
                             Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
                             atomic_state, Scope Level
@@ -693,6 +695,9 @@ expression_statement: LHS expression_op RHS
                             SHOULD COME BACK, THERE SHOULD BE A TYPE CHECK BTW LHS.datatype, RHS.datatype. 
                             IF IT MATCHES, WILL $$.datatype BE BOOLEAN? 
                             */
+                           /* 
+                           In this no user defined datatypes only primitive 
+                           */
                      }
                     ;
 exprrr: expression_statement
@@ -760,10 +765,10 @@ both_assignment: assignment_statement
                 ;
 
  /*LOOPS*/
-loop: for_loop | while_loop ;
+loop: for_loop | while_loop ; //////////////////////////////// COMPLETED ///////////////////////////////
 
  /*FOR LOOP*/
-for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements 
+for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN statements //////////////////////////////// COMPLETED ///////////////////////////////
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -779,7 +784,7 @@ for_loop: FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS PIPE exprrr SQ
        };
 
  /*WHILE LOOP*/
-while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements 
+while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statement");} SCOPEOPEN {scopeLevel++;} statements  //////////////////////////////// COMPLETED ///////////////////////////////
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -797,16 +802,16 @@ while_loop: REPEAT SQUAREOPEN RHS SQUARECLOSE  {fprintf(yyout, " : loop statemen
 
 
 /*CONDITIONAL STATEMENT*/
-conditional: when_statement;
+conditional: when_statement; //////////////////////////////// COMPLETED ///////////////////////////////
 
 /*WHEN STATEMENT*/
-when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+when_statement: WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements //////////////////////////////// COMPLETED ///////////////////////////////
        {
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE extend 
        ;
-extend : ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements 
+extend : ELSE_WHEN SQUAREOPEN RHS SQUARECLOSE { fprintf(yyout, " : conditional statement");  } SCOPEOPEN {scopeLevel++;} statements //////////////////////////////// COMPLETED ///////////////////////////////
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -871,13 +876,17 @@ func_invoke: INVOKE IDENTIFIER COLON arguments COLON
               For all functions with name as $2.ID, type check arguements
               */
               arg_dat.clear();
+              arg_is_array.clear();
+              arg_is_atomic.clear();
        }
            | INVOKE IDENTIFIER COLON NULL_ARGS COLON 
            {
               /*
               For all functions with name as $2.ID, type check if arguements are null
               */ 
-             arg_dat.clear();
+              arg_dat.clear();
+              arg_is_array.clear();
+              arg_is_atomic.clear();
            }
           ;
 
@@ -940,7 +949,7 @@ return_statement : RETURN RHS SEMICOLON { $$.datatype = $2.datatype; $$.is_array
 /*PRINT STATEMENT*/
 output : OP COLON opstring file_name SEMICOLON
        { 
-        fprintf(yyout, " : print statement");
+       //  fprintf(yyout, " : print statement");
        }
       ;
 
@@ -960,15 +969,17 @@ function: func_decl func_body
 
 func_args: all_datatypes IDENTIFIER 
        {
-              decl_arg_dat.push_back(($1.ID));
+              decl_arg_dat.push_back(($1.datatype));
               decl_arg_is_array.push_back($1.is_array);
+              decl_arg_is_atomic.push_back($1.is_atomic);
               i_tb.addVariable($2.ID, $1.datatype, $1.is_atomic, $1.is_array);
        } /*SHOULD COME BACK and see the order they are getting stored in*/
        | func_args COMMA all_datatypes IDENTIFIER 
        {
-              i_tb.addVariable($4.ID, $3.datatype, $3.is_atomic, $3.is_array);
+              decl_arg_dat.push_back(($3.datatype));
               decl_arg_is_array.push_back($3.is_array);
-              decl_arg_dat.push_back(($3.ID));
+              decl_arg_is_atomic.push_back($3.is_atomic);
+              i_tb.addVariable($4.ID, $3.datatype, $3.is_atomic, $3.is_array);
        } 
        ;
 
@@ -991,39 +1002,55 @@ func_return : nonAtomic_datatypes
             | IDENTIFIER {{printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;};}
             ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON func_return 
+func_decl :       FUNC {scopeLevel++;} IDENTIFIER COLON args COLON func_return //////////////////////////////// COMPLETED ///////////////////////////////
               { 
                      /*
                      Add args as they are encountered in the id_table, IN FUNCTIONS TABLE, name of the function
                      is $2.ID decl_arg_dats will be ready, return_type is $6.datatype, $6.is_array 
                      */ 
-              //       if(f_tb.searchFunction($2.ID, decl_arg_dat,decl_arg_is_array) == ""){
-              //        f_tb.addFunction($2.ID, decl_arg_dat, decl_arg_is_array,$6.datatype, $6.is_array, 0);
-              //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
-              //       }else {
-              //        printError(yylineno, FUNCTION_REDECLARATION_ERROR);
-              //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
-              //       }
-                     
+                    if(f_tb.searchFunction($3.ID, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic) == ""){
+                     f_tb.addFunction($3.ID, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic,$7.datatype, $7.is_array);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     fprintf(yyout, " : function declaration statement");
+                     f_tb.print();
+                    }else {
+                     printError(yylineno, FUNCTION_REDECLARATION_ERROR);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     return 1 ;
+                     fprintf(yyout, " : function declaration statement");
+                    }
               } 
               ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return 
+atomic_func_decl :   ATOMIC FUNC {scopeLevel++;} IDENTIFIER COLON args COLON func_return //////////////////////////////// COMPLETED ///////////////////////////////
                      { 
                             /*
                             Add args as they are encountered in the id_table, decl_arg_dats will be ready, return_type
                             is $6.datatype, $6.is_array 
                             */ 
-                            // if(f_tb.searchFunction($2.ID, decl_arg_dat,decl_arg_is_array) == ""){
-                            //        f_tb.addFunction($2.ID, decl_arg_dat, decl_arg_is_array , $6.datatype, $6.is_array, 1);
-                            //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
-                            // }else {                        
-                            //        printError(yylineno, FUNCTION_REDECLARATION_ERROR);
-                            //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
-                            // }
+                     if(f_tb.searchFunction($4.ID, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic) == ""){
+                            f_tb.addFunction($4.ID, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic,$8.datatype, $8.is_array);
+                            decl_arg_dat.clear(); 
+                            decl_arg_is_array.clear();
+                            decl_arg_is_atomic.clear();
+                            fprintf(yyout, " : function declaration statement");
+                            f_tb.print();
+                     }
+                     else {
+                            printError(yylineno, FUNCTION_REDECLARATION_ERROR);
+                            decl_arg_dat.clear(); 
+                            decl_arg_is_array.clear();
+                            decl_arg_is_atomic.clear();
+                            return 1 ;
+                            fprintf(yyout, " : function declaration statement");
+                            }
                      }
                      ;
 
-func_body : SCOPEOPEN {scopeLevel++;} func_statements 
+func_body : SCOPEOPEN func_statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -1051,7 +1078,24 @@ func_statements: func_scope func_statements
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK IDENTIFIER COLON {scopeLevel++;} args { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN taskscope 
+task: TASK IDENTIFIER COLON {scopeLevel++;} args
+       {
+              if(!t_tb.searchTask($2.ID, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic)){
+                     t_tb.addTask($2.ID, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     t_tb.print();
+                    }else {
+                     printError(yylineno, TASK_REDECLARATION_ERROR);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     return 1 ;
+                    }
+              fprintf(yyout, " : task declaration statement");
+       }
+              SCOPEOPEN taskscope 
        {
               i_tb.deleteVariables();
               scopeLevel--;
@@ -1164,14 +1208,15 @@ start: declaration start
 
 /* TYPE DEFINITION */
 
-type_declaration: TYPE TYPENAME 
+type_declaration: TYPE TYPENAME //////////////////////////////// COMPLETED ///////////////////////////////
               { 
-                     // types_set.insert($2.token); 
-                     if(c_tb.searchType($2.ID)){
+                     if(c_tb.searchType($2.token)){
                             printError(yylineno,TYPE_REDECLARATION);
                             return 1;
                      }
-                     curr_type = ($2.ID);
+                     c_tb.addType($2.token);
+                     c_tb.print();
+                     curr_type = ($2.token);
                      fprintf(yyout, " : type declaration statement"); 
 
               } SCOPEOPEN {scopeLevel++;} type_scope methods 
@@ -1179,6 +1224,7 @@ type_declaration: TYPE TYPENAME
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
+                     attr_tb.print();
               } SCOPECLOSE
               ;
 
@@ -1190,21 +1236,19 @@ declaration_t : declarationStmt_t SEMICOLON
               }
               ;
 
-declarationStmt_t : simpleDatatype simpleList_t
-                     {
+declarationStmt_t : simpleDatatype {
                             dt_state = ($1.datatype);
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
-                     }
-                | arrayDatatype arrayList_t
-                     {
+                     } simpleList_t
+                | arrayDatatype {
                             dt_state = ($1.datatype);
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
-                     }
+                     } arrayList_t
                 ;
 
-simpleList_t: IDENTIFIER 
+simpleList_t: IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1212,6 +1256,7 @@ simpleList_t: IDENTIFIER
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1221,13 +1266,14 @@ simpleList_t: IDENTIFIER
                             be the last one from the types_Set
                             */
                      }
-          | simpleList COMMA IDENTIFIER 
+          | simpleList_t COMMA IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
                             $3.is_atomic = atomic_state;
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1245,6 +1291,7 @@ simpleList_t: IDENTIFIER
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1255,7 +1302,7 @@ simpleList_t: IDENTIFIER
                             dt_state and RHS.datatype
                             */
                      }
-          | simpleList COMMA IDENTIFIER EQ RHS 
+          | simpleList_t COMMA IDENTIFIER EQ RHS 
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1263,6 +1310,7 @@ simpleList_t: IDENTIFIER
 
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1272,10 +1320,10 @@ simpleList_t: IDENTIFIER
                             will be the last one from the types_Set+ TYPE CHECK FOR COERCIBILITY OF
                             dt_state and RHS.datatype
                             */
-                     }
-          ;
+                     }      
+                     ;
 
-arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
                      {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -1283,6 +1331,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1292,7 +1341,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             last one from the types_Set atomic_state
                             */
                      }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE 
+          | arrayList_t COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1300,6 +1349,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
 
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1318,6 +1368,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1328,7 +1379,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
                             the last one from the types_Set + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
                             */
                      }
-          | arrayList COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
+          | arrayList_t COMMA IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE EQ RHS 
                      {
                             $3.datatype = (dt_state);
                             $3.is_array = array_state;
@@ -1336,6 +1387,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN dimlist SQUARECLOSE
 
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array);
+                                   // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1364,6 +1416,23 @@ func_decl_m : FUNC IDENTIFIER COLON {scopeLevel++;} args COLON func_return
               IN METHODS TABLE: $2.ID is method name, decl_arg_dats will be ready, 
               return_type is $6.datatype, $6.is_array class name will be the last element in the types_set
               */ 
+
+              if(m_tb.searchMethod($2.ID, curr_type, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic) == ""){
+                     m_tb.addMethod($2.ID, curr_type, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic,$7.datatype, $7.is_array);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     fprintf(yyout, " : function declaration statement");
+                     m_tb.print();
+
+                    }else {
+                     printError(yylineno, METHOD_REDECLARATION_ERROR);
+                     decl_arg_dat.clear(); 
+                     decl_arg_is_array.clear();
+                     decl_arg_is_atomic.clear();
+                     return 1 ;
+                     fprintf(yyout, " : function declaration statement");
+              }
                      decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement"); 
               } 
               ;

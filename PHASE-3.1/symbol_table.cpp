@@ -13,53 +13,65 @@ using namespace std ;
 
 /* -------------------------------------------------------- METHOD TABLE ----------------------------------------------------- */
 
-void MethodTable::addMethod(string name, string type, vector<string> arguments, string return_datatype, bool is_array_return_datatype, bool is_function_atomic){
+void MethodTable::addMethod(string name, string type, vector<string> arguments,  vector<int> is_array,vector<int> is_atomic,string return_datatype, bool is_array_return_datatype){
   method_table_row add ;
   add.arguments = arguments;
   add.is_array_return_datatype = is_array_return_datatype;
-  add.is_function_atomic = is_function_atomic ;
   add.name = name ;
+  add.is_array = is_array ;
+  add.is_atomic = is_atomic ;
   add.return_datatype = return_datatype ;
   add.type = type;
   this->m_tb.push_back(add);
 }
 
-string MethodTable::searchMethod(string type, string name, vector<string> arguments){
+string MethodTable::searchMethod(string name, string type, vector<string> arguments,  vector<int> is_array,vector<int> is_atomic){
+
   for(int i = this->m_tb.size() - 1 ; i >= 0 ;i-- ){
-    if(this->m_tb[i].name == name && arguments == this->m_tb[i].arguments){
+    if(this->m_tb[i].type == type && this->m_tb[i].name == name && arguments == this->m_tb[i].arguments && is_array == this->m_tb[i].is_array && is_atomic == this->m_tb[i].is_atomic){
       return this->m_tb[i].return_datatype ;
     }
   }
   return "" ;
 }
 
+
 void MethodTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Methods are: " << endl ;
   for(auto i : this->m_tb){
-    cout << i.is_function_atomic << " " << i.type << "::" << i.name << " - " ;
+    cout << i.type << "::" << i.name << " - " ;
     for(auto j : i.arguments){
       cout << j << ", " ;
     }
-    cout << " - " << i.is_array_return_datatype << endl ;
+    cout << ", is_return_array: " << i.is_array_return_datatype << endl ;
+    for(auto j: i.is_array){
+      cout << j <<", " ;
+    }
+    cout << endl ;
+    for(auto j: i.is_atomic){
+      cout << j << ", ";
+    }
+    cout << endl ;
   }
 }
 
 /* -------------------------------------------------------- FUNCTION TABLE ----------------------------------------------------- */
 
-void FunctionTable::addFunction(string name, vector<string> arguments, vector<int> is_array, string return_datatype, bool is_array_return_datatype, bool is_function_atomic){
+void FunctionTable::addFunction(string name, vector<string> arguments, vector<int> is_array, vector<int> is_atomic,string return_datatype, bool is_array_return_datatype){
   function_table_row add ;
   add.arguments = arguments;
   add.is_array_return_datatype = is_array_return_datatype;
-  add.is_function_atomic = is_function_atomic ;
   add.name = name ;
   add.is_array = is_array ;
+  add.is_atomic = is_atomic ;
   add.return_datatype = return_datatype ;
   this->f_tb.push_back(add);
 }
 
-string FunctionTable::searchFunction(string name, vector<string> arguments, vector<int> is_array){
+string FunctionTable::searchFunction(string name, vector<string> arguments, vector<int> is_array,vector<int> is_atomic){
   for(int i = this->f_tb.size() - 1 ; i>=0 ; i-- ){
-    if(this->f_tb[i].name == name && arguments == this->f_tb[i].arguments && is_array[i] == this->f_tb[i].is_array[i]){
+    if(this->f_tb[i].name == name && arguments == this->f_tb[i].arguments && is_array == this->f_tb[i].is_array && is_atomic == this->f_tb[i].is_atomic){
       return this->f_tb[i].return_datatype ;
     }
   }
@@ -68,27 +80,42 @@ string FunctionTable::searchFunction(string name, vector<string> arguments, vect
 
 void FunctionTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Functions are: " << endl ;
   for(auto i : this->f_tb){
-    cout << i.is_function_atomic << " " << i.name << " - " ;
+    cout << i.name << endl ;
+    cout << " args type: " ;
     for(auto j : i.arguments){
       cout << j << ", " ;
     }
-    cout << " - " << i.is_array_return_datatype << endl ;
+    cout << endl ;
+    cout << " args is_atomic: ";
+    for(auto j : i.is_atomic){
+      cout << j << ", ";
+    }
+    cout << endl ;
+    cout << " args is_array: ";
+    for(auto j : i.is_array){
+      cout << j << ", ";
+    }
+    cout << endl ;
+    cout << " return_is_array: " << i.is_array_return_datatype << endl ;
   }
 }
 
 /* -------------------------------------------------------- TASK TABLE ----------------------------------------------------------- */
 
-void TaskTable::addTask(string name, vector<string> arguments){
+void TaskTable::addTask(string name, vector<string> arguments,  vector<int> is_array, vector<int> is_atomic){
   task_table_row add;
   add.arguments = arguments;
   add.name = name;
+  add.args_atomic = is_atomic ;
+  add.args_is_array = is_array ;
   this->t_tb.push_back(add);
 }
 
-bool TaskTable::searchTask(string name, vector<string> arguments){
+bool TaskTable::searchTask(string name, vector<string> arguments, vector<int> is_array, vector<int> is_atomic){
   for(int i =this->t_tb.size()-1;i>=0;i--){
-    if(this->t_tb[i].name == name && this->t_tb[i].arguments == arguments){
+    if(this->t_tb[i].name == name && this->t_tb[i].arguments == arguments && this->t_tb[i].args_atomic == is_atomic && this->t_tb[i].args_is_array == is_array){
       return true ;
     }
   }
@@ -97,8 +124,10 @@ bool TaskTable::searchTask(string name, vector<string> arguments){
 
 void TaskTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Tasks are: " << endl ;
   for(auto i : this->t_tb){
-    cout << i.name << " - " ;
+    cout << i.name << endl ;
+    cout << "arguments: " << endl ;
     for(auto j : i.arguments){
       cout << j << ", " ;
     }
@@ -145,6 +174,7 @@ bool VariableTable::searchDeclaration(string name){
 
 void VariableTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Variables are: " << endl ;
   for(auto i: this->i_tb){
     cout << i.name << " " << i.datatype << " ,is_array: " << i.is_array << " ,is_atomic: " <<i.is_atomic << " ,scopeLevel: " << i.scopelevel << endl ;
   }
@@ -171,8 +201,9 @@ string AttributeTable::searchAttribute(string name, string type){
 
 void AttributeTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Attribute Table: "<< endl ;
   for(auto i: this->i_tb){
-    cout << "Type: " << i.type << " , " << i.name << " , " << i.datatype << " ,is_array: " << i.is_array << " ,is_atomic: " << i.is_atomic << endl ;
+    cout << i.name << " , " << "Type: " << i.type << " , " << i.datatype << " ,is_array: " << i.is_array << " ,is_atomic: " << i.is_atomic << endl ;
   }
 }
 
@@ -193,6 +224,7 @@ bool TypeTable::searchType(string name){
 
 void TypeTable::print(){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Types are: " << endl ;
   for(auto i : this->c_tb){
     cout << i.name << endl ;
   }

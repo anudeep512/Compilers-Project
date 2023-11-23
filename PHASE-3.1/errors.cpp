@@ -42,6 +42,8 @@ void printError(int lineNumber, int errorType){
     errorStr = "Should have atleast one START code block in the code" ;
   }else if(errorType == START_ERROR_MORE){
     errorStr = "More than one defination of start at line: " ;
+  } else if(errorType == METHOD_REDECLARATION_ERROR){
+    errorStr = "Method redeclaration error at line: " ;
   }
 
   std::cout << errorStr << lineNumber << std::endl ;

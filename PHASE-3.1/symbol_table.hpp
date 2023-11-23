@@ -14,23 +14,26 @@ typedef struct {
   string name ;
   string type ;
   vector<string> arguments ;
+  vector<int> is_array ;
+  vector<int> is_atomic ;
   string return_datatype ;
   bool is_array_return_datatype ;
-  bool is_function_atomic;
 } method_table_row ;
 
 typedef struct {
   string name ;
   vector<string> arguments ;
   vector<int> is_array ;
+  vector<int> is_atomic ;
   string return_datatype ;
   bool is_array_return_datatype ;
-  bool is_function_atomic;
 } function_table_row;
 
 typedef struct {
   string name ;
   vector<string> arguments ;
+  vector<int> args_atomic ;
+  vector<int> args_is_array ;
 } task_table_row ;
 
 typedef struct {
@@ -56,24 +59,24 @@ typedef struct{
 class MethodTable{
 public:
   vector<method_table_row> m_tb ;
-  void addMethod(string name, string type, vector<string> arguments, string return_datatype, bool is_array_return_datatype, bool is_function_atomic);
-  string searchMethod(string type, string name, vector<string> arguments);
+  void addMethod(string name, string type, vector<string> arguments, vector<int> is_array,vector<int> is_atomic, string return_datatype, bool is_array_return_datatype);
+  string searchMethod(string type, string name, vector<string> arguments, vector<int> is_array,vector<int> is_atomic);
   void print();
 };
 
 class FunctionTable{
 public:
   vector<function_table_row> f_tb ;
-  void addFunction(string name, vector<string> arguments, vector<int> is_array,string return_datatype, bool is_array_return_datatype, bool is_function_atomic);
-  string searchFunction(string name, vector<string> arguments, vector<int> is_array);
+  void addFunction(string name, vector<string> arguments, vector<int> is_array,vector<int> is_atomic,string return_datatype, bool is_array_return_datatype);
+  string searchFunction(string name, vector<string> arguments, vector<int> is_array,vector<int> is_atomic);
   void print();
 };
 
 class TaskTable{
 public:
   vector<task_table_row> t_tb ;
-  void addTask(string name, vector<string> arguments);
-  bool searchTask(string name, vector<string> arguments);
+  void addTask(string name, vector<string> arguments,  vector<int> is_array, vector<int> is_atomic);
+  bool searchTask(string name, vector<string> arguments,  vector<int> is_array, vector<int> is_atomic);
   void print();
 };
 
