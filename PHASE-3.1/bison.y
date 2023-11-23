@@ -1475,7 +1475,7 @@ method_statements: declaration
                  | log
                  | task_invoke
                  | func_invoke2
-                 | loop
+                 | loop 
                  | return_statement_m /*TYPE CHECK WITH MOST RECENT METHOD'S RETURN TYPE*/
                  | conditional | in_stmt EQ subroutine_token RHS SEMICOLON subroutine_token
                  | analyze_statement

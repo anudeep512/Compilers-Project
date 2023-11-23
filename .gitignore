@@ -18,9 +18,10 @@ PHASE - 2/bison.tab.c
 PHASE - 2/exe
 PHASE - 2/bison.output
 PHASE-3/
-PHASE-3.1/testcases/temp.cx
+PHASE-3.1/testcases
 PHASE-3.1/parsed_output
 PHASE-3.1/token_output
+PHASE-3.1/code_output
 PHASE-3.1/lex.yy.c
 PHASE-3.1/bison.tab.h
 PHASE-3.1/bison.tab.c
