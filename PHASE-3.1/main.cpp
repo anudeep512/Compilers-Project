@@ -23,9 +23,9 @@ int main(int argc, char ** argv) {
   yyout = fopen(outputParsedPath.c_str(),"w");
 
   // Code Output
-  std::string outputCodePath = std::string("./code_output/")+argv[1]+".cx";
+  std::string outputCodePath = std::string("./code_output/")+argv[1]+".cpp";
   fpcpp = fopen(outputCodePath.c_str(),"w");
-
+  fprintf(fpcpp, "#include <bits/stdc++.h>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\n\n\n");
 
   int i=yyparse();
 
