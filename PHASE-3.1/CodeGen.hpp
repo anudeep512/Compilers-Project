@@ -1,14 +1,30 @@
 #include <bits/stdc++.h>
 
-std::string FuncDeclGen(std::vector<std::string> &input)
+std::string changer(std::string variable)
 {
     std::map<std::string, std::string> map;
+    std::string ans;
 
-    map["number"] = "int";
-    map["letter"] = "char";
-    map["decimal"] = "float";
-    map["text"] = "string";
+    map["int"] = "number";
+    map["char"] = "letter";
+    map["float"] = "decimal";
+    map["string"] = "text";
 
+    if (map.find(variable) != map.end())
+    {
+        ans = map[variable];
+    }
+
+    else
+    {
+        ans = variable;
+    }
+
+    return ans;
+}
+
+std::string FuncDeclGen(std::vector<std::string> &input)
+{
     std::string output = "";
     bool colon = 0;
 
@@ -31,15 +47,7 @@ std::string FuncDeclGen(std::vector<std::string> &input)
             else if (colon == 1)
             {
                 output += ")";
-                if (map.find(input[i]) != map.end())
-                {
-                    output = map[input[i + 1]] + " " + output;
-                }
-
-                else
-                {
-                    output = input[i + 1] + " " + output;
-                }
+                output = input[i + 1] + " " + output;
 
                 i++;
             }
@@ -52,13 +60,7 @@ std::string FuncDeclGen(std::vector<std::string> &input)
 
         else
         {
-            if (map.find(input[i]) != map.end())
-            {
-                output += map[input[i]];
-            }
-
-            else
-                output += input[i];
+            output += input[i];
             output += " ";
         }
     }

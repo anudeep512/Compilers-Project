@@ -44,6 +44,7 @@
            bool boolVal; // If encountered a boolean constant, will store value here
            char *stringVal; // If encountered a string constant, will store value here
            char *token; // If encountered a token string like for/while, will store value here
+           char *converted; // If the given code has C++ reserved keywords, the changed variable name will be stored here.
        }attr;
 }
 
