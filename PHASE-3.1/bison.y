@@ -7,7 +7,7 @@
   #include "symbol_table.hpp"
   #include "semantics.hpp"   
   #include <string.h>
-  #include "CodeGen.hpp"
+
   extern int yylex();
   extern int yylineno;
   extern FILE * yyout, *fpcpp;
@@ -99,8 +99,8 @@
 %%
 
 subroutine_token: %empty {fprintf(fpcpp, "%s", yylval.attr.token);};
-subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.ID);};
-subroutine_datatype: %empty {fprintf(fpcpp, "hi %s", yylval.attr.datatype);};
+subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
+subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 //subroutine_is_atomic: %empty {fprintf(fpcpp, "%s", yylval.attr.is_atomic);};
 /* %type<attr> subroutine_is_atomic subroutine_is_array */
 //subroutine_is_array: %empty {fprintf(fpcpp, "%s", yylval.attr.is_array);};
@@ -256,7 +256,7 @@ T : IDENTIFIER subroutine_id E
 all_ops: arithmetic_op
       | comparison_op
       | logical_op
-      | HASH { fprintf(fpcpp, "<<"); }
+      | HASH { fprintf(fpcpp, "+"); }
       | ARROW { fprintf(fpcpp, "%s", $1); }
       ;
 
@@ -745,8 +745,8 @@ exprrr: expression_statement
       ;
 
 //for logging
-log: assignment_statement SEMICOLON { fprintf(fpcpp, "%s", $2); fprintf(yyout, " : assignment statement");  }
-    | expression_statement SEMICOLON { fprintf(fpcpp, "%s", $2);  fprintf(yyout, " : expression statement");  }
+log: assignment_statement SEMICOLON subroutine_token { fprintf(yyout, " : assignment statement");  }
+    | expression_statement SEMICOLON subroutine_token { fprintf(yyout, " : expression statement");  }
     ;
 
 g: IDENTIFIER subroutine_id EQ subroutine_token RHS 
@@ -1127,7 +1127,7 @@ taskscope: declaration taskscope
 /* Scope for Conditionals and Loop Statements */
 statement: declaration
           | log
-          | conditional
+          | conditional | in_stmt EQ subroutine_token RHS SEMICOLON subroutine_token 
           | loop
           | return_statement
           | func_invoke2
@@ -1180,7 +1180,7 @@ id     : IDENTIFIER subroutine_id
 
 startdec: START { //////////////////////////////// COMPLETED ///////////////////////////////
        fprintf(yyout, " : start declaration statement");
-       fprintf(fpcpp,"int main(int argc, char *argv[]) ");
+       fprintf(fpcpp,"int main() ");
        scopeLevel++;
        startCount++;
               if(startCount > 1){
@@ -1477,7 +1477,7 @@ method_statements: declaration
                  | func_invoke2
                  | loop
                  | return_statement_m /*TYPE CHECK WITH MOST RECENT METHOD'S RETURN TYPE*/
-                 | conditional
+                 | conditional | in_stmt EQ subroutine_token RHS SEMICOLON subroutine_token
                  | analyze_statement
                  | input
                  | output

@@ -7,8 +7,8 @@ type myType <<
     func printMsg : text msg, number c : void
     << 
         when [ (c == 0)] <<
-            this->c = c;
-            this->count = c;
+            in->c = c;
+            in->count = c;
         >>
         text str = ("Message from myType: " # msg # "\n");
         op: str;

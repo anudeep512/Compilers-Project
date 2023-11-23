@@ -1,18 +1,23 @@
 #include <bits/stdc++.h>
 
-std::string changer(std::string variable)
+char *changer(char *variable)
 {
     std::map<std::string, std::string> map;
-    std::string ans;
+    char *ans;
 
     map["int"] = "number";
     map["char"] = "letter";
     map["float"] = "decimal";
     map["string"] = "text";
 
-    if (map.find(variable) != map.end())
+    map["number"] = "int";
+    map["letter"] = "char";
+    map["text"] = "string";
+    map["decimal"] = "float";
+
+    if (map.find(std::string(variable)) != map.end())
     {
-        ans = map[variable];
+        ans = &map[variable][0];
     }
 
     else
