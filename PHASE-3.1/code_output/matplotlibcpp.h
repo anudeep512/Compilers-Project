@@ -2984,3 +2984,25 @@ private:
 };
 
 } // end namespace matplotlibcpp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
