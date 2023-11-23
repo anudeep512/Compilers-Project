@@ -34,7 +34,6 @@
        struct attribute
        {
            char *ID;          // Name of the variable
-           char *_type;       // Type of the variable (Function/Task/Type/Normal)
            bool is_atomic;    // Is the variable atomic?
            bool is_array;     // Is the datatype multidimensional?
            char *datatype;    // What is the datatype? (number/decimal/letter/text/bool)
@@ -43,7 +42,7 @@
            float decVal; // If encountered a decimal constant, will store value here
            char charVal; // If encountered a character constant, will store value here
            bool boolVal; // If encountered a boolean constant, will store value here
-           bool stringVal; // If encountered a string constant, will store value here
+           char *stringVal; // If encountered a string constant, will store value here
            char *token; // If encountered a token string like for/while, will store value here
        }attr;
 }
@@ -89,8 +88,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body
-
+%type<attr>  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype subroutine_is_atomic subroutine_is_array subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine
 
 %start begin
 
@@ -200,7 +198,7 @@ logical_op: AND { fprintf(fpcpp, "%s", $1); } | OR { fprintf(fpcpp, "%s", $1); }
 nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
 
 
-begin : {
+begin : %empty {
        if(startCount < 1){
               printError(yylineno,START_ERROR_LESS);
        }
@@ -215,7 +213,7 @@ begin : {
 
 /* RHS */
 
-E : {;}
+E : subroutine
 | SQUAREOPEN { fprintf(fpcpp, "%s", $1); } arr_access SQUARECLOSE { fprintf(fpcpp, "%s", $4); }
 ;
 
@@ -271,12 +269,24 @@ next : RHS all_ops next
 	| RHS 				
 	;
 
+subroutine_token: %empty {fprintf(fpcpp, "%s", yylval.attr.token);};
+subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.ID);};
+subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.datatype);};
+subroutine_is_atomic: %empty {fprintf(fpcpp, "%s", yylval.attr.is_atomic);};
+subroutine_is_array: %empty {fprintf(fpcpp, "%s", yylval.attr.is_array);};
+subroutine_intVal: %empty {fprintf(fpcpp, "%s", yylval.attr.intVal);};
+subroutine_decVal: %empty {fprintf(fpcpp, "%s", yylval.attr.decVal);};
+subroutine_charVal: %empty {fprintf(fpcpp, "%s", yylval.attr.charVal);};
+subroutine_boolVal: %empty {fprintf(fpcpp, "%s", yylval.attr.boolVal);};
+subroutine_stringVal: %empty {fprintf(fpcpp, "%s", yylval.attr.stringVal);};
+subroutine: %empty {;};
+
 RHS :	constants
     | T
     | TID { fprintf(fpcpp, "%s", $1.token);}
     | get_invoke | method_invoke | in_stmt
-    | ROUNDOPEN { fprintf(fpcpp, "%s", $1); } RHS all_ops next ROUNDCLOSE { fprintf(fpcpp, "%s", $6); } 
-    | ROUNDOPEN { fprintf(fpcpp, "%s", $1); } RHS ROUNDCLOSE { fprintf(fpcpp, "%s", $4); }
+    | ROUNDOPEN subroutine_token RHS all_ops next ROUNDCLOSE { fprintf(fpcpp, "%s", $6); } 
+    | ROUNDOPEN subroutine_token RHS ROUNDCLOSE { fprintf(fpcpp, "%s", $4); }
     | NEG { fprintf(fpcpp, "!"); } ROUNDOPEN { fprintf(fpcpp, "%s", $3); } RHS ROUNDCLOSE { fprintf(fpcpp, "%s", $6); }
     ;
 
@@ -836,7 +846,7 @@ extend : ELSE_WHEN { fprintf(fpcpp, "else if"); } SQUAREOPEN { fprintf(fpcpp, "(
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE { fprintf(fpcpp, "}"); }
-       | {;}
+       | subroutine
        ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
@@ -873,7 +883,7 @@ analyze_statement : ANALYZE analyze_label COLON analyze_label COLON analysis_arr
        } ;
 
 analyze_syntax   : COLON analysis_arrays analyze_syntax | 
-       {
+       %empty {
               /* 
               SHOULD COME BACK, WHAT ARE THESE? 
               */
@@ -937,7 +947,7 @@ sleep : SLEEP {fprintf(fpcpp,"usleep");} ROUNDOPEN {fprintf(fpcpp,"%s",$3.token)
 /* Grammar Rules for Input and Output*/
 file_name : ARROW {fprintf(fpcpp,"%s",$1.token);} STRINGLITERAL {fprintf(fpcpp,"%s",$3.token);}
           | ARROW {fprintf(fpcpp,"%s",$1.token);} IDENTIFIER {fprintf(fpcpp,"%s",$3.token);}
-          | {;}
+          | subroutine
           ;
 
 input : IP file_name COLON IDENTIFIER nextip
@@ -970,7 +980,7 @@ opstring : stringvalues nextop
          ;
 
 nextop : HASH stringvalues nextop
-       | {;}
+       | subroutine
        ;
 
 
@@ -1070,7 +1080,7 @@ func_scope: declaration
           ;
 
 func_statements: func_scope func_statements
-               | {;}
+               | subroutine
                ;
 
 /* Task declaration and implemenatation scope */
@@ -1094,7 +1104,7 @@ taskscope: declaration taskscope
         } SCOPECLOSE {fprintf(fpcpp,"}");}taskscope
         | sleep taskscope
         | method_invoke2 taskscope
-        | {;}
+        | subroutine
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -1120,7 +1130,7 @@ statement: declaration
           ;
 
 statements: statement statements
-          | {;}
+          | subroutine
           ;
           
           
@@ -1183,7 +1193,7 @@ start: declaration start
      } SCOPECLOSE {fprintf(fpcpp,"}");} start
      | sleep start
      | method_invoke2 start
-     | {;}
+     | subroutine
      ;
 
 /* TYPE DEFINITION */
@@ -1207,7 +1217,7 @@ type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME
               } SCOPECLOSE {fprintf(fpcpp,"}");} 
               ;
 
-type_scope: declaration_t type_scope | {;} ;
+type_scope: declaration_t type_scope | subroutine ;
 
 declaration_t : declarationStmt_t SEMICOLON {fprintf(fpcpp,"%s",$2.token);} 
               { 
@@ -1373,7 +1383,7 @@ arrayList_t : IDENTIFIER {fprintf(fpcpp,"%s",$1.token);} SQUAREOPEN {fprintf(fpc
                      ;
 
 methods: methods method
-       | {;}
+       | subroutine
        ;
 
 method: func_decl_m SCOPEOPEN {fprintf(fpcpp,"{");} method_body 
@@ -1486,7 +1496,7 @@ return_statement_m : RETURN {fprintf(fpcpp,"%s ",$1.token);} RHS SEMICOLON  {fpr
               } ;
 
 method_body: method_statements method_body
-           | {;}
+           | subroutine
            ;
            
 %%

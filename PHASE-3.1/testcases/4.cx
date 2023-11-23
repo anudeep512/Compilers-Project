@@ -1,0 +1,4 @@
+number a;
+$$ aa a;
+
+func incrCounter : number N : aa
