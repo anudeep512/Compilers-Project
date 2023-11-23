@@ -1486,7 +1486,7 @@ method_statements: declaration
                  {
                      i_tb.deleteVariables();
                      scopeLevel--;
-                 } SCOPECLOSE subroutine_closescope
+                 } SCOPECLOSE subroutine_closescope 
                  | method_invoke2
                  ;
 /* Return */
