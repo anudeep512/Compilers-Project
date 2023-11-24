@@ -42,7 +42,7 @@ task parallelFact: null
 
 
 start << 
-    number n = 10;
+    number n = (a*b*c*d*e + 1);
     array number num[n];
 
     for [ number i = 0 | (i < n) | i += 1] <<

@@ -4,33 +4,33 @@
 using namespace std;
 
 
-   int :  int 
+     int factorial(int b ) 
 {
     int res =  1,  i; 
    
-    „,­û (( i =  1 ) ; (i<=  b ); ( i +=  1)  )
+    for (( i =  1 ) ; (i<=  b ); ( i +=  1)  )
     {
          res*=  i; 
-    }}
+    }
 
     return  res;  
 }
 
 
-  int : ,  int b int
+      int add(int a , int b )
 {
     int c =  (a +  b); 
     return  c;
 }
 
-  float : ,  int b int
+      int add(float a , int b )
 {
     float c =  (a +  b);  // RHS error
     return  c;
 }
 
 // function overloading
-  float : ,  float b float
+      float add(float a , float b )
 {
     float c =  (a +  b); 
     {
@@ -48,16 +48,16 @@ void  parallelFact(int tid,  )
 
 
 int main()  { 
-    int n =  10; 
-    int num[ n] ; 
+    int n =  (a* b* c* d* e +  1); 
+     num[ n] ; 
 
-    „,­û ( int i =  0 ; (i <  n) ; i +=  1) {
+    for ( int i =  0 ; (i <  n) ; i +=  1) {
         num[ i]  =  i ; 
-    }}
+    }
 
       5  2   
 
-    int res1 =   add( 10,  num„,­û1„,­û) ; 
+    int res1 =   add( 10,  num[1]) ; 
 
     float res2 =   add( 10.300000,  2.300000) ;  // function overloading
 

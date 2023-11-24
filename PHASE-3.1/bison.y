@@ -6,6 +6,7 @@
   #include "errors.hpp"
   #include "symbol_table.hpp"
   #include "semantics.hpp"   
+  #include "CodeGen.hpp"
   #include <string.h>
 
   extern int yylex();
@@ -17,6 +18,11 @@
   int atomic_state;
   char * t_state ;
   char * curr_type ;
+
+  std::vector<std::string> func_array; 
+  std::vector<std::string> task_array;
+  std::vector<std::string> method_array;
+
   std::vector<char *> arg_dat; // used during invokes, will be sent to searching funcs
   std::vector<char *> decl_arg_dat; // used at declarations, will be sent to adding functions
   std::vector<int> decl_arg_is_array ;
@@ -92,7 +98,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr>  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype   subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_io subroutine_rs subr_init
+%type<attr> subroutine_io  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype   subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs
 
 
 
@@ -127,91 +133,88 @@ subroutine_closescope: %empty {fprintf(fpcpp,"}");} ;
 
 subr_this: %empty { fprintf(fpcpp, "this"); };
 
-subr_op: %empty { fprintf(fpcpp, "cout << "); } ;
-// subr_outputOP: %empty { fprintf(fpcpp, " << "); } ;
-
 subr_sleep: %empty { fprintf(fpcpp, "usleep"); } ;
 
-all_datatypes: NUDATATYPE subroutine_id
+all_datatypes: NUDATATYPE
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AUDATATYPE subroutine_token
+             | AUDATATYPE 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NARRUDATATYPE subroutine_token
+             | NARRUDATATYPE 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AARRUDATATYPE subroutine_token
+             | AARRUDATATYPE 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                             return 1;
                      }
-             | NBOOL subroutine_datatype
+             | NBOOL 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NDEC subroutine_datatype
+             | NDEC 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NNUM subroutine_datatype
+             | NNUM 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NTEXT subroutine_datatype
+             | NTEXT 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NLET subroutine_datatype
+             | NLET 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | ABOOL subroutine_datatype
+             | ABOOL 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | ADEC subroutine_datatype
+             | ADEC
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | ALET subroutine_datatype
+             | ALET 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | ATEXT subroutine_datatype
+             | ATEXT 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | ANUM subroutine_datatype
+             | ANUM 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
@@ -254,7 +257,7 @@ begin : %empty {
 /* RHS */
 
 E : subroutine
-| SQUAREOPEN { fprintf(fpcpp, "%s", $1); } arr_access SQUARECLOSE { fprintf(fpcpp, "%s", $4); }
+| SQUAREOPEN { fprintf(fpcpp, "%s", $1.token); } arr_access SQUARECLOSE { fprintf(fpcpp, "%s", $4.token); }
 ;
 
 T : IDENTIFIER subroutine_id E 
@@ -265,7 +268,7 @@ all_ops: arithmetic_op
       | comparison_op
       | logical_op
       | HASH { fprintf(fpcpp, "+"); }
-      | ARROW { fprintf(fpcpp, "%s", $1); }
+      | ARROW { fprintf(fpcpp, "%s", $1.token); }
       ;
 
 constants: INTEGERLITERAL subroutine_intVal
@@ -315,101 +318,112 @@ RHS :	constants
     ;
 
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
-nonAtomicSimple : NNUM subroutine_datatype
+nonAtomicSimple : NNUM 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-                | NDEC subroutine_datatype
+                | NDEC 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-                | NBOOL subroutine_datatype
+                | NBOOL 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-                | NLET subroutine_datatype
+                | NLET 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-                | NTEXT subroutine_datatype
+                | NTEXT 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-                | NVOID subroutine_datatype
+                | NVOID
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
                 ;
 
-atomicSimple : ANUM subroutine_datatype
+atomicSimple : ANUM
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-              | ADEC subroutine_datatype
+              | ADEC
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-              | ABOOL subroutine_datatype
+              | ABOOL
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-              | ALET subroutine_datatype
+              | ALET
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
-              | ATEXT subroutine_datatype
+              | ATEXT
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
               ; 
 
-nonAtomicArray : NARRNUM subroutine_datatype
+nonAtomicArray : NARRNUM
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NARRDEC subroutine_datatype
+              | NARRDEC
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NARRBOOL subroutine_datatype
+              | NARRBOOL
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NARRLET subroutine_datatype
+              | NARRLET
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NARRTEXT subroutine_datatype
+              | NARRTEXT
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
@@ -417,31 +431,31 @@ nonAtomicArray : NARRNUM subroutine_datatype
                      }
               ;
 
-atomicArray : AARRNUM subroutine_datatype
+atomicArray : AARRNUM
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | AARRDEC subroutine_datatype
+              | AARRDEC
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | AARRBOOL subroutine_datatype 
+              | AARRBOOL 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | AARRLET subroutine_datatype
+              | AARRLET
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | AARRTEXT subroutine_datatype
+              | AARRTEXT
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
@@ -458,30 +472,30 @@ declaration : declarationStmt SEMICOLON subroutine_token { fprintf(yyout, " : de
             ;
 
 
-/* declaration : declarationStmt SEMICOLON { fprintf(yyout, " : declaration statement"); }
-            ; */
-
 simpleDatatype : nonAtomicSimple 
-                     {
+                     {      fprintf(fpcpp, "%s", $1.converted);
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
               | atomicSimple 
                      {
+                            fprintf(fpcpp, "atomic %s", $1.converted);
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NUDATATYPE subroutine_id
+              | NUDATATYPE
                      {
+                            fprintf(fpcpp, "%s", $1.datatype);
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
                             $$.is_atomic = false;
                      }
            
-          | ATOMIC subroutine_token AUDATATYPE subroutine_id
+          | ATOMIC AUDATATYPE
                      {
+                            fprintf(fpcpp, "%s %s", $1.token, $2.datatype);
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
                             $$.is_atomic = true;
@@ -519,7 +533,6 @@ arrayDatatype  : nonAtomicArray
 
 declarationStmt : simpleDatatype  
                      {
-                            // printf("%s\n",$1.datatype);
                             dt_state = ($1.datatype);
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
@@ -810,13 +823,12 @@ both_assignment: assignment_statement
 loop: for_loop | while_loop ;
 
  /*FOR LOOP*/
-for_loop: FOR {scopeLevel++; fprintf(fpcpp, "%s", $1); } SQUAREOPEN subroutine_roundopen  both_assignment PIPE { fprintf(fpcpp, ";"); }  RHS PIPE { fprintf(fpcpp, ";"); }  exprrr SQUARECLOSE subroutine_roundclose { fprintf(yyout, " : loop statement");} SCOPEOPEN subroutine_openscope statements 
+for_loop: FOR {scopeLevel++; fprintf(fpcpp, "%s", $1.token); } SQUAREOPEN subroutine_roundopen  both_assignment PIPE { fprintf(fpcpp, ";"); }  RHS PIPE { fprintf(fpcpp, ";"); }  exprrr SQUARECLOSE subroutine_roundclose { fprintf(yyout, " : loop statement");} SCOPEOPEN subroutine_openscope statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE subroutine_closescope
        {
-              fprintf(fpcpp, "}");
               /*
               RHS.datatype is coercible with boolean?
               */
@@ -1012,17 +1024,17 @@ function: func_decl func_body
         | atomic_func_decl func_body
         ;
 
-func_args: all_datatypes IDENTIFIER subroutine_token
+func_args: all_datatypes {func_array.push_back(std::string($1.converted));  method_array.push_back(std::string($1.converted));} IDENTIFIER {func_array.push_back(std::string($3.ID));  method_array.push_back(std::string($3.ID));}
        {
               decl_arg_dat.push_back(($1.ID));
               decl_arg_is_array.push_back($1.is_array);
-              i_tb.addVariable($2.ID, $1.datatype, $1.is_atomic, $1.is_array);
+              i_tb.addVariable($3.ID, $1.datatype, $1.is_atomic, $1.is_array);
        } /*SHOULD COME BACK and see the order they are getting stored in*/
-       | func_args COMMA subroutine_token all_datatypes IDENTIFIER subroutine_id
-       {
-              i_tb.addVariable($5.ID, $4.datatype, $4.is_atomic, $4.is_array);
+       | func_args COMMA {func_array.push_back(std::string($2.token)); method_array.push_back(std::string($2.token)); } all_datatypes {func_array.push_back(std::string($4.converted)); method_array.push_back(std::string($4.converted)); } IDENTIFIER {func_array.push_back(std::string($6.ID));  method_array.push_back(std::string($6.ID)); }
+       {              
+              i_tb.addVariable($4.ID, $4.datatype, $4.is_atomic, $4.is_array);
               decl_arg_is_array.push_back($4.is_array);
-              decl_arg_dat.push_back(($4.ID));
+              decl_arg_dat.push_back(($6.ID));
        } 
        ;
 
@@ -1032,12 +1044,18 @@ args: func_args
 
 func_return : nonAtomic_datatypes 
               {
+                     func_array.push_back(std::string($1.converted));
+                     method_array.push_back(std::string($1.converted));
+
                      $$.datatype = ($1.datatype); 
                      $$.is_array = $1.is_array; 
                      /*Atomic is not needed*/
               }
             | NUDATATYPE 
             {
+              func_array.push_back(std::string($1.datatype));
+              method_array.push_back(std::string($1.datatype));
+
               $$.datatype = ($1.datatype); 
               $$.is_array = $1.is_array; 
               /*Atomic is not needed*/
@@ -1045,8 +1063,7 @@ func_return : nonAtomic_datatypes
             | IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;}
             ;
 
-func_decl :       FUNC IDENTIFIER COLON args COLON func_return 
-
+func_decl :  FUNC { func_array.clear(); func_array.push_back(std::string($1.token)); } IDENTIFIER {func_array.push_back(std::string($3.ID));} COLON { func_array.push_back(std::string($5.token)); } args COLON { func_array.push_back(std::string($8.token)); } func_return 
               { 
                     /*
                      Add args as they are encountered in the id_table, IN FUNCTIONS TABLE, name of the function
@@ -1059,6 +1076,12 @@ func_decl :       FUNC IDENTIFIER COLON args COLON func_return
               //        printError(yylineno, FUNCTION_REDECLARATION_ERROR);
               //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
               //       }
+
+                     cout<< FuncDeclGen(func_array);
+
+                     fprintf(fpcpp,"%s", FuncDeclGen(func_array).c_str());
+
+                     func_array.clear();
                      
               } 
               ;
@@ -1240,7 +1263,7 @@ type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
-              } SCOPECLOSE subroutine_closescope
+              } SCOPECLOSE subroutine_closescope {fprintf(fpcpp, ";");}
               ;
 
 type_scope: declaration_t type_scope | subroutine ;
@@ -1419,7 +1442,7 @@ method: func_decl_m SCOPEOPEN subroutine_openscope method_body
 
        } SCOPECLOSE subroutine_closescope ;
 
-func_decl_m : FUNC IDENTIFIER { fprintf(fpcpp,"%s",$2.datatype); fprintf(fpcpp,"%s",$2.token);}  COLON {fprintf(fpcpp,"(");scopeLevel++;} args COLON {fprintf(fpcpp,")");} func_return 
+func_decl_m : FUNC { method_array.clear(); method_array.push_back(std::string($1.token)); } IDENTIFIER { method_array.push_back(std::string($3.ID)); }  COLON {method_array.push_back(std::string($5.token));  scopeLevel++;} args COLON {method_array.push_back(std::string($8.token)); } func_return 
               { 
               /*
               Add args as they are encountered in the IDENTIFIER TABLE, 
@@ -1427,6 +1450,7 @@ func_decl_m : FUNC IDENTIFIER { fprintf(fpcpp,"%s",$2.datatype); fprintf(fpcpp,"
               return_type is $6.datatype, $6.is_array class name will be the last element in the types_set
               */ 
                      decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement"); 
+                     fprintf(fpcpp,"%s", FuncDeclGen(method_array).c_str());
               } 
               ;
 

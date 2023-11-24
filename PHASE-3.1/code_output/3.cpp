@@ -4,15 +4,15 @@
 using namespace std;
 
 
-int counter =  0;  // global int
+atomic int counter =  0;  // global int
 
 class myType {
  public: 
 
 
-    int count;  int data[ 100] ;  //attributes
+    int count;   data[ 100] ;  //attributes
 
-     numberfunc ( string : ,  int c ) void
+            void printMsg(string msg , int c )
     { 
         if ( (c ==  0)) {
             this-> c =  c; 
@@ -21,9 +21,9 @@ class myType {
         string str =  ("Message from myType: " + msg + "\n"); 
     }
 
-}
+};
 
-   int :   void
+      void incrCounter(int N )
 {
     int i =  0; 
     string t =  "hi"; 
