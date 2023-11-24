@@ -16,6 +16,10 @@
   char * dt_state ;
   int array_state;
   int atomic_state;
+
+  int makeParallel = -1;
+  char * task_name, * num_thr, * runs;
+
   char * t_state ;
   char * curr_type ;
 
@@ -67,9 +71,9 @@
 %token<attr> EQ INCR DECR ASSN_MODULO ASSN_EXPONENT ASSN_DIV ASSN_MUL 
 %token<attr> AND OR GT LT GTEQ LTEQ NOT_EQ NEG EQUAL_TWO
 %token<attr> INTEGERLITERAL STRINGLITERAL CHARACTERLITERAL BOOLEANLITERAL FLOATLITERAL
-%token<attr> COMMA SEMICOLON COLON
 %token<attr> PIPE
 %token<attr> IDENTIFIER
+%token<attr> COMMA SEMICOLON COLON
 %token<attr> SCOPEOPEN SCOPECLOSE
 %token<attr> ROUNDOPEN ROUNDCLOSE
 %token<attr> SQUAREOPEN SQUARECLOSE
@@ -100,7 +104,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> subroutine_io  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype   subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_pow subroutine_array subroutine_narray
+%type<attr> subroutine_io  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_pow subroutine_array subroutine_narray
 
 
 
@@ -110,9 +114,9 @@
 
 subroutine_token: %empty {fprintf(fpcpp, "%s ", yylval.attr.token);};
 subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
-subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
+// subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 //subroutine_is_atomic: %empty {fprintf(fpcpp, "%s", yylval.attr.is_atomic);};
-/* %type<attr> subroutine_is_atomic subroutine_is_array */
+/* %type<attr> subroutine_is_atomic subroutine_is_array subroutine_datatype*/
 //subroutine_is_array: %empty {fprintf(fpcpp, "%s", yylval.attr.is_array);};
 subroutine_intVal: %empty {fprintf(fpcpp, "%d", yylval.attr.intVal);};
 subroutine_decVal: %empty {fprintf(fpcpp, "%f", yylval.attr.decVal);};
@@ -165,8 +169,6 @@ all_datatypes: NUDATATYPE subroutine_narray
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            cout << "Here2\n";
-                            return 1;
                      }
              | NBOOL subroutine_narray
                      {
@@ -312,16 +314,7 @@ constants: INTEGERLITERAL subroutine_intVal
 
       ;
 
-next : RHS all_ops next {
-       if($2.token == "^") {
-              fprintf(fpcpp, "pow(");
-              fprintf(fpcpp, "%s", $1.token);
-              fprintf(fpcpp, ",");
-              fprintf(fpcpp, "%s", $3.token);
-              fprintf(fpcpp, ")");
-       }
-       }
-
+next : RHS all_ops next 
 	| RHS 				
 	;
 
@@ -459,30 +452,35 @@ atomicArray : AARRNUM
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = "int";
                      }
               | AARRDEC
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = "float";
                      }
               | AARRBOOL 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted ="bool";
                      }
               | AARRLET
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted ="char";
                      }
               | AARRTEXT
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted ="string";
                      }
               ;
 
@@ -530,6 +528,7 @@ arrayDatatype  : nonAtomicArray
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            fprintf(fpcpp, "%s", $1.converted);
                      }
               | atomicArray 
                      {
@@ -537,20 +536,22 @@ arrayDatatype  : nonAtomicArray
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            fprintf(fpcpp, "atomic <%s>", $1.converted);
                      }
-              | ARRAY subroutine_token NARRUDATATYPE subroutine_datatype
+              | ARRAY NARRUDATATYPE
                      {
-                            $$.datatype = ($1.datatype);
+                            fprintf(fpcpp, "%s", $2.datatype);
+                            $$.datatype = ($2.datatype);
                             $$.is_array = true; 
                             $$.is_atomic = false;
                      }
             
-              | ATOMIC ARRAY AARRUDATATYPE 
+              | ATOMIC ARRAY AARRUDATATYPE
                      {
-                            $$.datatype = ($1.datatype);
+                            fprintf(fpcpp, "%s<%s>", $1.token, $3.datatype);
+                            $$.datatype = ($3.datatype);
                             $$.is_array = true; 
                             $$.is_atomic = true;
-                            return 1;
                      }
               ;
 
@@ -753,9 +754,18 @@ exprlist: arith_expr
          | exprlist COMMA subroutine_id arith_expr
          ;
 
-arith_operand: IDENTIFIER { fprintf(fpcpp, "%s", $1.ID); } 
-              | INTEGERLITERAL { fprintf(fpcpp, "%d", $1.intVal); } 
-              | FLOATLITERAL { fprintf(fpcpp, "%f", $1.decVal); } 
+arith_operand: IDENTIFIER { 
+                     makeParallel = 0;
+                     $$.ID = $1.ID;
+                     fprintf(fpcpp, "%s", $1.ID); } 
+              | INTEGERLITERAL {
+                     makeParallel = 1;
+                     $$.intVal = $1.intVal;
+                     fprintf(fpcpp, "%d", $1.intVal); 
+              } 
+              | FLOATLITERAL { 
+                     $$.decVal = $1.decVal;       
+                     fprintf(fpcpp, "%f", $1.decVal); } 
               | ROUNDOPEN subroutine_token  arith_expr ROUNDCLOSE subroutine_token 
               ;
 
@@ -940,9 +950,7 @@ analyze_statement : ANALYZE {fprintf(fpcpp,"drawGraph(");} analyze_label COLON {
 /*calls*/
 
 
-
 // RHS:  RHS;
-
 func_invoke2 : func_invoke SEMICOLON {  fprintf(fpcpp, ";");  fprintf(yyout, " : call statement");  }
              ;
 
@@ -974,37 +982,34 @@ arguments : arguments COMMA subroutine_token  RHS
           }
           ;
 
+task_invoke_args: {fprintf(fpcpp, ",");} arguments 
+                | NULL_ARGS {arg_dat.clear();}
+                ;
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER COLON arith_expr COLON arith_expr COLON 
-              {
-                     fprintf(fpcpp,"Timer get;\n");
-                     fprintf(fpcpp,"for(int i=0;i<%s;i++){\n",$6.token);
-                     fprintf(fpcpp,"\tget.begin();\n");
-                     fprintf(fpcpp,"\tthread threads[%s];\n",$4.token);
-                     fprintf(fpcpp,"\tfor(int j=0;j<%s;j++){\n",$4.token);
-                     fprintf(fpcpp,"\t\tthreads[j] = thread(j");
-              } arguments 
-              {
-                     fprintf(fpcpp,");\n");
-                     fprintf(fpcpp,"\t}\n");
-                     fprintf(fpcpp,"\tfor(int j=0;i<%s;j++)\n\t{\n",$4.token);
-                     fprintf(fpcpp,"\t\tthreads[j].join();\n");
-                     fprintf(fpcpp,"\t}\n");
-                     fprintf(fpcpp,"\tget.stop();\n");
-                     fprintf(fpcpp,"}\n");
-                     fprintf(fpcpp,"double t = (get.time()/%s);\n",$6.token);
-
-              } COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
-              {
-                     /*
+task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON { 
+                     
+                     fprintf(yyout, " : call statement");                       /*
+                     
                      By here list of arg_dat (list of arguement's datatypes) will be ready. For all functions with name
                      as $1.ID, type check arguements
                      */
+
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $6.ID);
+                     fprintf(fpcpp, "\t\tget.begin();\n");
+                     fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
+                     fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
+                     
+              } task_invoke_args {
+
+                     fprintf(fpcpp, ");\n\t}");
+
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n\t\tthreads[i].join();\n\t}\n", $4.ID);
+                     fprintf(fpcpp, "\t\tget.stop();\n\t}\n\tdouble t = get.time()/%s;\n", $6.ID);
+
                      arg_dat.clear();
-              }
-              | MAKE_PARALLEL IDENTIFIER COLON arith_expr COLON arith_expr COLON NULL_ARGS COLON SEMICOLON { fprintf(yyout, " : call statement");  } ;
-               ;
+              }  COLON SEMICOLON ;
 
 /*get statement*/
 get_invoke : GET ARROW TIME ;
@@ -1182,11 +1187,26 @@ func_statements: func_scope func_statements
                ;
 
 /* Task declaration and implemenatation scope */
-task: TASK {fprintf(fpcpp,"void ");} IDENTIFIER subroutine_id COLON {fprintf(fpcpp,"(int tid, ");scopeLevel++;} args subroutine_roundclose { fprintf(yyout, " : task declaration statement"); } SCOPEOPEN subroutine_openscope taskscope 
+task: TASK { 
+              task_array.clear(); task_array.push_back("void"); 
+       } IDENTIFIER {        
+              task_array.push_back(std::string($3.ID)); 
+       } COLON { 
+                     task_array.push_back(std::string($5.token)); 
+                     task_array.push_back("int"); 
+                     task_array.push_back("tid"); 
+                     scopeLevel++;
+              } args  { 
+              task_array.push_back(")"); 
+              fprintf(yyout, " : task declaration statement"); 
+
+              fprintf(fpcpp,"\n%s", FuncDeclGen(task_array).c_str());      
+
+       } SCOPEOPEN subroutine_openscope taskscope 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE subroutine_closescope
+       } SCOPECLOSE subroutine_closescope 
     ;
 
 taskscope: declaration taskscope
@@ -1422,6 +1442,7 @@ arrayList_t : IDENTIFIER subroutine_id SQUAREOPEN subroutine_token dimlist SQUAR
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
                             $1.is_atomic = atomic_state;
+                            
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array);

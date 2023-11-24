@@ -28,7 +28,9 @@ task adder : array ThreadParams params
 start
 <<
 
-    number j = 0;
+    number j = 0;  array number arr[100];
+
+    arr[2*i + j] = 9;
 
     repeat [(j < 10)]
     <<

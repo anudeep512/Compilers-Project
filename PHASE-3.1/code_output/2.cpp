@@ -10,8 +10,7 @@
 using namespace std;
 
 
- mutex mtx[100000];
-int mut = 0;
+Timer get;
      
 int factorial(int b ) 
 {
@@ -56,7 +55,8 @@ float add(float a[] , float b )
 return  c;
 }
 
-void  parallelFact(int tid,  )
+  
+void parallelFact (int tid ) 
 {
     int thr =  tid ; 
      factorial(thr) ;
@@ -66,29 +66,31 @@ int hi;
 
 int main()  { 
     int n =  (a* b* c* d* e +  1); 
-     num[ n] ; 
+    int num[ n] ; 
 
     for ( int i =  0 ; (i <  n) ; i +=  1) {
         num[ i]  =  i ; 
     }
 
-      5  2  Timer get;
-for(int i=0;i<:;i++){
-	get.begin();
-	thread threads[:];
-	for(int j=0;j<:;j++){
-		threads[j] = thread(j2, 3);
+    int thr =  5,   runs=  4;  
+
+         
+	for(int i = 0; i < runs; i++) {
+		get.begin();
+		thread threads[thr];
+
+	for(int i = 0; i < thr; i++) {
+		threads[i] = thread(parallelFact, i+1 , add(a, b) );
 	}
-	for(int j=0;i<:;j++)
-	{
-		threads[j].join();
+	for(int i = 0; i < thr; i++) {
+		threads[i].join();
 	}
-	get.stop();
-}
-double t = (get.time()/:);
+		get.stop();
+	}
+	double t = get.time()/runs;
  
 
-    int res1 =   add( 10,  num[1]) ; 
+    int res1 =   add(  add( 10.100000,  2.100000) ,  num[1]) ; 
 
     float res2 =   add( 10.300000,  2.300000) ;  // function overloading
     drawGraph( "a",b,x,y) ; 

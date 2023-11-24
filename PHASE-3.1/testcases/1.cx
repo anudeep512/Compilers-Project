@@ -34,9 +34,6 @@ task temp : pt tempry
     >>
 >>
 
-
-
-
 start<<
 
     text a = "Heyy!";

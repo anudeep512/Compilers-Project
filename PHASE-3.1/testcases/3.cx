@@ -22,7 +22,7 @@ func incrCounter : number N : void
 
     invoke obj->printMsg: ("Hello from the main thread") :;
     ip: thrs;
-    op: str # heyy # huuh;
+    op -> "outptu.txt" : str # heyy # huuh;
     op: str#eeeee;
     repeat [ (i < N) ] 
     <<
@@ -39,12 +39,14 @@ start<<
     number thrs; 
     thrs = (2);
 
-    ip: thrs;
+    ip: thrs, hiii;
     op: str # heyy # huuh;
     op: str#eeeee;
 
     make parallel incrCounter : thrs * thrs : 4 : thrs :;  
-    ip: thrs;
+
+    ip -> "inp.txt" : thrs;
+    
     op: str # heyy # huuh;
     op: str#eeeee;
 

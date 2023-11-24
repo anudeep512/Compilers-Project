@@ -50,9 +50,11 @@ start <<
         num[i] = i ;
     >>
 
-    make parallel parallelFact: 5 : 2 : 2,3: ;
+    number thr = 5, runs = 4; 
 
-    number res1 = invoke add: 10, num[1]: ;
+    make parallel parallelFact: thr : runs : invoke add:a,b: : ;
+
+    number res1 = invoke add: invoke add: 10.1, 2.1: , num[1]: ;
 
     decimal res2 = invoke add: 10.3, 2.3: ; $$ function overloading
     analyze "a":b:x:y ;
