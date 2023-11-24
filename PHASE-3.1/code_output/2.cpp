@@ -10,7 +10,8 @@
 using namespace std;
 
 
-Timer get;
+ mutex mtx[100000];
+int mut = 0;
      
 int factorial(int b ) 
 {
@@ -73,6 +74,8 @@ int main()  {
     }
 
     int thr =  5,   runs=  4;  
+
+    runs = pow(runs,  2); 
 
          
 	for(int i = 0; i < runs; i++) {

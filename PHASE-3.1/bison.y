@@ -245,7 +245,7 @@ all_datatypes: NUDATATYPE subroutine_narray
               }
              ;
 
-expression_op: ASSN_DIV subroutine_token | ASSN_EXPONENT | ASSN_MODULO subroutine_token | ASSN_MUL subroutine_token | INCR subroutine_token | DECR subroutine_token ;
+expression_op: ASSN_DIV subroutine_token | ASSN_MODULO subroutine_token | ASSN_MUL subroutine_token | INCR subroutine_token | DECR subroutine_token ;
 comparison_op: LT subroutine_token | GT subroutine_token | GTEQ subroutine_token | LTEQ subroutine_token | NOT_EQ subroutine_token | EQUAL_TWO subroutine_token ;
 arithmetic_op: ADD subroutine_token | SUB subroutine_token | MUL subroutine_token | DIV subroutine_token | MODULO subroutine_token | EXPONENT  ;
 logical_op: AND subroutine_token | OR subroutine_token ;
@@ -789,7 +789,7 @@ expression_statement: LHS expression_op RHS
                             SHOULD COME BACK, THERE SHOULD BE A TYPE CHECK BTW LHS.datatype, RHS.datatype. 
                             IF IT MATCHES, WILL $$.datatype BE BOOLEAN? 
                             */
-                     }
+                     } | LHS ASSN_EXPONENT { fprintf(fpcpp, " = pow(%s, ", $1.ID); } RHS subroutine_roundclose 
                     ;
 exprrr: expression_statement
       | ROUNDOPEN subroutine_token expression_statement ROUNDCLOSE subroutine_token 

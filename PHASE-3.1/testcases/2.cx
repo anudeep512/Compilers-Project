@@ -52,6 +52,8 @@ start <<
 
     number thr = 5, runs = 4; 
 
+    runs[i] ^= 2;
+
     make parallel parallelFact: thr : runs : invoke add:a,b: : ;
 
     number res1 = invoke add: invoke add: 10.1, 2.1: , num[1]: ;
