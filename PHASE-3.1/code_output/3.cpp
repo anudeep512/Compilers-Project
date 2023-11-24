@@ -45,7 +45,7 @@ int main() {
     myType obj;  
 
     int thrs;  
-     thrs=  (2b); 
+     thrs=  (2); 
 
     cin>> thrs; 
     cout<< str << heyy << huuh; 

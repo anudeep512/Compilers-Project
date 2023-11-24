@@ -4,7 +4,8 @@
 using namespace std;
 
 
-     int factorial(int b ) 
+     
+int factorial(int b ) 
 {
     int res =  1,  i; 
    
@@ -17,20 +18,23 @@ using namespace std;
 }
 
 
-      int add(int a , int b )
+      
+int add(int a , int b )
 {
     int c =  (a +  b); 
     return  c;
 }
 
-      int add(float a , int b )
+      
+int add(float a , int b )
 {
     float c =  (a +  b);  // RHS error
     return  c;
 }
 
 // function overloading
-      float add(float a , float b )
+      
+float add(float a , float b )
 {
     float c =  (a +  b); 
     {
@@ -55,10 +59,27 @@ int main()  {
         num[ i]  =  i ; 
     }
 
-      5  2   
+      5  2  Timer get;
+for(int i=0;i<:;i++){
+	get.begin();
+	thread threads[:];
+	for(int j=0;j<:;j++){
+		threads[j] = thread(j2, 3);
+	}
+	for(int j=0;i<:;j++)
+{
+		threads[j].join();
+	}
+	get.stop();
+}
+double t = (get.time()/:);
+ 
 
     int res1 =   add( 10,  num[1]) ; 
 
     float res2 =   add( 10.300000,  2.300000) ;  // function overloading
 
+	return 0;
+
 }
+ 

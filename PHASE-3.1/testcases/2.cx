@@ -49,10 +49,11 @@ start <<
         num[i] = i ;
     >>
 
-    make parallel parallelFact: 5 : 2 : null: ;
+    make parallel parallelFact: 5 : 2 : 2,3: ;
 
     number res1 = invoke add: 10, num[1]: ;
 
     decimal res2 = invoke add: 10.3, 2.3: ; $$ function overloading
 
 >>
+ 
