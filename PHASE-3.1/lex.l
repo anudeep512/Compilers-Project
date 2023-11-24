@@ -95,7 +95,7 @@ NEWLINE [\n]
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
 MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
-COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
+/*COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})*/
 
 
 %%
@@ -509,9 +509,9 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
   }
 
 {MULTI_LINE_COMMENT} {
-  yytext[0] = '$';
+  yytext[0] = '/';
   yytext[1] = '*';
-  yytext[yyleng-1] = '$';
+  yytext[yyleng-1] = '/';
   yytext[yyleng-2] = '*';
   fprintf(fpcpp,"%s",yytext);
 }

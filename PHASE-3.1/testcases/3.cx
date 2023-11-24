@@ -11,7 +11,7 @@ type myType <<
             in->count = c;
         >>
         text str = ("Message from myType: " # msg # "\n");
-        op: str;
+        op : str # heyy # huuh;
     >>
 
 >>
@@ -37,7 +37,7 @@ start<<
 
     number thrs; 
 
-    ip : thrs;
+    ip -> "fileuu" : thrs , abc;
 
     make parallel incrCounter : thrs * thrs : 4 : thrs :;  
 
