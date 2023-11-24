@@ -1,10 +1,12 @@
 #include <bits/stdc++.h>
+#include <mutex>
 #include "matplotlibcpp.h"
 
 using namespace std;
 
 
-     
+ mutex mtx[100000];
+;int mut = 0;     
 int factorial(int b ) 
 {
     int res =  1,  i; 
@@ -33,15 +35,18 @@ int add(float a , int b )
 }
 
 // function overloading
-      
+       
 float add(float a , float b )
-{
+{mtx[mut].lock();
+
     float c =  (a +  b); 
     {
         int x =  (a -  b); 
          c=  (x +  2* b);  // should update the c value in this scope, is it updating?
     }
-    return  c;
+    mtx[mut].unlock();
+	mut++;
+return  c;
 }
 
 void  parallelFact(int tid,  )

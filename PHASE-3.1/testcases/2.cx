@@ -24,7 +24,7 @@ func add: decimal a, number b: number
 >>
 
 $$ function overloading
-func add: decimal a, decimal b: decimal
+atomic func add: decimal a, decimal b: decimal
 <<
     decimal c = (a + b);
     <<

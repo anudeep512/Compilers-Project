@@ -19,7 +19,7 @@
   char * t_state ;
   char * curr_type ;
 
-  std::vector<std::string> func_array; 
+  std::vector<std::string> func_array;
   std::vector<std::string> task_array;
   std::vector<std::string> method_array;
 
@@ -37,7 +37,7 @@
   int startCount = 0;
   int io=0;
   int io1 = 0;
-  int pow = 0;
+  int atm = 0;
 %}
 
 %union {
@@ -1030,7 +1030,8 @@ stringvalues : STRINGLITERAL subroutine_stringVal
             ;
 
 /* Return */
-return_statement : RETURN subroutine_token RHS SEMICOLON {fprintf(fpcpp,"%s",$4.token); $$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/fprintf(yyout, " : return statement"); } ;
+return_statement : RETURN subroutine_token RHS SEMICOLON {
+       fprintf(fpcpp,"%s",$4.token); $$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/fprintf(yyout, " : return statement"); } ;
                  | RETURN subroutine_token NVOID subroutine_token SEMICOLON subroutine_token {$$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/ fprintf(yyout, " : return statement"); } ;
 
 
@@ -1081,6 +1082,7 @@ func_return : nonAtomic_datatypes
 
                      $$.datatype = ($1.datatype); 
                      $$.is_array = $1.is_array; 
+
                      /*Atomic is not needed*/
               }
             | NUDATATYPE 
@@ -1108,7 +1110,7 @@ func_decl :  FUNC { func_array.clear(); func_array.push_back(std::string($1.toke
               //        printError(yylineno, FUNCTION_REDECLARATION_ERROR);
               //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
               //       }
-
+                     atm = 0;
                      cout<< FuncDeclGen(func_array);
 
                      fprintf(fpcpp,"\n%s", FuncDeclGen(func_array).c_str());
@@ -1117,12 +1119,13 @@ func_decl :  FUNC { func_array.clear(); func_array.push_back(std::string($1.toke
                      
               } 
               ;
-atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return 
+atomic_func_decl :   ATOMIC FUNC {func_array.clear(); func_array.push_back(std::string($2.token)); } IDENTIFIER {func_array.push_back(std::string($4.ID));} COLON { func_array.push_back(std::string($6.token)); } args COLON { func_array.push_back(std::string($9.token)); } func_return 
                      { 
                             /*
                             Add args as they are encountered in the id_table, decl_arg_dats will be ready, return_type
                             is $6.datatype, $6.is_array 
                             */ 
+
                             // if(f_tb.searchFunction($2.ID, decl_arg_dat,decl_arg_is_array) == ""){
                             //        f_tb.addFunction($2.ID, decl_arg_dat, decl_arg_is_array , $6.datatype, $6.is_array, 1);
                             //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
@@ -1130,14 +1133,21 @@ atomic_func_decl :   ATOMIC FUNC IDENTIFIER COLON args COLON func_return
                             //        printError(yylineno, FUNCTION_REDECLARATION_ERROR);
                             //        decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement");
                             // }
+                            cout<<"====================================="<<endl;
+                            // fprintf
+                            atm = 1;
+                            fprintf(fpcpp, "\n%s", FuncDeclGen(func_array).c_str());
+
+                            func_array.clear();
                      }
                      ;
 
-func_body : SCOPEOPEN subroutine_openscope { scopeLevel++;} func_statements 
+func_body : SCOPEOPEN subroutine_openscope {if(atm ==1){ fprintf(fpcpp,"mtx[mut].lock();\n"); scopeLevel++;}} func_statements 
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE subroutine_closescope
+       }
+       SCOPECLOSE subroutine_closescope
        ;
 
 func_scope: declaration
@@ -1145,7 +1155,11 @@ func_scope: declaration
           | task_invoke
           | func_invoke2 /*TYPE CHECK IF THE RETURN TYPE OF THIS FUNCTION IS VOID*/
           | loop
-          | return_statement
+          | {if(atm ==1){
+              fprintf(fpcpp,"mtx[mut].unlock();\n");
+              fprintf(fpcpp,"\tmut++;\n");
+              }}
+              return_statement
           | conditional
           | analyze_statement
           | input | output    | sleep
