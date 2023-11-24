@@ -4,13 +4,24 @@
 #include <string>
 #include <iostream>
 #include "CodeGen.hpp"
-// #include "matplotlibcpp.h"
+// #include "matplotlibcpp.h" 
 #include <chrono>
 
 
 using namespace std;
 using namespace chrono;
 
+// namespace plt = matplotlibcpp;
+// void drawGraph(string xlabel, string ylabel, double *x, double *y1)
+// {
+//     plt::figure_size(1200, 780); // Set this size once
+//     plt::plot(x,y1);
+//     // plt::plot(x,y2);
+//     plt::xlabel(xlabel);
+//     plt::ylabel(ylabel);
+//     plt::title("Graph");
+//     plt::show();
+// }
 
 class Timer{
     public:

@@ -1,12 +1,18 @@
 #include <bits/stdc++.h>
+#include <thread>
 #include <mutex>
+#include <fstream>
+#include <sstream>
+#include <usleep>
+#include <time>
 #include "matplotlibcpp.h"
 
 using namespace std;
 
 
  mutex mtx[100000];
-;int mut = 0;     
+int mut = 0;
+     
 int factorial(int b ) 
 {
     int res =  1,  i; 
@@ -28,16 +34,17 @@ int add(int a , int b )
 }
 
       
-int add(float a , int b )
+int add(float a , int b[] )
 {
-    float c =  (a +  b);  // RHS error
-    return  c;
+    float d =  (a +  b);  // RHS error
+    return  d;
 }
 
 // function overloading
        
-float add(float a , float b )
-{mtx[mut].lock();
+float add(float a[] , float b )
+{
+	mtx[mut].lock();
 
     float c =  (a +  b); 
     {
@@ -54,6 +61,7 @@ void  parallelFact(int tid,  )
     int thr =  tid ; 
      factorial(thr) ;
 }
+int hi; 
 
 
 int main()  { 
@@ -72,7 +80,7 @@ for(int i=0;i<:;i++){
 		threads[j] = thread(j2, 3);
 	}
 	for(int j=0;i<:;j++)
-{
+	{
 		threads[j].join();
 	}
 	get.stop();
@@ -83,6 +91,7 @@ double t = (get.time()/:);
     int res1 =   add( 10,  num[1]) ; 
 
     float res2 =   add( 10.300000,  2.300000) ;  // function overloading
+    drawGraph( "a",b,x,y) ; 
 
 	return 0;
 
