@@ -412,7 +412,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     {
       yylval.attr.is_atomic = true;
       yylval.attr.is_array = true;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype1: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
       return AARRUDATATYPE;
@@ -422,7 +422,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     {
       yylval.attr.is_atomic = true;
       yylval.attr.is_array = false;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype2: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
       return AUDATATYPE;
@@ -432,7 +432,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     {
       yylval.attr.is_atomic = false;
       yylval.attr.is_array = true;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype3: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
       return NARRUDATATYPE;
@@ -442,7 +442,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     {
       yylval.attr.is_atomic = false;
       yylval.attr.is_array = false;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", yytext);
+      fprintf(fp, "Userdefined Datatype4: %s\n", x); fprintf(yyout, "%s", yytext);
       chkArray = 0;
       chkAtomic = 0;
       return NUDATATYPE;
