@@ -7,12 +7,12 @@ using namespace std;
 atomic int counter =  0;  // global int
 
 class myType {
- public: 
-
+public:
 
     int count;   data[ 100] ;  //attributes
 
-            void printMsg(string msg , int c )
+            
+	void printMsg(string msg , int c )
     { 
         if ( (c ==  0)) {
             this-> c =  c; 
@@ -21,17 +21,24 @@ class myType {
         string str =  ("Message from myType: " + msg + "\n"); 
     }
 
+	myType() = default;
+	myType(const myType&) = default;
+	myType& operator = (const myType&) = default;
+	~myType() = default;
 };
 
-      void incrCounter(int N )
+      
+void incrCounter(int N )
 {
     int i =  0; 
     string t =  "hi"; 
 
      obj-> printMsg( ("Hello from the main thread") );
-    cin>> thrs; 
-    cout<< str << heyy << huuh; 
-    cout<< str<<eeeee; 
+    cin  >>  thrs; 
+     
+	ofstream fop( "outptu.txt"); fop <<  str <<  heyy <<  huuh;  fop.close();
+
+    cout <<  str<< eeeee; 
     while ( (i <  N) ) 
     {
          counter+=  1; 
@@ -47,21 +54,27 @@ int main() {
     int thrs;  
      thrs=  (2b); 
 
-    cin>> thrs; 
-    cout<< str << heyy << huuh; 
-    cout<< str<<eeeee; 
+    cin  >>  thrs >>  hiii; 
+    cout <<  str <<  heyy <<  huuh; 
+    cout <<  str<< eeeee; 
 
        thrs *  thrs  4  thrs   
-    cin>> thrs; 
-    cout<< str << heyy << huuh; 
-    cout<< str<<eeeee; 
+
+     
+	ifstream fin( "inp.txt"); fin  >>  thrs;  fin.close();
+
+    
+    cout <<  str <<  heyy <<  huuh; 
+    cout <<  str<< eeeee; 
 
 
      obj-> printMsg( ("Hello from the main thread"),  0);
 
-    cin>> thrs; 
-    cout<< str << heyy << huuh; 
-    cout<< str<<eeeee; 
+    cin  >>  thrs; 
+    cout <<  str <<  heyy <<  huuh; 
+    cout <<  str<< eeeee; 
 
+
+	return 0;
 
 }

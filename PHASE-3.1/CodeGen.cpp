@@ -30,9 +30,6 @@ class Timer{
         }     
 };
 
-
-
-
 char *changer(char *variable)
 {
     std::map<std::string, std::string> map;

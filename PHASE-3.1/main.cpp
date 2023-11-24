@@ -26,6 +26,7 @@ int main(int argc, char ** argv) {
   std::string outputCodePath = std::string("./code_output/")+argv[1]+".cpp";
   fpcpp = fopen(outputCodePath.c_str(),"w");
   fprintf(fpcpp, "#include <bits/stdc++.h>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\n\n\n");
+  fprintf(fpcpp,"Timer get;\n");
 
   int i=yyparse();
 
