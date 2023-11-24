@@ -4,61 +4,64 @@
 using namespace std;
 
 
-int  counter= 0; // global int
+int counter =  0;  // global int
 
 class myType {
  public: 
 
 
-    int count; int data[100]; //attributes
+    int count;  int data[ 100] ;  //attributes
 
-     numberfunc ( string :, int c ) void
+     numberfunc ( string : ,  int c ) void
     { 
-        if ( (c == 0)) {
-            this->c = c;
-            this->count = c;
+        if ( (c ==  0)) {
+            this-> c =  c; 
+            this-> count =  c; 
         }
-        string  str= ("Message from myType: " + msg + "\n");
-         cout<< str << heyy << huuh;
+        string str =  ("Message from myType: " + msg + "\n"); 
     }
 
 }
 
-   int :  void
+   int :   void
 {
-    int  i= 0;
-    string  t= "hi";
+    int i =  0; 
+    string t =  "hi"; 
 
-     obj->printMsg( ("Hello from the main thread") );
-    
-    while ( (i < N) ) 
+     obj-> printMsg( ("Hello from the main thread") );
+    cin>> thrs; 
+    cout<< str << heyy << huuh; 
+    cout<< str<<eeeee; 
+    while ( (i <  N) ) 
     {
-         counter+= 1;
-         i+= 1;
+         counter+=  1; 
+         i+=  1; 
     }
 }
 
 
 int main() {
     //number hey;
-    << ;; 
+    myType obj;  
 
-    int ;; 
+    int thrs;  
+     thrs=  (2b); 
 
-     ifstream fin( "fileuu"); fin >> thrs >> abc;
+    cin>> thrs; 
+    cout<< str << heyy << huuh; 
+    cout<< str<<eeeee; 
 
-       thrs * thrs  4  thrs   
+       thrs *  thrs  4  thrs   
+    cin>> thrs; 
+    cout<< str << heyy << huuh; 
+    cout<< str<<eeeee; 
 
-     obj->printMsg( ("Hello from the main thread") );
-    cout<< str;
-     cout<< counter;
 
-    obj->count = 0;
-    obj->c = 1; // ----------------------------------------------Attributes not found in TYPE
+     obj-> printMsg( ("Hello from the main thread"),  0);
 
-    // ---------------------------------------------------------------- Method not Found in TYPE error message
-     obj-> invalidMethodd( ("Invalid method name") );
-
+    cin>> thrs; 
+    cout<< str << heyy << huuh; 
+    cout<< str<<eeeee; 
 
 
 }

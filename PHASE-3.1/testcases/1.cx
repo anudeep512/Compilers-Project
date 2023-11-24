@@ -1,6 +1,14 @@
 type pt
 <<
     decimal x, y;
+    func dist : pt a, pt b: void 
+    <<
+        decimal d = ((a->x - b->x)^2) ;
+    
+        atomic number a = 0;
+        $$ return (d^1/2); $$ check if both works or not. 
+        return a; $$ return error
+    >>
 >>
 
 func dist : pt a, pt b: decimal 
@@ -54,6 +62,10 @@ start<<
     $$  -------------------------------------------------------- Type not found error below
     pty testt;
     pt crctType;
+
+    invoke crctType->dist : a, b:;
+
+    op : str ;
     
     testt-> x = 1; testt->y = 2;
 

@@ -92,7 +92,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr>  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype   subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_io subroutine_rs
+%type<attr>  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement analyze_syntax func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id subroutine_datatype   subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_io subroutine_rs subr_init
 
 
 
@@ -115,7 +115,8 @@ subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin");} else{fprintf(fpcpp,"cout
 subroutine_rs: %empty {if(io==1){fprintf(fpcpp,">>");} else{fprintf(fpcpp,"<<");}}
 subroutine_fileH: %empty {if(io==1){fprintf(fpcpp,"ifstream fin(");} else{fprintf(fpcpp,"ofstream fop(");}} 
 subroutine_fio: %empty {if(io==1){fprintf(fpcpp,"; fin");} else{fprintf(fpcpp,"; fop");}}
-subroutine_fileC: %empty {if(io1==0){if(io==1){fprintf(fpcpp," fin.close();");} else{fprintf(fpcpp," fop.close();");}}}
+subroutine_fileC: %empty {if(io1 == 0){if(io==1){fprintf(fpcpp," fin.close();");} else{fprintf(fpcpp," fop.close();");}}}
+subr_init: %empty {io1 = 1;}
 subroutine: %empty {;};
 
 subroutine_roundopen: %empty {fprintf(fpcpp, "(");} ;
@@ -964,9 +965,9 @@ sleep : SLEEP subr_sleep ROUNDOPEN subroutine_token FLOATLITERAL subroutine_decV
        | SLEEP subr_sleep ROUNDOPEN subroutine_roundopen INTEGERLITERAL subroutine_intVal ROUNDCLOSE subroutine_roundclose SEMICOLON subroutine_token { fprintf(yyout, " : sleep statement");  };
 
 /* Grammar Rules for Input and Output*/
-file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal subroutine_roundclose subroutine_fio 
-          | ARROW subroutine_fileH IDENTIFIER subroutine_id subroutine_roundclose subroutine_fio
-          | {io1 = 1;} subroutine_io
+file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal subroutine_roundclose subroutine_fio {io1 = 0;}
+          | ARROW subroutine_fileH IDENTIFIER subroutine_id subroutine_roundclose subroutine_fio 
+          | subroutine_io subr_init
           ;
 
 input : IP {io = 1;} file_name COLON subroutine_rs IDENTIFIER subroutine_id nextip subroutine_fileC
@@ -993,6 +994,7 @@ return_statement : RETURN subroutine_token RHS SEMICOLON {fprintf(fpcpp,"%s",$4.
 output : OP {io = 0;} file_name COLON opstring SEMICOLON subroutine_token subroutine_fileC
        { 
         fprintf(yyout, " : print statement");
+       //  printf("================================================");
        }
       ;
 
@@ -1044,6 +1046,7 @@ func_return : nonAtomic_datatypes
             ;
 
 func_decl :       FUNC IDENTIFIER COLON args COLON func_return 
+
               { 
                     /*
                      Add args as they are encountered in the id_table, IN FUNCTIONS TABLE, name of the function
@@ -1524,7 +1527,7 @@ method_body: method_statements method_body
            ;
            
 %%
-
+// io1 = 0;
 void yyerror(std::string s){
   std::cout << "Syntax Error: " << s << " at line number - " << yylineno << std::endl;
 }
