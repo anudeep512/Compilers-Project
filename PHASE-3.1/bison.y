@@ -147,17 +147,19 @@ all_datatypes: NUDATATYPE
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NARRUDATATYPE 
+             | ARRAY NARRUDATATYPE 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            cout << "Here1\n";
                      }
-             | AARRUDATATYPE 
+             | ATOMIC ARRAY AARRUDATATYPE 
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            cout << "Here2\n";
                             return 1;
                      }
              | NBOOL 
@@ -489,7 +491,7 @@ simpleDatatype : nonAtomicSimple
                      }
               | atomicSimple 
                      {
-                            fprintf(fpcpp, "atomic %s", $1.converted);
+                            fprintf(fpcpp, "atomic <%s>", $1.converted);
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
@@ -504,7 +506,7 @@ simpleDatatype : nonAtomicSimple
            
           | ATOMIC AUDATATYPE
                      {
-                            fprintf(fpcpp, "%s %s", $1.token, $2.datatype);
+                            fprintf(fpcpp, "%s<%s>", $1.token, $2.datatype);
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
                             $$.is_atomic = true;
