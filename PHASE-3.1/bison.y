@@ -100,7 +100,7 @@
 
 %%
 
-subroutine_token: %empty {fprintf(fpcpp, "%s", yylval.attr.token);};
+subroutine_token: %empty {fprintf(fpcpp, "%s ", yylval.attr.token);};
 subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 //subroutine_is_atomic: %empty {fprintf(fpcpp, "%s", yylval.attr.is_atomic);};
@@ -131,25 +131,25 @@ subr_op: %empty { fprintf(fpcpp, "cout << "); } ;
 
 subr_sleep: %empty { fprintf(fpcpp, "usleep"); } ;
 
-all_datatypes: NUDATATYPE subroutine_datatype
+all_datatypes: NUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AUDATATYPE subroutine_datatype
+             | AUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NARRUDATATYPE subroutine_datatype
+             | NARRUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AARRUDATATYPE subroutine_datatype
+             | AARRUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
@@ -472,14 +472,14 @@ simpleDatatype : nonAtomicSimple
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NUDATATYPE subroutine_token
+              | NUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
                             $$.is_atomic = false;
                      }
            
-          | ATOMIC subroutine_token AUDATATYPE subroutine_token 
+          | ATOMIC subroutine_token AUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
@@ -531,7 +531,7 @@ declarationStmt : simpleDatatype
                      } arrayList
                 ;
 
-simpleList: IDENTIFIER subroutine_token //////////////////////////////// COMPLETED ///////////////////////////////
+simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -683,15 +683,13 @@ dimlist : dimlist COMMA { fprintf(fpcpp, "]["); } array_inValues
         | array_inValues
         ;
 
-LHS : IDENTIFIER 
+LHS : IDENTIFIER subroutine_id
        {
               i_tb.searchDeclaration($1.ID);
               /*
               Search for identifier, get it's attributes, 
               store in $1.datatype, $1.is_array, $1.is_atomic
               */
-
-              fprintf(fpcpp, "%s", $1.ID);
        }
     | IDENTIFIER subroutine_id SQUAREOPEN subroutine_token arr_access SQUARECLOSE subroutine_token
                  {
@@ -731,7 +729,6 @@ arith_expr: arith_expr arithmetic_op arith_operand
  /*ASSIGNMENT STATEMENT*/
 assignment_statement: LHS EQ subroutine_token RHS 
                      {
-
                             /*
                             Type check for LHS.datatype, RHS.datatype
                             */
