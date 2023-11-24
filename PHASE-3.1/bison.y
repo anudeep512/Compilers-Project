@@ -117,11 +117,11 @@ subroutine_decVal: %empty {fprintf(fpcpp, "%f", yylval.attr.decVal);};
 subroutine_charVal: %empty {fprintf(fpcpp, "%c", yylval.attr.charVal);};
 subroutine_boolVal: %empty {fprintf(fpcpp, "%d", yylval.attr.boolVal);};
 subroutine_stringVal: %empty {fprintf(fpcpp, "%s", yylval.attr.stringVal);};
-subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin");} else{fprintf(fpcpp,"cout");}}
-subroutine_rs: %empty {if(io==1){fprintf(fpcpp,">>");} else{fprintf(fpcpp,"<<");}}
-subroutine_fileH: %empty {if(io==1){fprintf(fpcpp,"ifstream fin(");} else{fprintf(fpcpp,"ofstream fop(");}} 
+subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin ");} else{fprintf(fpcpp,"cout ");}}
+subroutine_rs: %empty {if(io==1){fprintf(fpcpp," >> ");} else{fprintf(fpcpp,"<< ");}}
+subroutine_fileH: %empty {if(io==1){fprintf(fpcpp,"\n\tifstream fin(");} else{fprintf(fpcpp,"\n\tofstream fop(");}} 
 subroutine_fio: %empty {if(io==1){fprintf(fpcpp,"; fin");} else{fprintf(fpcpp,"; fop");}}
-subroutine_fileC: %empty {if(io1 == 0){if(io==1){fprintf(fpcpp," fin.close();");} else{fprintf(fpcpp," fop.close();");}}}
+subroutine_fileC: %empty {if(io1 == 0){if(io==1){fprintf(fpcpp," fin.close();\n");} else{fprintf(fpcpp," fop.close();\n");}}}
 subr_init: %empty {io1 = 1;}
 subroutine: %empty {;};
 
@@ -303,7 +303,16 @@ constants: INTEGERLITERAL subroutine_intVal
 
       ;
 
-next : RHS all_ops next 
+next : RHS all_ops next {
+       if($2.token == "^") {
+              fprintf(fpcpp, "pow(");
+              fprintf(fpcpp, "%s", $1.token);
+              fprintf(fpcpp, ",");
+              fprintf(fpcpp, "%s", $3.token);
+              fprintf(fpcpp, ")");
+       }
+       }
+
 	| RHS 				
 	;
 
@@ -1079,7 +1088,7 @@ func_decl :  FUNC { func_array.clear(); func_array.push_back(std::string($1.toke
 
                      cout<< FuncDeclGen(func_array);
 
-                     fprintf(fpcpp,"%s", FuncDeclGen(func_array).c_str());
+                     fprintf(fpcpp,"\n%s", FuncDeclGen(func_array).c_str());
 
                      func_array.clear();
                      
@@ -1221,7 +1230,7 @@ startdec: START { //////////////////////////////// COMPLETED ///////////////////
        {
               i_tb.deleteVariables();
               scopeLevel--;
-       } SCOPECLOSE subroutine_closescope
+       } {fprintf(fpcpp, "\treturn 0;\n\n");} SCOPECLOSE subroutine_closescope
        ;
 
 start: declaration start
@@ -1245,7 +1254,7 @@ start: declaration start
      ;
 
 /* TYPE DEFINITION */
-subr_public: %empty { fprintf(fpcpp, "\n public: \n"); };
+subr_public: %empty { fprintf(fpcpp, "\npublic:"); };
 
 type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME
               { 
@@ -1263,6 +1272,13 @@ type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
+
+              } {
+                     fprintf(fpcpp, "\t%s() = default;\n", $3.token);
+                     fprintf(fpcpp, "\t%s(const %s&) = default;\n", $3.token, $3.token);
+                     fprintf(fpcpp, "\t%s& operator = (const %s&) = default;\n", $3.token, $3.token);
+                     fprintf(fpcpp, "\t~%s() = default;\n", $3.token);
+
               } SCOPECLOSE subroutine_closescope {fprintf(fpcpp, ";");}
               ;
 
@@ -1450,7 +1466,7 @@ func_decl_m : FUNC { method_array.clear(); method_array.push_back(std::string($1
               return_type is $6.datatype, $6.is_array class name will be the last element in the types_set
               */ 
                      decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement"); 
-                     fprintf(fpcpp,"%s", FuncDeclGen(method_array).c_str());
+                     fprintf(fpcpp,"\n\t%s", FuncDeclGen(method_array).c_str());
               } 
               ;
 
