@@ -24,7 +24,7 @@ func add: decimal a, number b: number
 >>
 
 $$ function overloading
-func add: decimal a, decimal b: decimal
+atomic func add: decimal a, decimal b: decimal
 <<
     decimal c = (a + b);
     <<
@@ -58,3 +58,4 @@ start <<
     decimal res2 = invoke add: 10.3, 2.3: ; $$ function overloading
 
 >>
+ 

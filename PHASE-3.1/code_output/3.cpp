@@ -52,7 +52,7 @@ int main() {
     myType obj;  
 
     int thrs;  
-     thrs=  (2b); 
+     thrs=  (2); 
 
     cin  >>  thrs >>  hiii; 
     cout <<  str <<  heyy <<  huuh; 

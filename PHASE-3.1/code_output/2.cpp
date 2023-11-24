@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <mutex>
 #include "matplotlibcpp.h"
 
 using namespace std;
@@ -42,7 +43,9 @@ float add(float a , float b )
         int x =  (a -  b); 
          c=  (x +  2* b);  // should update the c value in this scope, is it updating?
     }
-    return  c;
+    mtx[mut].unlock();
+	mut++;
+return  c;
 }
 
   
@@ -86,3 +89,4 @@ int main()  {
 	return 0;
 
 }
+ 

@@ -25,8 +25,7 @@ int main(int argc, char ** argv) {
   // Code Output
   std::string outputCodePath = std::string("./code_output/")+argv[1]+".cpp";
   fpcpp = fopen(outputCodePath.c_str(),"w");
-  fprintf(fpcpp, "#include <bits/stdc++.h>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\n\n\n");
-  fprintf(fpcpp,"Timer get;\n");
+  fprintf(fpcpp, "#include <bits/stdc++.h>\n#include <mutex>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\n\n\n mutex mtx[100000];\n;int mut = 0;");
 
   int i=yyparse();
 

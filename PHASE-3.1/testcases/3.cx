@@ -37,7 +37,7 @@ start<<
     myType obj; 
 
     number thrs; 
-    thrs = (2^b);
+    thrs = (2);
 
     ip: thrs, hiii;
     op: str # heyy # huuh;
