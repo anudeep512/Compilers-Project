@@ -98,7 +98,7 @@
 
 %%
 
-subroutine_token: %empty {fprintf(fpcpp, "%s", yylval.attr.token);};
+subroutine_token: %empty {fprintf(fpcpp, "%s ", yylval.attr.token);};
 subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 subroutine_datatype: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should be changed to yylval.attr.converted
 //subroutine_is_atomic: %empty {fprintf(fpcpp, "%s", yylval.attr.is_atomic);};
@@ -109,6 +109,7 @@ subroutine_decVal: %empty {fprintf(fpcpp, "%f", yylval.attr.decVal);};
 subroutine_charVal: %empty {fprintf(fpcpp, "%c", yylval.attr.charVal);};
 subroutine_boolVal: %empty {fprintf(fpcpp, "%d", yylval.attr.boolVal);};
 subroutine_stringVal: %empty {fprintf(fpcpp, "%s", yylval.attr.stringVal);};
+subroutine_close_scope: %empty {fprintf(fpcpp,">>");};
 subroutine: %empty {;};
 
 subroutine_roundopen: %empty {fprintf(fpcpp, "(");} ;
@@ -124,25 +125,25 @@ subr_outputOP: %empty { fprintf(fpcpp, " << "); } ;
 
 subr_sleep: %empty { fprintf(fpcpp, "usleep"); } ;
 
-all_datatypes: NUDATATYPE subroutine_datatype
+all_datatypes: NUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AUDATATYPE subroutine_datatype
+             | AUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | NARRUDATATYPE subroutine_datatype
+             | NARRUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-             | AARRUDATATYPE subroutine_datatype
+             | AARRUDATATYPE subroutine_token
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
@@ -465,14 +466,14 @@ simpleDatatype : nonAtomicSimple
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                      }
-              | NUDATATYPE subroutine_token
+              | NUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
                             $$.is_atomic = false;
                      }
            
-          | ATOMIC subroutine_token AUDATATYPE subroutine_token 
+          | ATOMIC subroutine_token AUDATATYPE subroutine_id
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = false; 
@@ -524,7 +525,7 @@ declarationStmt : simpleDatatype
                      } arrayList
                 ;
 
-simpleList: IDENTIFIER subroutine_token //////////////////////////////// COMPLETED ///////////////////////////////
+simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED ///////////////////////////////
               {
                             $1.datatype = (dt_state);
                             $1.is_array = array_state;
@@ -676,15 +677,13 @@ dimlist : dimlist COMMA { fprintf(fpcpp, "]["); } array_inValues
         | array_inValues
         ;
 
-LHS : IDENTIFIER 
+LHS : IDENTIFIER subroutine_id
        {
               i_tb.searchDeclaration($1.ID);
               /*
               Search for identifier, get it's attributes, 
               store in $1.datatype, $1.is_array, $1.is_atomic
               */
-
-              fprintf(fpcpp, "%s", $1.ID);
        }
     | IDENTIFIER subroutine_id SQUAREOPEN subroutine_token arr_access SQUARECLOSE subroutine_token
                  {
@@ -724,7 +723,6 @@ arith_expr: arith_expr arithmetic_op arith_operand
  /*ASSIGNMENT STATEMENT*/
 assignment_statement: LHS EQ subroutine_token RHS 
                      {
-
                             /*
                             Type check for LHS.datatype, RHS.datatype
                             */
@@ -961,11 +959,11 @@ sleep : SLEEP subr_sleep ROUNDOPEN subroutine_token FLOATLITERAL subroutine_decV
 
 /* Grammar Rules for Input and Output*/
 file_name : ARROW subroutine_token STRINGLITERAL subroutine_stringVal
-          | ARROW subroutine_token IDENTIFIER subroutine_id
-          | subroutine
+          | ARROW {fprintf(fpcpp,"ifstream fin(");}  subroutine_token IDENTIFIER subroutine_id {fprintf(fpcpp,"\"");}subroutine_roundclose
+          | subroutine {fprintf(fpcpp,"cin ");}
           ;
 
-input : IP file_name COLON IDENTIFIER subroutine_id nextip
+input : IP file_name COLON subroutine_close_scope IDENTIFIER subroutine_id nextip
       ;
 
 /*SCAN STATEMENT*/
