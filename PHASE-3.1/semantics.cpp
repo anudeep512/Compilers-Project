@@ -2,6 +2,24 @@
 #include "errors.hpp"
 #include "symbol_table.hpp"
 
+void printArgs(vector<string> datatypes, vector<int> array, vector<int> atomic){
+  cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
+  cout << "Arguments Passage: " << endl ;
+  cout << "Datatypes are: " << endl ;
+  for(auto i: datatypes){
+    cout << i << " , " ;
+  }
+  cout << endl ;
+  for(auto i: array){
+    cout << i << " , " ;
+  }
+  cout << endl ;
+  for(auto i: atomic){
+    cout << i << " , " ;
+  }
+  cout << endl ;
+}
+
 // This is required in semantic analysis for typechecking
 // We don't have operator overloading 
 // We even don't have move operator and = operation
@@ -15,12 +33,22 @@ vector<string> to_string_vec(vector<char*> vec)
   return ans;
 }
 
+char* cstr(string str) {
+
+  char* cstr = new char[str.length() + 1];
+  std::strcpy(cstr, str.c_str());
+
+  return cstr;
+}
+
 string is_coercible_rhs(string dt1, string dt2, string op){
+  // cout << "is_coercible_rhs: " << dt1 << " "<<dt2 << " " << op << endl ;
   if(op == "#" && (dt1 == "number" || dt1 == "decimal" || dt1 == "letter" || dt1 == "bool" || dt1 == "text") && (dt2 == "number" || dt2 == "decimal" || dt2 == "letter" || dt2 == "bool" || dt2 == "text")){ 
     return "text" ; // Resultant expression is changed to string
   }
   string res = dt1 + dt2 ;
-  if(dt1 == "texttext" && (op == ">" || op == "<" || op == "<=" || op == ">=" || op == "==" || op == "!=")){
+  if(res == "texttext" && (op == ">" || op == "<" || op == "<=" || op == ">=" || op == "==" || op == "!=")){
+    // cout << "INNNN THIISSSS" << endl ;
     return "bool" ;
   }else if(res == "numbernumber" && (op == "/" || op == "*" || op == "+" || op == "-" || op == "^" || op == "%")){
     return "number";
@@ -80,10 +108,10 @@ string is_coercible_rhs(string dt1, string dt2, string op){
 }
 
 bool is_primitive(string dt){
+
   if(dt != "text" && dt != "letter" && dt != "number" && dt != "decimal" && dt != "bool"){
     return false ;
   }
-
   return true ;
 }
 
@@ -141,6 +169,18 @@ bool compatibility(string dt1, string dt2){
   return false ;
 }
 
+bool compatibility_calls(vector<string> arg1, vector<string> arg2){
+  if(arg1.size() != arg2.size()){
+    return false ;
+  }else {
+    bool a = true ;
+    for(int i = 0; i < arg1.size(); i++){
+      // cout << arg1[i] << " " << arg2[i] << endl  ;
+      a = a & compatibility(arg1[i],arg2[i]);
+    }
+    return a; 
+  }
+}
 
 
 

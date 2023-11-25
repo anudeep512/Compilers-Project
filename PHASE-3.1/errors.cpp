@@ -44,7 +44,29 @@ void printError(int lineNumber, int errorType){
     errorStr = "More than one defination of start at line: " ;
   } else if(errorType == METHOD_REDECLARATION_ERROR){
     errorStr = "Method redeclaration error at line: " ;
-  }
+  } else if(errorType == NOT_AN_ARRAY){
+    errorStr = "Variable not an array error at line: " ;
+  } else if(errorType == CANNOT_USE_TID){
+    errorStr = "TID cannot be used in the current scope at line: " ;
+  } else if(errorType == MODULO_ASSIGNMENT_ERROR){
+    errorStr = "Modulo assignment type error at line: " ;
+  } else if(errorType == ARRAY_CANNOT_HAVE_NON_INTEGERS){
+    errorStr = "Arrays cannot have non number datatypes inside indexing at line: " ;
+  } else if(errorType == MAKE_PARALLEL_ERROR){
+    errorStr = "Make parallel accepts only type numbers in first two arguments for calling at line: " ;
+  }else if(errorType == ARRAY_CANNOT_BE_ACCESSED_USING_ARROW){
+    errorStr = "Arrays cannot be accessed using arrow operator at line: " ;
+  } else if(errorType == INVALID_USE_OF_RETURN){
+    errorStr = "Invalid use of return at line: " ;
+  } else if(errorType == FUNCTION_MUST_HAVE_1_RETURN){
+    errorStr = "The Function must have atleast one return statement, error at line: " ;
+  } else if(errorType == USER_DEFINED_ARRAY_ERROR){
+    errorStr = "Cannot create atomic user defined arrays, error at line: " ;
+  } else if(errorType == THE_ARRAY_SHOULD_BE_ACCESSED_FULLY){
+    errorStr = "The array should be accessed fully, error at line: " ;
+  }else if(errorType == INCOMPITABLE_ARRAY_DIMS){
+    errorStr = "The array Level uncompitable for returnFretur, error at line: " ;
+  } 
 
   std::cout << errorStr << lineNumber << std::endl ;
 }

@@ -1,26 +1,28 @@
 atomic number counter = 0; $$ global int
 
-type myType <<
-
-    number count, array number data[100]; //attributes
+type myType 
+<<
+    number count; 
+    array number data[100]; 
 
     func printMsg : text msg, number c : void
     << 
-        when [ (c == 0)] <<
-            this->c = c;
-            this->count = c;
+        when [ (c == 0)] 
+        <<
+            in->count = c;
         >>
         text str = ("Message from myType: " # msg # "\n");
         op: str;
+        return void;
     >>
 
 >>
 
-func incrCounter : number N : void
+task incrCounter : number N
 <<
     number i = 0;
-
-    invoke obj->printMsg: ("Hello from the main thread") :;
+    myType obj ;
+    invoke obj->printMsg: ("Hello from the main thread"),100 :;
     
     repeat [ (i < N) ] 
     <<
@@ -40,15 +42,15 @@ start<<
 
     make parallel incrCounter : thrs * thrs : 4 : thrs :;  
 
-    invoke obj->printMsg: ("Hello from the main thread") :;
+    invoke obj->printMsg: ("Hello from the main thread"),100 :;
     op: str;
     op : counter;
 
-    invoke obj->count = 0;
-    invoke obj->c = 1; $$ ----------------------------------------------Attributes not found in TYPE
+    obj->count = 0;
+    $$ obj->c = 1; $$ ----------------------------------------------Attributes not found in TYPE
 
     $$ ---------------------------------------------------------------- Method not Found in TYPE error message
-    invoke obj-> invalidMethodd: ("Invalid method name") :;
+    $$ invoke obj-> invalidMethodd: ("Invalid method name") :;
 
 
 

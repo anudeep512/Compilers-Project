@@ -19,7 +19,7 @@ func add: number a, number b: number
 
 func add: decimal a, number b: number
 <<
-    decimal c = (a + b); $$ RHS error
+    decimal c = (a + b); 
     return c;
 >>
 
@@ -29,7 +29,7 @@ func add: decimal a, decimal b: decimal
     decimal c = (a + b);
     <<
         number x = (a - b);
-        c = (x + 2*b); $$ should update the c value in this scope, is it updating?
+        c = (x + 2*b);
     >>
     return c;
 >>
@@ -45,7 +45,8 @@ start <<
     number n = 10;
     array number num[n];
 
-    for [ number i = 0 | (i < n) | i += 1] <<
+    for [ number i = 0 | (i < n) | i += 1] 
+    <<
         num[i] = i ;
     >>
 
@@ -53,6 +54,6 @@ start <<
 
     number res1 = invoke add: 10, num[1]: ;
 
-    decimal res2 = invoke add: 10.3, 2.3: ; $$ function overloading
+    decimal res2 = invoke add: 10.3, 2.3: ;
 
 >>

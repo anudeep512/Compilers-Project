@@ -371,7 +371,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
   if(chkType == 1)
   {
-    fprintf(fp, "Userdefined Datatype: %s\n", x);
+    fprintf(fp, "Userdefined Datatype1: %s\n", x);
     fprintf(yyout, "%s", x);
     // Type name should be considered as a token, not a datatype as of now.
     // The ones declared in the scopes will be rendered as DATATYPE values.
@@ -390,8 +390,6 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     yylval.attr.ID = strdup(yytext);
     return IDENTIFIER;
   }
-
-
   else
   {
     // Below all will be rendered in datatype attributes
@@ -400,7 +398,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     {
       yylval.attr.is_atomic = true;
       yylval.attr.is_array = true;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype2: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
       return AARRUDATATYPE;
@@ -410,7 +408,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     {
       yylval.attr.is_atomic = true;
       yylval.attr.is_array = false;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype3: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
       return AUDATATYPE;
@@ -420,9 +418,10 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     {
       yylval.attr.is_atomic = false;
       yylval.attr.is_array = true;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", x);
+      fprintf(fp, "Userdefined Datatype4: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
+      std::cout <<"lex.l-424: Hey Hello wassup"<<" "<<yylval.attr.datatype<<std::endl ;
       return NARRUDATATYPE;
     }
 
@@ -430,7 +429,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     {
       yylval.attr.is_atomic = false;
       yylval.attr.is_array = false;
-      fprintf(fp, "Userdefined Datatype: %s\n", x); fprintf(yyout, "%s", yytext);
+      fprintf(fp, "Userdefined Datatype5: %s\n", x); fprintf(yyout, "%s", yytext);
       chkArray = 0;
       chkAtomic = 0;
       return NUDATATYPE;
