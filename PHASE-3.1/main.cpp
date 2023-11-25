@@ -6,7 +6,7 @@
 extern int yyparse();
 extern FILE * yyin ;
 extern FILE * yyout ;
-FILE * fp;
+FILE * fp, *fpcpp;
 
 int main(int argc, char ** argv) {
 
@@ -22,11 +22,17 @@ int main(int argc, char ** argv) {
   std::string outputParsedPath = std::string("./parsed_output/")+argv[1]+".parsed";
   yyout = fopen(outputParsedPath.c_str(),"w");
 
+  // Code Output
+  std::string outputCodePath = std::string("./code_output/")+argv[1]+".cpp";
+  fpcpp = fopen(outputCodePath.c_str(),"w");
+  fprintf(fpcpp, "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <atomic>\n#include <fstream>\n#include <sstream>\n#include <chrono>\n#include<codegen.h>\n#include <random>\n#include <time.h>\n#include <unistd.h>\n#include <cstdlib>\n#include <ctime>\n#include <cmath>\n#include <vector>\n#include <map>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\nusing namespace chrono;\n\nTimer get; \nmutex mtx[100000];\nint mut = 0;\n\n");
+
   int i=yyparse();
 
   return 0 ;
 
 }
+
 
 
 

@@ -1,0 +1,79 @@
+type data
+<<
+  number total;
+  number thread; 
+>>
+
+func check : decimal x, decimal y : bool
+<<
+  when [(x+y < 0)]
+  <<
+    return true;
+  >>
+  default
+  <<
+    return false;
+  >>
+>>
+
+func rand : null : number 
+<<
+  return 5 ;
+>>
+
+func findPi : number total, number thread, data p : void
+<<
+  array decimal mem[100];
+  mem[0] = p->total;
+  number num_of_points = 0;
+  decimal x,y;
+  x = 0;
+  y = 0;
+  number i;
+  i = 0;
+  for[i=0|(i<p->thread)|i+=1] 
+  <<
+    x = ((invoke rand : null : )/1000);
+    y = ((invoke rand : null : )/1000);
+
+    mem[i] = x;
+    mem[i+1] = y;
+
+    when[invoke check:x,y:]
+    <<
+      num_of_points += 1;
+      mem[i+1] = x;
+      mem[i+5] = y;
+    >>
+    default
+    <<
+      mem[i- 1] = -2.0;
+      mem[i+2] = -2.0;
+    >>
+  >>
+  return void ;
+>>
+
+$$ tid is a keyword in the language 
+task parallelpi: number N 
+<<
+  number thread = tid;
+  data d ;
+  d->thread = tid ;
+  d->total = N ;
+  invoke findPi : N,thread, d :  ;
+>>
+
+start
+<<
+  number N;
+  number Th;
+  ip->"inp.txt":N,Th ;
+  number i;
+  i = 0;
+  for[i = 2|(i<=64)|i ^= 2]
+  <<
+    number z = 10;
+    make parallel parallelpi:i:z: N :;
+  >>
+>>

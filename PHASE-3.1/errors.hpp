@@ -11,6 +11,7 @@
 #define METHOD_NOT_FOUND 5
 #define TYPE_ATTR_NOT_FOUND 6
 #define TYPE_ERROR_RHS 7
+
 #define TYPE_ERROR_RHS_LHS 8
 #define LEVEL_ERROR 9 // Need to look into this might be handled in RHS error
 #define PREDICATE_ERROR 10 // Occurs when the perdicate evaluates to String 
@@ -35,6 +36,7 @@
 #define USER_DEFINED_ARRAY_ERROR 30
 #define THE_ARRAY_SHOULD_BE_ACCESSED_FULLY 31
 #define INCOMPITABLE_ARRAY_DIMS 32
+#define NOT_STRING 33
 /*
   start error -> > 1 starts or 0 start
 */

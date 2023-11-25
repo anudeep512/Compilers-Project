@@ -1,0 +1,67 @@
+func aa :  number a : text 
+<<
+letter c = 'aao' ;
+  return "a" ;
+>>
+
+func bwweref : null : letter 
+<<
+  return '1';
+>>
+
+func c : null : number 
+<<
+  invoke bwweref: null : ;
+  return 10 ;
+>>
+
+type c 
+<<
+  number cee ;
+  func anuu : null : letter 
+  <<
+    letter swe ;
+    return '9' ;
+    in->cee = 30 ;
+  >> 
+>>
+
+atomic func new : number b : text 
+<<
+  number z ;
+  c FFF;
+  number bro = invoke FFF->anuu:null: ;
+  return "25" ;
+>>
+
+type b 
+<<
+  c obj1 ;
+  func bbb: text z : number 
+  <<
+  c uuu ;
+  uuu = in->obj1 ;
+  invoke uuu->anuu:null: ;
+  
+
+  return 10 ;
+  >>
+
+  func uuuu: number j, atomic array text z: text 
+  <<
+    number g = invoke in->bbb:"null" : ;
+    number gwdw ; 
+    return "ok" ;
+  >>
+>>
+
+
+start 
+<<
+
+  array text a[1000,20] ;
+
+  a[999,10] = "10" ;
+
+
+>>

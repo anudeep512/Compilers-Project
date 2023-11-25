@@ -1,3 +1,5 @@
+decimal z = 0;
+
 type pt
 <<
     decimal x, y;
@@ -9,8 +11,11 @@ func dist : pt ab, pt b: decimal
     
     bool check = true ;
     atomic number a = 0;
+    text t = "hii";
+
     when[check]
     <<
+        $$ z += t;
         return (d*0.5); 
     >>
     default
@@ -29,8 +34,8 @@ task temp : array pt temp , number size
     
         decimal s = invoke dist: temp[1], temp[2] : ;
         
-        op: s -> "log.txt";
-        op: "log.txt";
+        op -> "log.txt" : "hii" ;
+        op : "log.txt" ;
         i += 1;
     >>
 >>
@@ -55,7 +60,7 @@ start
 
     decimal numbeur = 1; $$  error (using kw as id) - syntax analysis error
 
-    op: a -> "output.txt" ; $$ should create that new file and write 'a' string to it.
+    op-> a : "output.txt" ; $$ should create that new file and write 'a' string to it.
 
     op: a; $$ should print the string 'a' to the terminal
 
@@ -67,9 +72,10 @@ start
     testt-> x = 1;
     testt->y = 2;
 
-    array pt i[100,20] ;
+    array pt i[100] ;
     $$ -------------------------------------------------------- Task not found error below
     $$ make parallel tasktempppp : 7 : 3 : testt:;
-    make parallel temp : 7 : 3 : i, 10 : ;
+    number a ;
+    make parallel temp : a : a : i, 10 : ;
 
 >>

@@ -110,13 +110,14 @@
 %type<attr> expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement analyze_label analyze_statement 
 %type<attr> func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop 
 %type<attr> func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method 
-%type<attr> method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_in_args
+%type<attr> method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_in_args subroutine
 
 %start begin
 
 %%
 
 subroutine_in_args : %empty{in_call_args = 1;} ;
+subroutine: %empty {;};
 
 all_datatypes: NUDATATYPE 
                      {
@@ -256,12 +257,15 @@ nonAtomic_datatypes: nonAtomicArray
                    | nonAtomicSimple 
                    ;
 
-begin : {
+begin_subroutine: %empty {
               if(startCount < 1){
                      printError(yylineno,START_ERROR_LESS);
                      return 1 ;
               }
        }
+       ;
+
+begin : begin_subroutine
       | startdec begin
       | declaration begin
       | function begin
@@ -272,7 +276,7 @@ begin : {
 
 /* RHS */
 
-E      :    {;}
+E      :    subroutine
        | SQUAREOPEN {curr_array_level = 0;} arr_access SQUARECLOSE
        {
               cout << "273 - " << $1.ID << endl ;
@@ -483,6 +487,9 @@ RHS :	constants
                     $$.is_array = false ;
                     $$.is_atomic = false ; 
                     cout << "473- " << $$.datatype << endl ;  
+              }else{
+                     printError(yylineno,TYPE_ERROR_RHS);
+                     return 1;
               }
        }
        ;
@@ -703,7 +710,7 @@ declarationStmt : simpleDatatype
                 {
                      // printf("%s\n",$1.datatype);
                      dt_state = $1.datatype;
-                     array_state = $1.is_array;
+                     array_state = false;
                      atomic_state = $1.is_atomic;
                 } 
                 simpleList
@@ -711,7 +718,7 @@ declarationStmt : simpleDatatype
                 arrayDatatype  
                 {
                      dt_state = $1.datatype;
-                     array_state = $1.is_array;
+                     array_state = true;
                      atomic_state = $1.is_atomic;
                 } 
                 arrayList
@@ -1155,7 +1162,7 @@ extend : ELSE_WHEN SQUAREOPEN RHS
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE 
-       | {;}
+       | subroutine
        ;
 
  /*DEFAULT STATEMENT (occurs only once)*/
@@ -1164,7 +1171,7 @@ extend : ELSE_WHEN SQUAREOPEN RHS
               i_tb.deleteVariables();
               scopeLevel--;
        } SCOPECLOSE 
-       | {;}
+       | subroutine
        ;   */
 
  /*ANALYSIS STATEMENT*/
@@ -1282,7 +1289,24 @@ sleep : SLEEP ROUNDOPEN FLOATLITERAL ROUNDCLOSE SEMICOLON { fprintf(yyout, " : s
 /* Grammar Rules for Input and Output*/
 file_name : ARROW STRINGLITERAL
           | ARROW IDENTIFIER
-          | {;}
+          {
+              vector<string> a = i_tb.rhsSearchVariable($2.ID);
+              if(a.size() == 0){
+                     printError(yylineno, VARIABLE_NOT_FOUND);
+                     return 1;
+              }
+              string b = "text" ;
+              cout <<"1299 - " << a[0] << endl ;
+              if(a[0] != b) {
+                     printError(yylineno,NOT_STRING);
+              }
+              if(stoi(a[1]) == 1) {if(stoi(a[3]) != curr_array_level + 1){
+                     printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
+                     return 1;
+              }
+              }
+          }
+          | subroutine
           ;
 
 input : IP file_name COLON IDENTIFIER nextip
@@ -1297,7 +1321,19 @@ nextip : COMMA IDENTIFIER nextip
     ;
 
 stringvalues : STRINGLITERAL 
-             | IDENTIFIER
+             | IDENTIFIER 
+             {
+              vector<string> a = i_tb.rhsSearchVariable($1.ID);
+              if(a.size() == 0){
+                     printError(yylineno, VARIABLE_NOT_FOUND);
+                     return 1;
+              }
+              cout << a[0] << " "<<a[1]<< endl ;
+              if(stoi(a[1]) && stoi(a[3]) != curr_array_level + 1){
+                     printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
+                     return 1;
+              }
+             }
             ;
 
 /* Return */
@@ -1339,7 +1375,7 @@ return_statement : RETURN RHS SEMICOLON
                  } ;
 
 /*PRINT STATEMENT*/
-output : OP COLON opstring file_name SEMICOLON
+output : OP file_name COLON opstring SEMICOLON
        { 
        //  fprintf(yyout, " : print statement");
        }
@@ -1349,7 +1385,7 @@ opstring : stringvalues nextop
          ;
 
 nextop : HASH stringvalues nextop
-       | {;}
+       | subroutine
        ;
 
 
@@ -1496,7 +1532,7 @@ func_scope: declaration
           ;
 
 func_statements: func_scope func_statements
-               | {;}
+               | subroutine
                ;
 
 /* Task declaration and implemenatation scope */
@@ -1538,7 +1574,7 @@ taskscope: declaration taskscope
         } SCOPECLOSE taskscope
         | sleep taskscope
         | method_invoke2 taskscope
-        | {;}
+        | subroutine
         ;
 
 /* Scope for Conditionals and Loop Statements */
@@ -1564,7 +1600,7 @@ statement: declaration
           ;
 
 statements: statement statements
-          | {;}
+          | subroutine
           ;
           
           
@@ -1678,7 +1714,7 @@ start: declaration start
      } SCOPECLOSE start
      | sleep start
      | method_invoke2 start
-     | {;}
+     | subroutine
      ;
 
 /* TYPE DEFINITION */
@@ -1705,7 +1741,7 @@ type_declaration: TYPE TYPENAME //////////////////////////////// COMPLETED /////
               } SCOPECLOSE
               ;
 
-type_scope: declaration_t type_scope | {;} ;
+type_scope: declaration_t type_scope | subroutine ;
 
 declaration_t : declarationStmt_t SEMICOLON 
               { 
@@ -1843,7 +1879,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN {array_dim = 0;} dimlist SQUARECLOSE ///////
                      ;
 
 methods: methods method
-       | {;}
+       | subroutine
        ;
 
 method: func_decl_m SCOPEOPEN method_body //////////////////////////////// COMPLETED ///////////////////////////////
@@ -2113,7 +2149,7 @@ return_statement_m : RETURN RHS SEMICOLON
               } ;
 
 method_body: method_statements method_body
-           | {;}
+           | subroutine
            ;
            
 %%

@@ -40,7 +40,8 @@ start<<
 
     ip : thrs;
 
-    make parallel incrCounter : thrs * thrs : 4 : thrs :;  
+    number par = (thrs*thrs) ;
+    make parallel incrCounter : par : thrs : thrs :;  
 
     invoke obj->printMsg: ("Hello from the main thread"),100 :;
     op: str;

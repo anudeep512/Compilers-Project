@@ -66,7 +66,9 @@ void printError(int lineNumber, int errorType){
     errorStr = "The array should be accessed fully, error at line: " ;
   }else if(errorType == INCOMPITABLE_ARRAY_DIMS){
     errorStr = "The array Level uncompitable for returnFretur, error at line: " ;
-  } 
+  } else if(errorType == NOT_STRING){
+    errorStr = "Not string passed to input/ output, error at line: " ;
+  }  
 
   std::cout << errorStr << lineNumber << std::endl ;
 }

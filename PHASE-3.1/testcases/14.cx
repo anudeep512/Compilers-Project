@@ -1,0 +1,79 @@
+number MAX = 4;         $$  maximum size of matrix
+number MAX_THREAD = 4;  $$  maximum number of threads
+
+array number matA[MAX, MAX];
+array number matB[MAX, MAX];
+array number matC[MAX, MAX];
+number step_i = 0;
+
+task multi : null
+<<
+	number i = (step_i + 1) ; $$ i denotes row number of resultant matC
+
+	for [number j = 0| (j < MAX)| j += 1]
+    <<
+        for [number k = 0| (k < MAX)|k += 1]
+        <<
+            matC[i,j] += (matA[i,k] * matB[k,j]);
+        >>
+    >>
+	
+>>
+
+$$  Driver Code
+start
+<<
+	$$  Taking inputs for matA and matB
+
+	for [number i = 0| (i < MAX)| i += 1]
+    <<
+		for[number j = 0| (j < MAX)| j += 1]
+        <<
+            number a = matA[i,j];
+            number b = matB[i,j];
+
+			ip->file_of_matrix1 : a;
+			ip->file_of_matrix2 : b;
+		>>
+	>>
+
+	$$  Displaying matA
+
+	$$ op: "\n", "Matrix A";
+
+	for [number i = 0| (i < MAX)| i += 1] 
+    <<
+		for [number j = 0| (j < MAX)| j += 1]
+        <<
+            number a = matA[i,j];
+            op: a # " ";
+        >>
+		op: "\n";
+	>>
+
+	$$  Displaying matB
+
+	$$ op: "\n", "Matrix B", "\n";
+	for [number i = 0| (i < MAX) | i += 1]
+    <<
+		for [number j = 0 | (j < MAX) | j += 1]
+        <<
+            number b = matB[i,j];
+			op: b # " ";	 
+        >>
+		op: "\n";
+	>>
+
+	number a = 1;
+    make parallel multi : MAX_THREAD: a: null:;
+
+    for [number i = 0| (i < MAX)| i += 1]
+    <<
+        for [number j = 0| (j < MAX)|j += 1]
+        <<
+            number c = matC[i,j];
+            op: c # " ";
+        >>
+        op: "\n";
+    >>
+>>

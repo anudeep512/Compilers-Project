@@ -50,7 +50,9 @@ start <<
         num[i] = i ;
     >>
 
-    make parallel parallelFact: 5 : 2 : null: ;
+    number a = 5 ;
+    number b = 2;
+    make parallel parallelFact: a : b : null: ;
 
     number res1 = invoke add: 10, num[1]: ;
 
