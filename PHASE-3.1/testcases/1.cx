@@ -1,5 +1,3 @@
-decimal z = 0;
-
 type pt
 <<
     decimal x, y;
@@ -11,11 +9,9 @@ func dist : pt ab, pt b: decimal
     
     bool check = true ;
     atomic number a = 0;
-    text t = "hii";
 
     when[check]
     <<
-        $$ z += t;
         return (d*0.5); 
     >>
     default
@@ -24,18 +20,22 @@ func dist : pt ab, pt b: decimal
     >>
 >>
 
-task temp : array pt temp , number size 
+task temp : number a , number b 
 <<
-    number thr = tid, i = 0;
+    number thr = tid, i = 0, j= 3;
+
+    number x = thr;
     
     number ii = 0 ;
-    repeat[(i < size - 1)] 
+    repeat[(i < j)] 
     <<
     
-        decimal s = invoke dist: temp[1], temp[2] : ;
+        number s = (a + b + tid) ;
         
-        op -> "log.txt" : "hii" ;
-        op : "log.txt" ;
+        op -> "log.txt" : s # "\n" ;
+
+        op : "\ntid and i are " # x # ", " # i;
+        
         i += 1;
     >>
 >>
@@ -43,26 +43,15 @@ task temp : array pt temp , number size
 
 start
 <<
-
-    text a = "Heyy!";
-    
-    $$ ---------------------------------------------------------- Re - declaration error below
-    $$ text a = "Re-declared, should come out as error!";
-
-    $$ ---------------------------------------------------------- Variable not found error below
-    $$ op: x;
-
-    $$ -------------------------------------------------------- Function not found error below
-    $$ invoke dee : a : ; 
  
     $$ type error RHS
-    $$ decimal one = "yes"; $$ not an error (will check in semantics)
+   $$ decimal one = "yes"; $$ not an error (will check in semantics)
 
     decimal numbeur = 1; $$  error (using kw as id) - syntax analysis error
 
-    op-> a : "output.txt" ; $$ should create that new file and write 'a' string to it.
+    op-> "output.txt": numbeur ; $$ should create that new file and write 'a' string to it.
 
-    op: a; $$ should print the string 'a' to the terminal
+    op: numbeur; $$ should print the string 'a' to the terminal
 
     $$  -------------------------------------------------------- Type not found error below
     $$ pty testt;
@@ -75,8 +64,8 @@ start
     array pt i[100] ;
     $$ -------------------------------------------------------- Task not found error below
     $$ make parallel tasktempppp : 7 : 3 : testt:;
-    number a ;
-    make parallel temp : a : a : i, 10 : ;
+    number a = 3;
+    make parallel temp : a : a : 10, 10 : ;
     number d ; text f;
 
 >>

@@ -1,8 +1,3 @@
-inbuilt datatype: decimal
-Identifier: z
-operator: =
-Constant: 0
-PUNCTUATION: ;
 reserved keyword: type
 Userdefined Datatype1: pt
 Special Symbol: <<
@@ -58,11 +53,6 @@ Identifier: a
 operator: =
 Constant: 0
 PUNCTUATION: ;
-inbuilt datatype: text
-Identifier: t
-operator: =
-Constant: "hii"
-PUNCTUATION: ;
 reserved keyword: when
 Special Symbol: [
 Identifier: check
@@ -86,12 +76,11 @@ Special Symbol: >>
 reserved keyword: task
 Identifier: temp
 PUNCTUATION: :
-reserved keyword: array
-Userdefined Datatype4: pt
-Identifier: temp
+inbuilt datatype: number
+Identifier: a
 PUNCTUATION: ,
 inbuilt datatype: number
-Identifier: size
+Identifier: b
 Special Symbol: <<
 inbuilt datatype: number
 Identifier: thr
@@ -101,6 +90,15 @@ PUNCTUATION: ,
 Identifier: i
 operator: =
 Constant: 0
+PUNCTUATION: ,
+Identifier: j
+operator: =
+Constant: 3
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: x
+operator: =
+Identifier: thr
 PUNCTUATION: ;
 inbuilt datatype: number
 Identifier: ii
@@ -112,38 +110,38 @@ Special Symbol: [
 Special Symbol: (
 Identifier: i
 operator: <
-Identifier: size
-operator: -
-Constant: 1
+Identifier: j
 Special Symbol: )
 Special Symbol: ]
 Special Symbol: <<
-inbuilt datatype: decimal
+inbuilt datatype: number
 Identifier: s
 operator: =
-reserved keyword: invoke
-Identifier: dist
-PUNCTUATION: :
-Identifier: temp
-Special Symbol: [
-Constant: 1
-Special Symbol: ]
-PUNCTUATION: ,
-Identifier: temp
-Special Symbol: [
-Constant: 2
-Special Symbol: ]
-PUNCTUATION: :
+Special Symbol: (
+Identifier: a
+operator: +
+Identifier: b
+operator: +
+reserved keyword: tid
+Special Symbol: )
 PUNCTUATION: ;
 reserved keyword: op
 operator: ->
 Constant: "log.txt"
 PUNCTUATION: :
-Constant: "hii"
+Identifier: s
+Special Symbol: #
+Constant: "\n"
 PUNCTUATION: ;
 reserved keyword: op
 PUNCTUATION: :
-Constant: "log.txt"
+Constant: "\ntid and i are "
+Special Symbol: #
+Identifier: x
+Special Symbol: #
+Constant: ", "
+Special Symbol: #
+Identifier: i
 PUNCTUATION: ;
 Identifier: i
 operator: +=
@@ -153,11 +151,6 @@ Special Symbol: >>
 Special Symbol: >>
 reserved keyword: start
 Special Symbol: <<
-inbuilt datatype: text
-Identifier: a
-operator: =
-Constant: "Heyy!"
-PUNCTUATION: ;
 inbuilt datatype: decimal
 Identifier: numbeur
 operator: =
@@ -165,13 +158,13 @@ Constant: 1
 PUNCTUATION: ;
 reserved keyword: op
 operator: ->
-Identifier: a
-PUNCTUATION: :
 Constant: "output.txt"
+PUNCTUATION: :
+Identifier: numbeur
 PUNCTUATION: ;
 reserved keyword: op
 PUNCTUATION: :
-Identifier: a
+Identifier: numbeur
 PUNCTUATION: ;
 Userdefined Datatype5: pt
 Identifier: crctType
@@ -200,6 +193,8 @@ Special Symbol: ]
 PUNCTUATION: ;
 inbuilt datatype: number
 Identifier: a
+operator: =
+Constant: 3
 PUNCTUATION: ;
 reserved keyword: make parallel
 Identifier: temp
@@ -208,7 +203,7 @@ Identifier: a
 PUNCTUATION: :
 Identifier: a
 PUNCTUATION: :
-Identifier: i
+Constant: 10
 PUNCTUATION: ,
 Constant: 10
 PUNCTUATION: :

@@ -312,10 +312,11 @@ constants: INTEGERLITERAL subroutine_intVal
                      printf("%c",$1.charVal);
               } 
 
-      | FLOATLITERAL subroutine_decVal
+      | FLOATLITERAL 
               {
                      $$.datatype = "decimal"; 
                      $$.decVal = $1.decVal;
+                     fprintf(fpcpp, "%.1ff", $1.decVal);
               } 
 
       | BOOLEANLITERAL subroutine_boolVal
@@ -786,7 +787,7 @@ arith_operand: IDENTIFIER {
               } 
               | FLOATLITERAL { 
                      $$.decVal = $1.decVal;       
-                     fprintf(fpcpp, "%f", $1.decVal); } 
+                     fprintf(fpcpp, "%", $1.decVal); } 
               | ROUNDOPEN subroutine_token  arith_expr ROUNDCLOSE subroutine_token 
               ;
 
@@ -1040,7 +1041,9 @@ sleep : SLEEP subr_sleep ROUNDOPEN subroutine_token FLOATLITERAL subroutine_decV
        | SLEEP subr_sleep ROUNDOPEN subroutine_roundopen INTEGERLITERAL subroutine_intVal ROUNDCLOSE subroutine_roundclose SEMICOLON subroutine_token { fprintf(yyout, " : sleep statement");  };
 
 /* Grammar Rules for Input and Output*/
-file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal subroutine_roundclose subroutine_fio {io1 = 0;}
+file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal {
+       if(io == 0){ fprintf(fpcpp, ", ios::app"); }
+} subroutine_roundclose subroutine_fio {io1 = 0;}
           | ARROW subroutine_fileH IDENTIFIER subroutine_id subroutine_roundclose subroutine_fio 
           | subroutine_io subr_init
           ;

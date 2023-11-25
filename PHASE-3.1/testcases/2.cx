@@ -1,4 +1,4 @@
-func factorial : number b: array decimal
+func factorial : number b: number 
 <<
     number res = 1, i;
    
@@ -11,26 +11,19 @@ func factorial : number b: array decimal
 >>
 
 
-func add: number a, number b: void
+func add: number a, number b: number
 <<
     number c = (a + b);
-    letter a = 'v';
-    return void;
->>
-
-func add: decimal a, array number b: number
-<<
-    decimal c = (a + b[10]);
-     number hi = 10;
     return c;
 >>
 
+
 $$ function overloading
-atomic func add: array decimal akukgky, decimal b: decimal
+atomic func add:  decimal a, decimal b: decimal
 <<
-    decimal c = (akukgky[5] + b);
+    decimal c = (a + b);
     <<
-        number x = (akukgky[6] - b);
+        number x = (a - b);
         c = (x + 2*b);
     >>
     return c;
@@ -63,4 +56,3 @@ start <<
     decimal res2 = invoke add: 10.3, 2.3: ;
 
 >>
- 

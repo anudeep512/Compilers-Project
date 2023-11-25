@@ -1,0 +1,258 @@
+inbuilt datatype: array number
+Identifier: arr
+Special Symbol: [
+Constant: 10
+Special Symbol: ]
+PUNCTUATION: ;
+reserved keyword: type
+Userdefined Datatype: ThreadParams
+Special Symbol: <<
+inbuilt datatype: number
+Identifier: begin
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: end
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: result
+PUNCTUATION: ;
+Special Symbol: >>
+reserved keyword: task
+Identifier: adder
+PUNCTUATION: :
+reserved keyword: array
+Userdefined Datatype3: ThreadParams
+Identifier: params
+Special Symbol: <<
+Identifier: params
+operator: ->
+Identifier: result
+operator: =
+Constant: 0
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: i
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: x
+PUNCTUATION: ;
+reserved keyword: for
+Special Symbol: [
+Identifier: i
+operator: =
+Special Symbol: (
+Identifier: params
+operator: ->
+Identifier: begin
+Special Symbol: )
+Special Symbol: |
+Special Symbol: (
+Identifier: i
+operator: <
+Identifier: params
+operator: ->
+Identifier: end
+Special Symbol: )
+Special Symbol: |
+Identifier: i
+operator: +=
+Constant: 1
+Special Symbol: ]
+Special Symbol: <<
+Identifier: params
+operator: ->
+Identifier: result
+operator: +=
+Identifier: arr
+Special Symbol: [
+Identifier: i
+Special Symbol: ]
+PUNCTUATION: ;
+Special Symbol: >>
+Special Symbol: >>
+reserved keyword: start
+Special Symbol: <<
+inbuilt datatype: number
+Identifier: j
+operator: =
+Constant: 0
+PUNCTUATION: ;
+inbuilt datatype: array number
+Identifier: arr
+Special Symbol: [
+Constant: 100
+Special Symbol: ]
+PUNCTUATION: ;
+Identifier: arr
+Special Symbol: [
+Constant: 2
+operator: *
+Identifier: i
+operator: +
+Identifier: j
+Special Symbol: ]
+operator: =
+Constant: 9
+PUNCTUATION: ;
+reserved keyword: repeat
+Special Symbol: [
+Special Symbol: (
+Identifier: j
+operator: <
+Constant: 10
+Special Symbol: )
+Special Symbol: ]
+Special Symbol: <<
+Identifier: arr
+Special Symbol: [
+Identifier: j
+Special Symbol: ]
+operator: =
+Identifier: j
+PUNCTUATION: ;
+Special Symbol: >>
+inbuilt datatype: number
+Identifier: numThreads
+operator: =
+Constant: 2
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: chunkSize
+operator: =
+Special Symbol: (
+Identifier: arraySize
+operator: /
+Identifier: numThreads
+Special Symbol: )
+PUNCTUATION: ;
+reserved keyword: array
+Userdefined Datatype3: ThreadParams
+Identifier: params
+Special Symbol: [
+Identifier: numThreads
+Special Symbol: ]
+PUNCTUATION: ;
+reserved keyword: for
+Special Symbol: [
+inbuilt datatype: number
+Identifier: i
+operator: =
+Constant: 0
+Special Symbol: |
+Special Symbol: (
+Identifier: i
+operator: <
+Identifier: numThreads
+Special Symbol: )
+Special Symbol: |
+Identifier: i
+operator: +=
+Constant: 1
+Special Symbol: ]
+Special Symbol: <<
+Userdefined Datatype4: ThreadParams
+Identifier: y
+operator: =
+Identifier: params
+Special Symbol: [
+Identifier: i
+Special Symbol: ]
+PUNCTUATION: ;
+Identifier: y
+operator: ->
+Identifier: begin
+operator: =
+Special Symbol: (
+Identifier: i
+operator: *
+Identifier: chunkSize
+Special Symbol: )
+PUNCTUATION: ;
+Identifier: y
+operator: ->
+Identifier: end
+operator: =
+Special Symbol: (
+Special Symbol: (
+Identifier: y
+operator: ->
+Identifier: begin
+Special Symbol: )
+operator: +
+Identifier: chunkSize
+Special Symbol: )
+PUNCTUATION: ;
+reserved keyword: when
+Special Symbol: [
+Special Symbol: (
+Identifier: i
+operator: ==
+Identifier: numThreads
+operator: -
+Constant: 1
+Special Symbol: )
+Special Symbol: ]
+Special Symbol: <<
+Identifier: y
+operator: ->
+Identifier: end
+operator: =
+Constant: 10
+PUNCTUATION: ;
+Special Symbol: >>
+Special Symbol: >>
+reserved keyword: make parallel
+Identifier: adder
+PUNCTUATION: :
+Identifier: numThreads
+PUNCTUATION: :
+Constant: 1
+PUNCTUATION: :
+Identifier: params
+PUNCTUATION: :
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: totalSum
+operator: =
+Constant: 0
+PUNCTUATION: ;
+reserved keyword: for
+Special Symbol: [
+inbuilt datatype: number
+Identifier: i
+operator: =
+Constant: 0
+Special Symbol: |
+Special Symbol: (
+Identifier: i
+operator: <
+Identifier: numThreads
+Special Symbol: )
+Special Symbol: |
+Identifier: i
+operator: +=
+Constant: 1
+Special Symbol: ]
+Special Symbol: <<
+Userdefined Datatype4: ThreadParams
+Identifier: y
+operator: =
+Identifier: params
+Special Symbol: [
+Identifier: i
+Special Symbol: ]
+PUNCTUATION: ;
+Identifier: totalSum
+operator: +=
+Special Symbol: (
+Identifier: y
+operator: ->
+Identifier: result
+Special Symbol: )
+PUNCTUATION: ;
+Special Symbol: >>
+reserved keyword: op
+PUNCTUATION: :
+Identifier: totalSum
+PUNCTUATION: ;
+Special Symbol: >>

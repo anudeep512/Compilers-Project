@@ -1,5 +1,3 @@
-decimal z = 0; : declaration statement
-
 type pt : type declaration statement
 <<
     decimal x, y; : declaration statement
@@ -11,11 +9,9 @@ func dist : pt ab, pt b: decimal
     
     bool check = true ; : declaration statement
     atomic number a = 0; : declaration statement
-    text t = "hii"; : declaration statement
 
     when[check] : conditional statement
     <<
-        
         return (d*0.5); : return statement 
     >>
     default : conditional statement
@@ -24,18 +20,22 @@ func dist : pt ab, pt b: decimal
     >>
 >>
 
-task temp : array pt temp , number size 
+task temp : number a , number b 
 << : task declaration statement
-    number thr = tid, i = 0; : declaration statement
+    number thr = tid, i = 0, j= 3; : declaration statement
+
+    number x = thr; : declaration statement
     
     number ii = 0 ; : declaration statement
-    repeat[(i < size - 1)] : loop statement 
+    repeat[(i < j)] : loop statement 
     <<
     
-        decimal s = invoke dist: temp[1], temp[2] : ; : declaration statement
+        number s = (a + b + tid) ; : declaration statement
         
-        op -> "log.txt" : "hii" ; : print statement
-        op : "log.txt" ; : print statement
+        op -> "log.txt" : s # "\n" ; : print statement
+
+        op : "\ntid and i are " # x # ", " # i; : print statement
+        
         i += 1; : expression statement
     >>
 >>
@@ -43,26 +43,15 @@ task temp : array pt temp , number size
 
 start : start declaration statement
 <<
-
-    text a = "Heyy!"; : declaration statement
-    
-    
-    
-
-    
-    
-
-    
-    
  
     
-    
+   
 
     decimal numbeur = 1; : declaration statement 
 
-    op-> a : "output.txt" ; : print statement 
+    op-> "output.txt": numbeur ; : print statement 
 
-    op: a; : print statement 
+    op: numbeur; : print statement 
 
     
     
@@ -75,8 +64,8 @@ start : start declaration statement
     array pt i[100] ; : declaration statement
     
     
-    number a ; : declaration statement
-    make parallel temp : a : a : : call statement i, 10 : ;
+    number a = 3; : declaration statement
+    make parallel temp : a : a : : call statement 10, 10 : ;
     number d ; : declaration statement text f; : declaration statement
 
 >>
