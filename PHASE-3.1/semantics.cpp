@@ -1,6 +1,8 @@
 #include "semantics.hpp"
 #include "errors.hpp"
 #include "symbol_table.hpp"
+#include  <cstring>
+
 
 void printArgs(vector<string> datatypes, vector<int> array, vector<int> atomic){
   cout << "------------------------------------------------------------------------------------------------------------------------" << endl ;
@@ -36,7 +38,7 @@ vector<string> to_string_vec(vector<char*> vec)
 char* cstr(string str) {
 
   char* cstr = new char[str.length() + 1];
-  std::strcpy(cstr, str.c_str());
+  strcpy(cstr, str.c_str());
 
   return cstr;
 }

@@ -997,7 +997,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON {
                      */
 
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $6.ID);
-                     fprintf(fpcpp, "\t\tget.begin();\n");
+                     fprintf(fpcpp, "\t\tgett.begin();\n");
                      fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
                      fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
@@ -1007,7 +1007,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON {
                      fprintf(fpcpp, ");\n\t}");
 
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n\t\tthreads[i].join();\n\t}\n", $4.ID);
-                     fprintf(fpcpp, "\t\tget.stop();\n\t}\n\tget.t = get.t/%s;\n", $6.ID);
+                     fprintf(fpcpp, "\t\tgett.stop();\n\t}\n\tgett.t = gett.t/%s;\n", $6.ID);
 
                      arg_dat.clear();
               }  COLON SEMICOLON ;
@@ -1248,8 +1248,11 @@ statements: statement statements
           | subroutine
           ;
           
+subroutine_arrow: %empty {
+       fprintf(fpcpp, ".");
+}
           
-access : IDENTIFIER subroutine_id ARROW subroutine_token id 
+access : IDENTIFIER subroutine_id ARROW subroutine_arrow id 
        {
               /*$1.datatype should be from an existing class*/ 
               t_state = ($1.datatype);
@@ -1261,7 +1264,7 @@ id     : IDENTIFIER subroutine_id
               t_state = ($1.datatype); 
               $$.datatype = ($1.datatype);
        }
-       | id ARROW subroutine_token IDENTIFIER subroutine_id
+       | id ARROW subroutine_arrow IDENTIFIER subroutine_id
        {
               t_state = ($1.datatype); 
               /*
@@ -1534,26 +1537,10 @@ method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE id ARROW subroutine_token IDENTIFIER subroutine_id COLON subroutine_roundopen method_args COLON subroutine_roundclose
+method_invoke : INVOKE id ARROW subroutine_arrow IDENTIFIER subroutine_id COLON subroutine_roundopen method_args COLON subroutine_roundclose
               {
-                     /* 
-                     Type check: $2.datatype should be a class, and $4.ID should be a function 
-                     in that class
-                     */ 
-                     /*
-                     BY here list of arg_dat (list of arguement's datatypes) will be ready. 
-                     For all mthods with name as $2.ID, type check arguements
-                     */
-              arg_dat.clear();
+                     arg_dat.clear();
               }
-              /*| INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
-              {
-                     /*
-                     Currently the t_state variable contains the datatype of id (i.e., $3). 
-                     CHECK: is $3.datatype among a type set, CHECK if the IDENTIFIER, i.e, $5.ID is 
-                     in the methods table whose type i t_state. If yes, then check for arguements
-                     /*
-              }*/
               ;
 
 in_stmt : IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id

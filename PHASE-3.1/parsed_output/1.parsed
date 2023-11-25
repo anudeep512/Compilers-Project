@@ -1,0 +1,82 @@
+decimal z = 0; : declaration statement
+
+type pt : type declaration statement
+<<
+    decimal x, y; : declaration statement
+>>
+
+func dist : pt ab, pt b: decimal 
+<<
+    decimal d = ((ab->x - b->x)*(ab->x - b->x)) ; : declaration statement
+    
+    bool check = true ; : declaration statement
+    atomic number a = 0; : declaration statement
+    text t = "hii"; : declaration statement
+
+    when[check] : conditional statement
+    <<
+        
+        return (d*0.5); : return statement 
+    >>
+    default : conditional statement
+    <<
+        return a; : return statement 
+    >>
+>>
+
+task temp : array pt temp , number size 
+<< : task declaration statement
+    number thr = tid, i = 0; : declaration statement
+    
+    number ii = 0 ; : declaration statement
+    repeat[(i < size - 1)] : loop statement 
+    <<
+    
+        decimal s = invoke dist: temp[1], temp[2] : ; : declaration statement
+        
+        op -> "log.txt" : "hii" ; : print statement
+        op : "log.txt" ; : print statement
+        i += 1; : expression statement
+    >>
+>>
+
+
+start : start declaration statement
+<<
+
+    text a = "Heyy!"; : declaration statement
+    
+    
+    
+
+    
+    
+
+    
+    
+ 
+    
+    
+
+    decimal numbeur = 1; : declaration statement 
+
+    op-> a : "output.txt" ; : print statement 
+
+    op: a; : print statement 
+
+    
+    
+    pt crctType; : declaration statement
+    
+    pt testt ; : declaration statement
+    testt-> x = 1; : assignment statement
+    testt->y = 2; : assignment statement
+
+    array pt i[100] ; : declaration statement
+    
+    
+    number a ; : declaration statement
+    make parallel temp : a : a : : call statement i, 10 : ;
+    number d ; : declaration statement text f; : declaration statement
+
+>>

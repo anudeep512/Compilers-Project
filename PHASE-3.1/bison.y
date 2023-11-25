@@ -730,6 +730,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                      $1.is_array = array_state;
                      $1.is_atomic = atomic_state;
                      if(i_tb.searchDeclaration($1.ID)){
+                     cout << "iaufiuafagdagfaifgaifafadfhnfawuwoiruwaawvt" << endl ;
                             printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                             return 1;
                      }
@@ -753,7 +754,9 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                      $1.datatype = (dt_state);
                      $1.is_array = array_state;
                      $1.is_atomic = atomic_state;
+                     cout<< "===============-------------------------============srgwgrhgdh" ;
                      if(i_tb.searchDeclaration($1.ID)){
+                            cout << "Error heree - 758" << endl ;
                             printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                             return 1;
                      }

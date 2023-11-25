@@ -77,5 +77,6 @@ start
     $$ make parallel tasktempppp : 7 : 3 : testt:;
     number a ;
     make parallel temp : a : a : i, 10 : ;
+    number d ; text f;
 
 >>
