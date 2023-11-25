@@ -15,10 +15,10 @@ type myType
         op: str;
         return void;
     >>
-
+    
 >>
 
-task incrCounter : number N
+task incrCounter : number i
 <<
     number i = 0;
     myType obj ;
@@ -39,15 +39,13 @@ start<<
     number thrs; 
     thrs = (2);
 
-    ip: thrs, hiii;
-    op: str # heyy # huuh;
-    op: str#eeeee;
+    ip: thrs;
 
     number par = (thrs*thrs) ;
     make parallel incrCounter : par : thrs : thrs :;  
 
     invoke obj->printMsg: ("Hello from the main thread"),100 :;
-    op: str;
+    
     op : counter;
 
     obj->count = 0;

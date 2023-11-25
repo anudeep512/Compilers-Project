@@ -3,7 +3,7 @@
   #include <unordered_set>
   #include <string>
   #include "bison.tab.h"
-
+extern int in_call_args ;
   extern FILE* fp;
 
   int chkType = 0; // to track if the encountered token is type or not
@@ -137,7 +137,7 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
   }
 	if(strcmp(yytext,"in") == 0) { return IN; }
 	if(strcmp(yytext,"func") == 0) { return FUNC; }
-	if(strcmp(yytext,"invoke") == 0) { return INVOKE; }
+	if(strcmp(yytext,"invoke") == 0) { in_call_args = 1 ;return INVOKE; }
 	if(strcmp(yytext,"ip") == 0) { return IP; }
 	if(strcmp(yytext,"op") == 0) { return OP; }
 }

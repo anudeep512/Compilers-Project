@@ -17,15 +17,9 @@ func add: number a, number b: number
     return c;
 >>
 
-func add: decimal a, array number b: number
-<<
-    decimal c = (a + b);
-     number hi = 10;
-    return c;
->>
 
 $$ function overloading
-atomic func add: array decimal a, decimal b: decimal
+atomic func add:  decimal a, decimal b: decimal
 <<
     decimal c = (a + b);
     <<
@@ -57,9 +51,8 @@ start <<
     number b = 2;
     make parallel parallelFact: a : b : null: ;
 
-    number res1 = invoke add: invoke add: 10.1, 2.1: , num[1]: ;
+    number res1 = invoke add: invoke add: 10,10 : , num[1]: ;
 
     decimal res2 = invoke add: 10.3, 2.3: ;
 
 >>
- 

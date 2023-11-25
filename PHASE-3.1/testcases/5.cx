@@ -40,7 +40,7 @@ start
     invoke incrCounter : (thrs * thrs) : ;  
 
     invoke obj->printMsg: ("Hello from the main thread") :;
-    op : str;
+    $$ op : str;
     op : counter;
 
 >>

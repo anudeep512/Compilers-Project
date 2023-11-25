@@ -101,7 +101,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> subroutine_io return_routine return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_array subroutine_narray
+%type<attr> subroutine_io return_routine return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_array subroutine_narray subroutine_dim
 
 
 
@@ -117,7 +117,7 @@ subroutine_id: %empty {fprintf(fpcpp, "%s", yylval.attr.converted);}; // Should 
 //subroutine_is_array: %empty {fprintf(fpcpp, "%s", yylval.attr.is_array);};
 subroutine_intVal: %empty {fprintf(fpcpp, "%d", yylval.attr.intVal);};
 subroutine_decVal: %empty {fprintf(fpcpp, "%f", yylval.attr.decVal);};
-subroutine_charVal: %empty {fprintf(fpcpp, "%c", yylval.attr.charVal);};
+subroutine_charVal: %empty {fprintf(fpcpp, "'%c'", yylval.attr.charVal);};
 subroutine_boolVal: %empty {fprintf(fpcpp, "%d", yylval.attr.boolVal);};
 subroutine_stringVal: %empty {fprintf(fpcpp, "%s", yylval.attr.stringVal);};
 subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin ");} else{fprintf(fpcpp,"cout ");}}
@@ -150,86 +150,102 @@ all_datatypes: NUDATATYPE subroutine_narray
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.datatype;
+                            // printf("================================%s\n",$$.converted);
                      }
              | AUDATATYPE subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ARRAY NARRUDATATYPE 
                      {
-                            $$.datatype = ($1.datatype);
-                            $$.is_array = $1.is_array;
-                            $$.is_atomic = $1.is_atomic;
+                            $$.datatype = ($2.datatype);
+                            $$.is_array = $2.is_array;
+                            $$.is_atomic = $2.is_atomic;
+                            $$.converted = $2.datatype;
+                            // printf("================================%s\n",$$.converted);
                             // cout << "Here1\n";
                             arr = 1;
                      }
              | ATOMIC ARRAY AARRUDATATYPE 
                      {
-                            $$.datatype = ($1.datatype);
-                            $$.is_array = $1.is_array;
-                            $$.is_atomic = $1.is_atomic;
+                            $$.datatype = ($3.datatype);
+                            $$.is_array = $3.is_array;
+                            $$.is_atomic = $3.is_atomic;
+                            $$.converted = $3.converted;
                      }
              | NBOOL subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | NDEC subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | NNUM subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | NTEXT subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | NLET subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ABOOL subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ADEC subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ALET subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ATEXT subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | ANUM subroutine_narray
                      {
                             $$.datatype = ($1.datatype);
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
+                            $$.converted = $1.converted;
                      }
              | subroutine_array nonAtomicArray 
              {
@@ -250,7 +266,7 @@ expression_op: ASSN_DIV subroutine_token | ASSN_MODULO subroutine_token | ASSN_M
 comparison_op: LT subroutine_token | GT subroutine_token | GTEQ subroutine_token | LTEQ subroutine_token | NOT_EQ subroutine_token | EQUAL_TWO subroutine_token ;
 arithmetic_op: ADD subroutine_token | SUB subroutine_token | MUL subroutine_token | DIV subroutine_token | MODULO subroutine_token | EXPONENT  ;
 logical_op: AND subroutine_token | OR subroutine_token ;
-nonAtomic_datatypes: nonAtomicArray | nonAtomicSimple ;
+nonAtomic_datatypes:  nonAtomicArray | nonAtomicSimple ;
 
 
 begin : %empty {
@@ -293,12 +309,14 @@ constants: INTEGERLITERAL subroutine_intVal
               {
                      $$.datatype = "letter"; 
                      $$.charVal = $1.charVal;
+                     // printf("%c",$1.charVal);
               } 
 
-      | FLOATLITERAL subroutine_decVal
+      | FLOATLITERAL 
               {
                      $$.datatype = "decimal"; 
                      $$.decVal = $1.decVal;
+                     fprintf(fpcpp, "%.1ff", $1.decVal);
               } 
 
       | BOOLEANLITERAL subroutine_boolVal
@@ -417,6 +435,7 @@ nonAtomicArray : NARRNUM
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                             $$.converted = $1.converted;
+                            //  printf("hiiiiiiiiiiiiiiiiiiiiiiii\n");
                      }
               | NARRDEC
                      {
@@ -751,8 +770,10 @@ LHS : IDENTIFIER subroutine_id
 arr_access: exprlist
           ;
 
+subroutine_dim : %empty {fprintf(fpcpp, "][");};
+
 exprlist: arith_expr
-         | exprlist COMMA subroutine_id arith_expr
+         | exprlist COMMA subroutine_dim arith_expr
          ;
 
 arith_operand: IDENTIFIER { 
@@ -766,7 +787,7 @@ arith_operand: IDENTIFIER {
               } 
               | FLOATLITERAL { 
                      $$.decVal = $1.decVal;       
-                     fprintf(fpcpp, "%f", $1.decVal); } 
+                     fprintf(fpcpp, "%", $1.decVal); } 
               | ROUNDOPEN subroutine_token  arith_expr ROUNDCLOSE subroutine_token 
               ;
 
@@ -997,7 +1018,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON {
                      */
 
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $6.ID);
-                     fprintf(fpcpp, "\t\tget.begin();\n");
+                     fprintf(fpcpp, "\t\tgett.begin();\n");
                      fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
                      fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
@@ -1007,7 +1028,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON {
                      fprintf(fpcpp, ");\n\t}");
 
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n\t\tthreads[i].join();\n\t}\n", $4.ID);
-                     fprintf(fpcpp, "\t\tget.stop();\n\t}\n\tget.t = get.t/%s;\n", $6.ID);
+                     fprintf(fpcpp, "\t\tgett.stop();\n\t}\n\tgett.t = gett.t/%s;\n", $6.ID);
 
                      arg_dat.clear();
               }  COLON SEMICOLON ;
@@ -1020,7 +1041,9 @@ sleep : SLEEP subr_sleep ROUNDOPEN subroutine_token FLOATLITERAL subroutine_decV
        | SLEEP subr_sleep ROUNDOPEN subroutine_roundopen INTEGERLITERAL subroutine_intVal ROUNDCLOSE subroutine_roundclose SEMICOLON subroutine_token { fprintf(yyout, " : sleep statement");  };
 
 /* Grammar Rules for Input and Output*/
-file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal subroutine_roundclose subroutine_fio {io1 = 0;}
+file_name : ARROW  subroutine_fileH STRINGLITERAL subroutine_stringVal {
+       if(io == 0){ fprintf(fpcpp, ", ios::app"); }
+} subroutine_roundclose subroutine_fio {io1 = 0;}
           | ARROW subroutine_fileH IDENTIFIER subroutine_id subroutine_roundclose subroutine_fio 
           | subroutine_io subr_init
           ;
@@ -1043,7 +1066,7 @@ stringvalues : STRINGLITERAL subroutine_stringVal
 /* Return */
 return_statement : RETURN subroutine_token RHS SEMICOLON {
        fprintf(fpcpp,"%s",$4.token); $$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/fprintf(yyout, " : return statement"); } ;
-                 | RETURN subroutine_token NVOID subroutine_token SEMICOLON subroutine_token {$$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/ fprintf(yyout, " : return statement"); } ;
+                 | RETURN subroutine_token NVOID SEMICOLON subroutine_token {$$.datatype = $3.datatype; $$.is_array = $3.is_array; /*Atomics not needed here ig*/ /*TYPE CHECK WITH LAST FUNCTION'S RETURN DATATYPE AND THIS DATATYPE*/ fprintf(yyout, " : return statement"); } ;
 
 
 /*PRINT STATEMENT*/
@@ -1088,8 +1111,15 @@ args: func_args
 
 func_return : nonAtomic_datatypes 
               {
+                     if($1.is_array==0){
                      func_array.push_back(std::string($1.converted));
                      method_array.push_back(std::string($1.converted));
+                     }
+                     else{
+                            func_array.push_back(std::string($1.converted)+" *");
+                            method_array.push_back(std::string($1.converted)+" *");
+                     }
+                     // printf("%d\n",$1.is_array);
 
                      $$.datatype = ($1.datatype); 
                      $$.is_array = $1.is_array; 
@@ -1248,8 +1278,11 @@ statements: statement statements
           | subroutine
           ;
           
+subroutine_arrow: %empty {
+       fprintf(fpcpp, ".");
+}
           
-access : IDENTIFIER subroutine_id ARROW subroutine_token id 
+access : IDENTIFIER subroutine_id ARROW subroutine_arrow id 
        {
               /*$1.datatype should be from an existing class*/ 
               t_state = ($1.datatype);
@@ -1261,7 +1294,7 @@ id     : IDENTIFIER subroutine_id
               t_state = ($1.datatype); 
               $$.datatype = ($1.datatype);
        }
-       | id ARROW subroutine_token IDENTIFIER subroutine_id
+       | id ARROW subroutine_arrow IDENTIFIER subroutine_id
        {
               t_state = ($1.datatype); 
               /*
@@ -1534,26 +1567,10 @@ method_invoke2 : method_invoke SEMICOLON  { fprintf(yyout, " : call statement");
 
 method_args : arguments | NULL_ARGS ;
 
-method_invoke : INVOKE id ARROW subroutine_token IDENTIFIER subroutine_id COLON subroutine_roundopen method_args COLON subroutine_roundclose
+method_invoke : INVOKE id ARROW subroutine_arrow IDENTIFIER subroutine_id COLON subroutine_roundopen method_args COLON subroutine_roundclose
               {
-                     /* 
-                     Type check: $2.datatype should be a class, and $4.ID should be a function 
-                     in that class
-                     */ 
-                     /*
-                     BY here list of arg_dat (list of arguement's datatypes) will be ready. 
-                     For all mthods with name as $2.ID, type check arguements
-                     */
-              arg_dat.clear();
+                     arg_dat.clear();
               }
-              /*| INVOKE IDENTIFIER id ARROW IDENTIFIER COLON method_args COLON 
-              {
-                     /*
-                     Currently the t_state variable contains the datatype of id (i.e., $3). 
-                     CHECK: is $3.datatype among a type set, CHECK if the IDENTIFIER, i.e, $5.ID is 
-                     in the methods table whose type i t_state. If yes, then check for arguements
-                     /*
-              }*/
               ;
 
 in_stmt : IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id
