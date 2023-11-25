@@ -166,7 +166,7 @@ all_datatypes: NUDATATYPE subroutine_narray
                             $$.is_array = $2.is_array;
                             $$.is_atomic = $2.is_atomic;
                             $$.converted = $2.datatype;
-                            printf("================================%s\n",$$.converted);
+                            // printf("================================%s\n",$$.converted);
                             // cout << "Here1\n";
                             arr = 1;
                      }
@@ -309,7 +309,7 @@ constants: INTEGERLITERAL subroutine_intVal
               {
                      $$.datatype = "letter"; 
                      $$.charVal = $1.charVal;
-                     printf("%c",$1.charVal);
+                     // printf("%c",$1.charVal);
               } 
 
       | FLOATLITERAL 
@@ -1091,7 +1091,7 @@ function: func_decl func_body
         | atomic_func_decl func_body
         ;
 
-func_args: all_datatypes { task_array.push_back(","); func_array.push_back(std::string($1.converted)); task_array.push_back(std::string($1.converted)); method_array.push_back(std::string($1.converted)); printf("================================%s\n",$1.converted);} IDENTIFIER {if(arr==0){func_array.push_back(std::string($3.ID)); method_array.push_back(std::string($3.ID)); task_array.push_back(std::string($3.ID));} else{func_array.push_back(std::string($3.ID)+"[]"); task_array.push_back(std::string($3.ID)+"[]"); method_array.push_back(std::string($3.ID)+"[]");}}
+func_args: all_datatypes { task_array.push_back(","); func_array.push_back(std::string($1.converted)); task_array.push_back(std::string($1.converted)); method_array.push_back(std::string($1.converted));} IDENTIFIER {if(arr==0){func_array.push_back(std::string($3.ID)); method_array.push_back(std::string($3.ID)); task_array.push_back(std::string($3.ID));} else{func_array.push_back(std::string($3.ID)+"[]"); task_array.push_back(std::string($3.ID)+"[]"); method_array.push_back(std::string($3.ID)+"[]");}}
        {
               decl_arg_dat.push_back(($1.ID));
               decl_arg_is_array.push_back($1.is_array);

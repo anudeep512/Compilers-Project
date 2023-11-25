@@ -133,11 +133,11 @@ all_datatypes: NUDATATYPE
                      }
              | ARRAY NARRUDATATYPE 
                      {
-                            cout << "132 - Hereeee" << endl ;
+                            // cout << "132 - Hereeee" << endl ;
                             $$.datatype = $2.datatype;
                             $$.is_array = $2.is_array;
                             $$.is_atomic = $2.is_atomic;
-                            cout << "136, dtype: " << $$.datatype << ", is_array: " << $$.is_array << ", is_atomic: "<<$$.is_atomic << endl ;
+                            // cout << "136, dtype: " << $$.datatype << ", is_array: " << $$.is_array << ", is_atomic: "<<$$.is_atomic << endl ;
                      }
              | ATOMIC ARRAY AARRUDATATYPE
                      {
@@ -279,7 +279,7 @@ begin : begin_subroutine
 E      :    subroutine
        | SQUAREOPEN {curr_array_level = 0;} arr_access SQUARECLOSE
        {
-              cout << "273 - " << $1.ID << endl ;
+              // cout << "273 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno, VARIABLE_NOT_FOUND);
@@ -289,7 +289,7 @@ E      :    subroutine
                      printError(yylineno,NOT_AN_ARRAY);
                      return 1;
               }
-              cout << "283-" << curr_array_level <<", ID level: "<<stoi(a[2]) << endl ;
+              // cout << "283-" << curr_array_level <<", ID level: "<<stoi(a[2]) << endl ;
               if(stoi(a[3]) != curr_array_level + 1){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -300,21 +300,21 @@ E      :    subroutine
 T : IDENTIFIER {curr_array_level = -1;} E 
        {
               var_name = $1.ID ;
-              cout << "294-Search Variable is: " << var_name << endl ;    
+              // cout << "294-Search Variable is: " << var_name << endl ;    
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno, VARIABLE_NOT_FOUND);
                      return 1;
               }
-              cout <<"300-Datatype of " << var_name << " is "<< a[0] << endl ;
+              // cout <<"300-Datatype of " << var_name << " is "<< a[0] << endl ;
               return_dim_count = stoi(a[3]);
-              cout << "302-Return dim count: "<< return_dim_count << endl ;
+              // cout << "302-Return dim count: "<< return_dim_count << endl ;
               var_name = "" ;
               $$.datatype =  cstr(a[0]);
               $$.is_atomic = stoi(a[2]);
-              cout << "304- Datatype is " << $$.datatype << endl ;
-              cout <<"306 - Current array level " << curr_array_level << endl ;
-              cout <<"311 - in call args " << in_call_args << endl ;
+              // cout << "304- Datatype is " << $$.datatype << endl ;
+              // cout <<"306 - Current array level " << curr_array_level << endl ;
+              // cout <<"311 - in call args " << in_call_args << endl ;
               // if(in_call_args){
               //        if(return_dim_count == 1 && curr_array_level + 1 == 0){
               //               $$.is_array = true ;
@@ -407,7 +407,7 @@ constants: INTEGERLITERAL
 next : RHS all_ops next 
        {
               string a = is_coercible_rhs($1.datatype,$3.datatype,$2.ID) ; 
-              cout << "383: "<<$1.datatype << " " << $3.datatype << " " << $2.ID << endl ;
+              // cout << "383: "<<$1.datatype << " " << $3.datatype << " " << $2.ID << endl ;
               if( a == "" ){
                      printError(yylineno,TYPE_ERROR_RHS);
                      return 1 ;
@@ -467,8 +467,8 @@ RHS :	constants
     | ROUNDOPEN RHS all_ops next ROUNDCLOSE
     {
        string a = is_coercible_rhs(string($2.datatype),string($4.datatype),$3.ID);
-       cout << "443-"<<$2.datatype << " " << $4.datatype << " " << $3.ID << endl ;
-       // cout << a << endl ;
+       // cout << "443-"<<$2.datatype << " " << $4.datatype << " " << $3.ID << endl ;
+       // // cout << a << endl ;
        if( a == "" ){
               printError(yylineno,TYPE_ERROR_RHS);
               return 1 ;
@@ -485,12 +485,12 @@ RHS :	constants
     }
     | NEG ROUNDOPEN RHS ROUNDCLOSE
        {
-              cout << "468- " << $3.datatype << endl ;
+              // cout << "468- " << $3.datatype << endl ;
               if(string($3.datatype) == "number" || string($3.datatype) == "decimal" || string($3.datatype) == "bool" || string($3.datatype) == "letter"){
                     $$.datatype = "bool" ;
                     $$.is_array = false ;
                     $$.is_atomic = false ; 
-                    cout << "473- " << $$.datatype << endl ;  
+                    // cout << "473- " << $$.datatype << endl ;  
               }else{
                      printError(yylineno,TYPE_ERROR_RHS);
                      return 1;
@@ -639,7 +639,7 @@ errorDatatypes: IDENTIFIER| ATOMIC IDENTIFIER| ARRAY IDENTIFIER| ATOMIC ARRAY ID
 
 declaration : declarationStmt SEMICOLON 
             { 
-                     i_tb.print();
+                     // i_tb.print();
                      fprintf(yyout, " : declaration statement"); 
             }
             | errorDatatypes IDENTIFIER 
@@ -656,7 +656,7 @@ declaration : declarationStmt SEMICOLON
 simpleDatatype : nonAtomicSimple 
                      {
                             $$.datatype = $1.datatype;
-                            cout << "627-Datatype is: " << $$.datatype << endl ;
+                            // cout << "627-Datatype is: " << $$.datatype << endl ;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;    
                      }
@@ -669,7 +669,7 @@ simpleDatatype : nonAtomicSimple
               | NUDATATYPE 
                      {
                             $$.datatype = $1.datatype;
-                            cout << "640-Datatype is: " << $$.datatype << endl ;
+                            // cout << "640-Datatype is: " << $$.datatype << endl ;
                             $$.is_array = false; 
                             $$.is_atomic = false;
                      }
@@ -734,12 +734,12 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                      $1.is_array = array_state;
                      $1.is_atomic = atomic_state;
                      if(i_tb.searchDeclaration($1.ID)){
-                     cout << "iaufiuafagdagfaifgaifafadfhnfawuwoiruwaawvt" << endl ;
+                     // cout << "iaufiuafagdagfaifgaifafadfhnfawuwoiruwaawvt" << endl ;
                             printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                             return 1;
                      }
                      i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,0);
-                     // i_tb.print();
+                     // // i_tb.print();
               }
           | simpleList COMMA IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
@@ -751,22 +751,22 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             return 1;
                      }
                      i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array,0);
-                     // i_tb.print();
+                     // // i_tb.print();
               }
           | IDENTIFIER EQ RHS //////////////////////////////// COMPLETED ///////////////////////////////
               {
                      $1.datatype = (dt_state);
                      $1.is_array = array_state;
                      $1.is_atomic = atomic_state;
-                     cout<< "===============-------------------------============srgwgrhgdh" ;
+                     // cout<< "===============-------------------------============srgwgrhgdh" ;
                      if(i_tb.searchDeclaration($1.ID)){
-                            cout << "Error heree - 758" << endl ;
+                            // cout << "Error heree - 758" << endl ;
                             printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                             return 1;
                      }
-                     cout << $3.datatype  << endl ;      
-                     cout << $1.datatype << endl;
-                     cout << (string($1.datatype) == string($3.datatype)) << endl ;
+                     // cout << $3.datatype  << endl ;      
+                     // cout << $1.datatype << endl;
+                     // cout << (string($1.datatype) == string($3.datatype)) << endl ;
                      if(assignment($1.datatype, $3.datatype, 0)) {
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,0);
                      }else {
@@ -794,7 +794,7 @@ simpleList: IDENTIFIER //////////////////////////////// COMPLETED //////////////
                             printError(yylineno,TYPE_ERROR_RHS_LHS);
                             return 1;
                      }
-                     // i_tb.print();
+                     // // i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                      Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -814,7 +814,7 @@ arrayList : IDENTIFIER SQUAREOPEN {array_dim = 0;} dimlist SQUARECLOSE /////////
 
                      i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,array_dim+1);
                      array_dim = 0;
-                     // i_tb.print();
+                     // // i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                      Scope Level
@@ -832,7 +832,7 @@ arrayList : IDENTIFIER SQUAREOPEN {array_dim = 0;} dimlist SQUARECLOSE /////////
 
                      i_tb.addVariable($3.ID, $3.datatype, $3.is_atomic, $3.is_array,array_dim+1);
                      array_dim = 0;
-                     // i_tb.print();
+                     // // i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
                      atomic_state, Scope Level
@@ -856,7 +856,7 @@ dimlist : dimlist COMMA {array_dim++;} array_inValues
 
 LHS :  IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "826 - " << $1.ID << endl ;
+              // cout << "826 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno,VARIABLE_NOT_FOUND);
@@ -872,7 +872,7 @@ LHS :  IDENTIFIER //////////////////////////////// COMPLETED ///////////////////
        }
        | IDENTIFIER {in_make_parallel_arrays = 2;curr_array_level = 0;} SQUAREOPEN arr_access SQUARECLOSE //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "842 - " << $1.ID << endl ;
+              // cout << "842 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno,VARIABLE_NOT_FOUND);
@@ -885,7 +885,7 @@ LHS :  IDENTIFIER //////////////////////////////// COMPLETED ///////////////////
               $$.datatype = cstr(a[0]);
               $$.is_array = stoi(a[1]) ;
               $$.is_atomic = stoi(a[2]) ;
-              cout << "855-" << curr_array_level << endl ;
+              // cout << "855-" << curr_array_level << endl ;
               if(curr_array_level + 1 != stoi(a[3])){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -934,7 +934,7 @@ LHS :  IDENTIFIER //////////////////////////////// COMPLETED ///////////////////
               $$.datatype = cstr(a[0]);
               $$.is_array = stoi(a[1]);
               $$.is_atomic = stoi(a[2]);
-              cout << "904-" << curr_array_level << endl ;
+              // cout << "904-" << curr_array_level << endl ;
               if(curr_array_level +1 != stoi(a[3])){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -951,7 +951,7 @@ exprlist: arith_expr
 
 arith_operand: IDENTIFIER 
               {
-                     cout <<"916-search identifier: "<<($1.ID) << endl ;
+                     // cout <<"916-search identifier: "<<($1.ID) << endl ;
                      vector<string> a = i_tb.rhsSearchVariable($1.ID);
                      if(a.size() == 0){
                             printError(yylineno, VARIABLE_NOT_FOUND);
@@ -1037,7 +1037,7 @@ g: IDENTIFIER EQ RHS //////////////////////////////// COMPLETED ////////////////
                      return 1;
               }
               i_tb.addVariable($1.ID, dt_state, atomic_state, array_state,0);
-              i_tb.print();
+              // i_tb.print();
               /*
               Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -1094,7 +1094,7 @@ loop: for_loop | while_loop ; //////////////////////////////// COMPLETED ///////
  /*FOR LOOP*/
 for_loop      : FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS 
               {
-                     cout << "1068- Datatype: " << $6.datatype << endl ;
+                     // cout << "1068- Datatype: " << $6.datatype << endl ;
                      if(!(string($6.datatype) == "number" || string($6.datatype) == "letter" || string($6.datatype) == "decimal" || string($6.datatype) == "bool") ){
                             printError(yylineno,PREDICATE_ERROR);
                             return 1;
@@ -1111,7 +1111,7 @@ for_loop      : FOR {scopeLevel++;} SQUAREOPEN both_assignment PIPE RHS
  /*WHILE LOOP*/
 while_loop :  REPEAT SQUAREOPEN RHS 
               {
-                     cout << "1085 - Datatype: " << $3.datatype << endl ;
+                     // cout << "1085 - Datatype: " << $3.datatype << endl ;
                      if(!(string($3.datatype) == "number" || string($3.datatype) == "letter" || string($3.datatype) == "decimal" || string($3.datatype) == "bool") ){
                      printError(yylineno,PREDICATE_ERROR);
                      return 1;
@@ -1140,7 +1140,7 @@ conditional: when_statement; //////////////////////////////// COMPLETED ////////
 /*WHEN STATEMENT*/
 when_statement: WHEN SQUAREOPEN RHS 
        {
-              cout << "1114- Datatype: " << $3.datatype << endl ;
+              // cout << "1114- Datatype: " << $3.datatype << endl ;
               if(!(string($3.datatype) == "number" || string($3.datatype) == "letter" || string($3.datatype) == "decimal" || string($3.datatype) == "bool") ){
               printError(yylineno,PREDICATE_ERROR);
               return 1;
@@ -1154,7 +1154,7 @@ when_statement: WHEN SQUAREOPEN RHS
        ;
 extend : ELSE_WHEN SQUAREOPEN RHS 
        {
-              cout << "1128- Datatype: " << $3.datatype << endl ;
+              // cout << "1128- Datatype: " << $3.datatype << endl ;
               if(!(string($3.datatype) == "number" || string($3.datatype) == "letter" || string($3.datatype) == "decimal" || string($3.datatype) == "bool") ){
               printError(yylineno,PREDICATE_ERROR);
               return 1;
@@ -1207,7 +1207,7 @@ func_invoke: INVOKE IDENTIFIER subroutine_in_args COLON arguments COLON
               BY here list of arg_dat (list of arguement's datatypes) will be ready. 
               For all functions with name as $2.ID, type check arguements
               */
-              printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+              // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               vector<string> a = f_tb.rhsSearchFunction($2.ID,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(a.size() == 0){
                      printError(yylineno, FUNCTION_NOT_FOUND);
@@ -1234,7 +1234,7 @@ func_invoke: INVOKE IDENTIFIER subroutine_in_args COLON arguments COLON
           $$.datatype = cstr(a[0]);
           $$.is_array = stoi(a[1]);
           $$.is_atomic = false ;
-          printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+          // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
           arg_dat.clear();
           arg_is_array.clear();
           arg_is_atomic.clear();
@@ -1267,7 +1267,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  arith_expr COLO
                             printError(yylineno, TASK_NOT_FOUND);
                             return 1;
                      }
-                     printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+                     // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
                      arg_is_array.clear();
                      arg_is_atomic.clear();
                      arg_dat.clear();
@@ -1279,7 +1279,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  arith_expr COLO
                             printError(yylineno, TASK_NOT_FOUND);
                             return 1;
                      }
-                     printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+                     // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
                      arg_dat.clear();
                      arg_is_array.clear();
                      arg_is_atomic.clear();
@@ -1303,7 +1303,7 @@ file_name : ARROW STRINGLITERAL
                      return 1;
               }
               string b = "text" ;
-              cout <<"1299 - " << a[0] << endl ;
+              // cout <<"1299 - " << a[0] << endl ;
               if(a[0] != b) {
                      printError(yylineno,NOT_STRING);
               }
@@ -1335,7 +1335,7 @@ stringvalues : STRINGLITERAL
                      printError(yylineno, VARIABLE_NOT_FOUND);
                      return 1;
               }
-              cout << a[0] << " "<<a[1]<< endl ;
+              // cout << a[0] << " "<<a[1]<< endl ;
               if(stoi(a[1]) && stoi(a[3]) != curr_array_level + 1){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -1404,7 +1404,7 @@ function: func_decl func_body
 
 func_args: all_datatypes IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "1351 - is_array: " << $1.is_array << endl ;
+              // cout << "1351 - is_array: " << $1.is_array << endl ;
               decl_arg_dat.push_back($1.datatype);
               decl_arg_is_array.push_back($1.is_array);
               decl_arg_is_atomic.push_back($1.is_atomic);
@@ -1419,7 +1419,7 @@ func_args: all_datatypes IDENTIFIER //////////////////////////////// COMPLETED /
        } /*SHOULD COME BACK and see the order they are getting stored in*/
        | func_args COMMA all_datatypes IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "1365 - is_array: " << $3.is_array << endl ;
+              // cout << "1365 - is_array: " << $3.is_array << endl ;
               decl_arg_dat.push_back(($3.datatype));
               decl_arg_is_array.push_back($3.is_array);
               decl_arg_is_atomic.push_back($3.is_atomic);
@@ -1466,7 +1466,7 @@ func_decl :   FUNC {scopeLevel++;func_start = 1;} IDENTIFIER COLON args COLON fu
                      return_type = $7.datatype ;
                      is_array_ret = $7.is_array ; 
                      fprintf(yyout, " : function declaration statement");
-                     f_tb.print();
+                     // f_tb.print();
                     }else {
                      printError(yylineno, FUNCTION_REDECLARATION_ERROR);
                      decl_arg_dat.clear(); 
@@ -1491,10 +1491,10 @@ atomic_func_decl :   ATOMIC FUNC {scopeLevel++;func_start = 1;chkAtomic = 0;} ID
                             
                      return_type = $8.datatype ;
                      is_array_ret = $8.is_array ; 
-                     cout << "1435 - return_type: "<<return_type << endl ;
-                     cout << "1436 - ret_is_array: "<<is_array_ret << endl ;
+                     // cout << "1435 - return_type: "<<return_type << endl ;
+                     // cout << "1436 - ret_is_array: "<<is_array_ret << endl ;
                             fprintf(yyout, " : function declaration statement");
-                            f_tb.print();
+                            // f_tb.print();
                      }
                      else {
                             printError(yylineno, FUNCTION_REDECLARATION_ERROR);
@@ -1551,7 +1551,7 @@ task: TASK IDENTIFIER COLON {scopeLevel++;in_task = 1;} args ///////////////////
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     t_tb.print();
+                     // t_tb.print();
                     }else {
                      printError(yylineno, TASK_REDECLARATION_ERROR);
                      decl_arg_dat.clear(); 
@@ -1613,7 +1613,7 @@ statements: statement statements
           
           
 access : IDENTIFIER {
-       cout << "1544 - " << $1.ID << endl ;
+       // cout << "1544 - " << $1.ID << endl ;
        vector<string> b = i_tb.rhsSearchVariable($1.ID);
        if(b.size() == 0){
               printError(yylineno,VARIABLE_NOT_FOUND);
@@ -1629,7 +1629,7 @@ access : IDENTIFIER {
        {
               /*$1.datatype should be from an existing class*/ 
               // $$.datatype = ;
-              // cout << "Datatype at end: "<<$4.datatype << endl ;
+              // // cout << "Datatype at end: "<<$4.datatype << endl ;
               $$.datatype = $4.datatype ;
               dt_type = NULL ;
               tok = 0;
@@ -1639,7 +1639,7 @@ access : IDENTIFIER {
 id     : IDENTIFIER
         {     
               if(tok == 1){
-                     // cout <<"Here" << endl;
+                     // // cout <<"Here" << endl;
                      vector<string> a = attr_tb.rhsSearchAttribute($1.ID,dt_type);
                      if(a.size() == 0){
                             printError(yylineno,TYPE_ATTR_NOT_FOUND);
@@ -1651,10 +1651,10 @@ id     : IDENTIFIER
                      }
                      $$.datatype = cstr(a[0]);
               }else {
-                     // cout << "There" << endl ;
-                     cout << "1579 - " << $1.ID << endl ;
+                     // // cout << "There" << endl ;
+                     // cout << "1579 - " << $1.ID << endl ;
                      vector<string> b = i_tb.rhsSearchVariable($1.ID);
-                     // cout << $1.ID << endl ;
+                     // // cout << $1.ID << endl ;
                      if(b.size() == 0){
                             printError(yylineno,VARIABLE_NOT_FOUND);
                             return 1;
@@ -1674,8 +1674,8 @@ id     : IDENTIFIER
               /*
                      After the check is done, we are supposed to update the t_state to the last identifier type
               */ 
-              // cout << "OMG" << endl ;
-              // cout << $3.ID <<" "<< $1.datatype << endl ;
+              // // cout << "OMG" << endl ;
+              // // cout << $3.ID <<" "<< $1.datatype << endl ;
               vector<string> a = attr_tb.rhsSearchAttribute($3.ID,$1.datatype);
               if(a.size() == 0){
                      printError(yylineno,TYPE_ATTR_NOT_FOUND);
@@ -1734,9 +1734,9 @@ type_declaration: TYPE TYPENAME //////////////////////////////// COMPLETED /////
                             return 1;
                      }
                      c_tb.addType($2.token);
-                     c_tb.print();
+                     // c_tb.print();
                      curr_type = ($2.token);
-                     cout<< "1680 - current type: " << curr_type << endl ;
+                     // cout<< "1680 - current type: " << curr_type << endl ;
                      fprintf(yyout, " : type declaration statement"); 
 
               } SCOPEOPEN {scopeLevel++;in_scope = 1;} type_scope methods 
@@ -1744,7 +1744,7 @@ type_declaration: TYPE TYPENAME //////////////////////////////// COMPLETED /////
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
-                     attr_tb.print();
+                     // attr_tb.print();
                      in_scope = 0;
               } SCOPECLOSE
               ;
@@ -1760,7 +1760,7 @@ declaration_t : declarationStmt_t SEMICOLON
 
 declarationStmt_t : simpleDatatype {
                             dt_state = $1.datatype;
-                            cout << "datatype: " << $1.datatype << endl ;
+                            // cout << "datatype: " << $1.datatype << endl ;
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
                      } simpleList_t
@@ -1779,7 +1779,7 @@ simpleList_t: IDENTIFIER //////////////////////////////// COMPLETED ////////////
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,0);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1796,7 +1796,7 @@ simpleList_t: IDENTIFIER //////////////////////////////// COMPLETED ////////////
                             $3.is_atomic = atomic_state;
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array,0);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1814,7 +1814,7 @@ simpleList_t: IDENTIFIER //////////////////////////////// COMPLETED ////////////
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,0);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1833,7 +1833,7 @@ simpleList_t: IDENTIFIER //////////////////////////////// COMPLETED ////////////
 
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array,0);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1854,7 +1854,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN {array_dim = 0;} dimlist SQUARECLOSE ///////
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,array_dim +1);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1873,7 +1873,7 @@ arrayList_t : IDENTIFIER SQUAREOPEN {array_dim = 0;} dimlist SQUARECLOSE ///////
 
                             if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
                                    attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array,array_dim + 1);
-                                   // attr_tb.print();
+                                   // // attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1920,7 +1920,7 @@ func_decl_m : FUNC IDENTIFIER COLON {scopeLevel++;func_start = 1;} args COLON fu
                      return_type = $7.datatype ;
                      is_array_ret = $7.is_array ; 
                      fprintf(yyout, " : function declaration statement");
-                     m_tb.print();
+                     // m_tb.print();
 
                     }
               else {
@@ -1949,7 +1949,7 @@ method_invoke : INVOKE id ARROW IDENTIFIER subroutine_in_args COLON method_args 
                      BY here list of arg_dat (list of arguement's datatypes) will be ready. 
                      For all mthods with name as $2.ID, type check arguements
                      */
-                     // cout << "Here" << endl ;
+                     // // cout << "Here" << endl ;
                      vector<string> b = m_tb.rhsSearchMethod($4.ID,$2.datatype,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
                      if(b.size() == 0){
                             printError(yylineno, METHOD_NOT_FOUND);
@@ -1966,7 +1966,7 @@ method_invoke : INVOKE id ARROW IDENTIFIER subroutine_in_args COLON method_args 
               
 in_stmt : IN ARROW IDENTIFIER 
        {
-              cout << "1909 - In the type: " << $3.ID << endl ;
+              // cout << "1909 - In the type: " << $3.ID << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -1985,12 +1985,12 @@ in_stmt : IN ARROW IDENTIFIER
        }
        | INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON arguments COLON 
        {
-              cout << "1928 - Hereeeeeeeeee" << endl ;
+              // cout << "1928 - Hereeeeeeeeee" << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
               }
-              cout << "1933 - Current type: " << curr_type << endl ; 
+              // cout << "1933 - Current type: " << curr_type << endl ; 
 
               vector<string> a = m_tb.rhsSearchMethod($4.ID,curr_type,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(a.size() == 0){
@@ -2004,7 +2004,7 @@ in_stmt : IN ARROW IDENTIFIER
               In this check if $4.ID exists in the methods table whose class is last element in the types_set
                + TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
-             printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+             // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               arg_dat.clear();
               arg_is_array.clear();
               arg_is_atomic.clear();
@@ -2012,8 +2012,8 @@ in_stmt : IN ARROW IDENTIFIER
        }
        | INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON NULL_ARGS COLON 
        {      
-              cout << "1954 - Theeeereeeee" << endl ;
-              cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() << endl;
+              // cout << "1954 - Theeeereeeee" << endl ;
+              // cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() << endl;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -2030,7 +2030,7 @@ in_stmt : IN ARROW IDENTIFIER
               In this check if $4.ID exists in the methods table whose class is last element in the types_set + 
               TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
-              printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+              // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               arg_dat.clear();
               arg_is_array.clear();
               arg_is_atomic.clear();
@@ -2056,9 +2056,9 @@ method_statements: declaration
                  | method_invoke2
                  | INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON NULL_ARGS COLON 
        {      
-              cout << "1998 - Theeeereeeee" << endl ;
-              cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() <<" "<<$4.ID  << endl;
-              printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+              // cout << "1998 - Theeeereeeee" << endl ;
+              // cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() <<" "<<$4.ID  << endl;
+              // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -2075,18 +2075,18 @@ method_statements: declaration
               In this check if $4.ID exists in the methods table whose class is last element in the types_set + 
               TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
-              printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+              // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               arg_dat.clear();
               arg_is_array.clear();
               arg_is_atomic.clear();
        }|            INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON arguments COLON 
        {
-              cout << "2023 - Hereeeeeeeeee" << endl ;
+              // cout << "2023 - Hereeeeeeeeee" << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
               }
-              cout << "2028 - Current type: " << curr_type << endl ; 
+              // cout << "2028 - Current type: " << curr_type << endl ; 
 
               vector<string> a = m_tb.rhsSearchMethod($4.ID,curr_type,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(a.size() == 0){
@@ -2100,7 +2100,7 @@ method_statements: declaration
               In this check if $4.ID exists in the methods table whose class is last element in the types_set
                + TYPE CHECK FOR PARARMETERS AND RETURN TYPES, SAME AS FUNCTION
               */
-             printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+             // printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               arg_dat.clear();
               arg_is_array.clear();
               arg_is_atomic.clear();
@@ -2110,7 +2110,7 @@ method_statements: declaration
 /* Return */
 return_statement_m : RETURN RHS SEMICOLON 
               { 
-                     cout << "2051 - Return is : " << $2.datatype << endl ;
+                     // cout << "2051 - Return is : " << $2.datatype << endl ;
                      if(func_start ==0){
                             printError(yylineno,INVALID_USE_OF_RETURN);
                             return 1;

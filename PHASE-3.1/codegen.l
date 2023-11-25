@@ -153,7 +153,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
 
     // printf("In lex I am printing %s\n", yylval.attr.converted );
-    printf("%s %s\n", yylval.attr.datatype ,yylval.attr.converted);
+    // printf("%s %s\n", yylval.attr.datatype ,yylval.attr.converted);
 
     if(!strcmp(yytext, "number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext); fprintf(yyout, "%s", yytext);
@@ -319,7 +319,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
   yylval.attr.is_atomic = false;
   yylval.attr.charVal = yytext[1];
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
-  printf("%c==========================\n",yylval.attr.charVal);
+  // printf("%c==========================\n",yylval.attr.charVal);
   return CHARACTERLITERAL;
 }
 
@@ -452,7 +452,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
       fprintf(fp, "Userdefined Datatype4: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
-      std::cout <<"lex.l-424: Hey Hello wassup"<<" "<<yylval.attr.datatype<<std::endl ;
+      // std::cout <<"lex.l-424: Hey Hello wassup"<<" "<<yylval.attr.datatype<<std::endl ;
       return NARRUDATATYPE;
     }
 
