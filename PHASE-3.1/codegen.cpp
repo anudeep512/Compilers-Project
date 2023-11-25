@@ -1,8 +1,18 @@
-#include "codegen.hpp"
+#include <map>
+#include <string>
+#include <vector>
+#include <string>
 #include <iostream>
-using namespace std ;
+#include "CodeGen.hpp"
+// #include "matplotlibcpp.h" 
+#include <chrono>
 
-// void drawGraph(string xlabel, string ylabel, double x[], double y1[])
+
+using namespace std;
+using namespace chrono;
+
+// namespace plt = matplotlibcpp;
+// void drawGraph(string xlabel, string ylabel, double *x, double *y1)
 // {
 //     plt::figure_size(1200, 780); // Set this size once
 //     plt::plot(x,y1);
@@ -13,22 +23,25 @@ using namespace std ;
 //     plt::show();
 // }
 
-void Timer::start(){
-    this->st = high_resolution_clock::now();
-}
+class Timer{
+    public:
+        high_resolution_clock::time_point start, end;
+        double t;
+        void begin(){
+            start = high_resolution_clock::now();
+        }
+        void stop(){
+            end = high_resolution_clock::now();
+            t += duration_cast<microseconds>(end - start).count();
+        }
+        double time(){
+            double tmp =  t;
+            t = 0;
+            return tmp;
+        }     
+};
 
-void Timer::stop(){
-    this->end = high_resolution_clock::now();
-    this->t += duration_cast<microseconds>(this->end - this->st).count();
-}
-
-double Timer::time(){
-    double tmp =  this->t;
-    this->t = 0;
-    return tmp;
-}     
-
-string changer(char *variable)
+std::string changer(char *variable)
 {
     std::map<std::string, std::string> map;
     char *ans;

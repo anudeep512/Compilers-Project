@@ -194,7 +194,7 @@ string VariableTable::searchVariable(string name){
 }
 
 vector<string> VariableTable::rhsSearchVariable(string name){
-  cout <<"symbol-table.cpp-197 " << name << endl ;
+  //  <<"symbol-table.cpp-197 " << name << endl ;
   vector<string> ret ;
   for(int i = this->i_tb.size() - 1; i >= 0; i--){
     if(this->i_tb[i].name == name) {

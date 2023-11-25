@@ -7,6 +7,7 @@ extern int yyparse();
 extern FILE * yyin ;
 extern FILE * yyout ;
 FILE * fp, *fpcpp;
+FILE * fp, *fpcpp;
 
 int main(int argc, char ** argv) {
 

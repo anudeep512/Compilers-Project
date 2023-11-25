@@ -33,12 +33,15 @@ task incrCounter : number N
 
 
 start<<
-
+    $$number hey;
     myType obj; 
 
     number thrs; 
+    thrs = (2);
 
-    ip : thrs;
+    ip: thrs, hiii;
+    op: str # heyy # huuh;
+    op: str#eeeee;
 
     number par = (thrs*thrs) ;
     make parallel incrCounter : par : thrs : thrs :;  

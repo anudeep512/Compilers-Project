@@ -274,7 +274,7 @@ fprintf(fp,"PUNCTUATION: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
 if(strcmp(yytext,",") ==0){ return COMMA;}
 else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
-else if(strcmp(yytext,":") ==0){ std::cout << chkAtomic << std::endl ;chkAtomic = 0;return COLON;}
+else if(strcmp(yytext,":") ==0){ chkAtomic = 0;return COLON;}
 }
 
  /*CONSTANTS*/
@@ -421,7 +421,6 @@ else if(strcmp(yytext,":") ==0){ std::cout << chkAtomic << std::endl ;chkAtomic 
       fprintf(fp, "Userdefined Datatype4: %s\n", x); fprintf(yyout, "%s", x);
       chkArray = 0;
       chkAtomic = 0;
-      std::cout <<"lex.l-424: Hey Hello wassup"<<" "<<yylval.attr.datatype<<std::endl ;
       return NARRUDATATYPE;
     }
 
