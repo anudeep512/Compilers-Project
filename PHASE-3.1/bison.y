@@ -315,16 +315,20 @@ T : IDENTIFIER {curr_array_level = -1;} E
               cout << "304- Datatype is " << $$.datatype << endl ;
               cout <<"306 - Current array level " << curr_array_level << endl ;
               cout <<"311 - in call args " << in_call_args << endl ;
-              if(in_call_args){
-                     if(return_dim_count == 1 && curr_array_level + 1 == 0){
-                            $$.is_array = true ;
-                     }else $$.is_array = false ;
-              }else {
-              if(curr_array_level + 1 < return_dim_count )
-                     $$.is_array = true;
-              if(curr_array_level + 1 == return_dim_count ){
-                     $$.is_array = false ;
-              }
+              // if(in_call_args){
+              //        if(return_dim_count == 1 && curr_array_level + 1 == 0){
+              //               $$.is_array = true ;
+              //        }else $$.is_array = false ;
+              // }else {
+              // if(curr_array_level + 1 < return_dim_count )
+              //        $$.is_array = true;
+              // if(curr_array_level + 1 == return_dim_count ){
+              //        $$.is_array = false ;
+              // }
+              // }
+              if(curr_array_level + 1 != return_dim_count){
+                     printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
+                     return 1;
               }
        }
   | func_invoke
@@ -1408,6 +1412,7 @@ func_args: all_datatypes IDENTIFIER //////////////////////////////// COMPLETED /
                      printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                      return 1;
               }
+              
               if($1.is_array == true) 
               i_tb.addVariable($2.ID, $1.datatype, $1.is_atomic, $1.is_array,1);
               else i_tb.addVariable($2.ID, $1.datatype, $1.is_atomic, $1.is_array,0);
