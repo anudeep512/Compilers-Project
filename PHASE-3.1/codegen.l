@@ -317,9 +317,9 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
 {CHARACTERLIT} {
   yylval.attr.is_array = false;
   yylval.attr.is_atomic = false;
-  yylval.attr.charVal = yytext[2];
+  yylval.attr.charVal = yytext[1];
   fprintf(fp,"Constant: %s\n",yytext);fprintf(yyout, "%s", yytext);
-
+  printf("%c==========================\n",yylval.attr.charVal);
   return CHARACTERLITERAL;
 }
 
