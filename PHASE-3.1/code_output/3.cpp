@@ -1,24 +1,35 @@
 #include <bits/stdc++.h>
+#include <thread>
+#include <mutex>
+#include <fstream>
+#include <sstream>
+#include <usleep>
+#include <time>
 #include "matplotlibcpp.h"
 
 using namespace std;
 
 
-atomic int counter =  0;  // global int
+ mutex mtx[100000];
+int mut = 0;
+atomic <> counter =  0;  // global int
 
-class myType {
+class myType 
+{
 public:
-
-    int count;   data[ 100] ;  //attributes
+     count;  
+     data[ 100] ;  
 
             
-	void printMsg(string msg , int c )
+	void printMsg( msg ,  c )
     { 
-        if ( (c ==  0)) {
-            this-> c =  c; 
-            this-> count =  c; 
+        if ( ( c==  0)) 
+        {
+             =  c; 
         }
-        string str =  ("Message from myType: " + msg + "\n"); 
+         str =  ("Message from myType: " +  msg+ "\n"); 
+        cout <<  str; 
+        return  ; 
     }
 
 	myType() = default;
@@ -27,54 +38,8 @@ public:
 	~myType() = default;
 };
 
-      
-void incrCounter(int N )
-{
-    int i =  0; 
-    string t =  "hi"; 
-
-     obj-> printMsg( ("Hello from the main thread") );
-    cin  >>  thrs; 
-     
-	ofstream fop( "outptu.txt"); fop <<  str <<  heyy <<  huuh;  fop.close();
-
-    cout <<  str<< eeeee; 
-    while ( (i <  N) ) 
-    {
-         counter+=  1; 
-         i+=  1; 
-    }
-}
-
-
-int main() {
-    //number hey;
-    myType obj;  
-
-    int thrs;  
-     thrs=  (2); 
-
-    cin  >>  thrs >>  hiii; 
-    cout <<  str <<  heyy <<  huuh; 
-    cout <<  str<< eeeee; 
-
-       thrs *  thrs  4  thrs   
-
-     
-	ifstream fin( "inp.txt"); fin  >>  thrs;  fin.close();
-
     
-    cout <<  str <<  heyy <<  huuh; 
-    cout <<  str<< eeeee; 
 
-
-     obj-> printMsg( ("Hello from the main thread"),  0);
-
-    cin  >>  thrs; 
-    cout <<  str <<  heyy <<  huuh; 
-    cout <<  str<< eeeee; 
-
-
-	return 0;
-
-}
+     i =  0; 
+    myType obj ; 
+     obj-> printMsg( ("Hello from the main thread"), 100 )

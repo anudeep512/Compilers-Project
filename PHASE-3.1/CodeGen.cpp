@@ -41,7 +41,7 @@ class Timer{
         }     
 };
 
-char *changer(char *variable)
+std::string changer(char *variable)
 {
     std::map<std::string, std::string> map;
     char *ans;
@@ -66,7 +66,7 @@ char *changer(char *variable)
         ans = variable;
     }
 
-    return ans;
+    return std::string(ans);
 }
 
 

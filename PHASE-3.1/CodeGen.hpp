@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-char *changer(char *variable);
+std::string changer(char *variable);
 
 std::string FuncDeclGen(std::vector<std::string> &input);
 

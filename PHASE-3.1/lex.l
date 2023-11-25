@@ -2,6 +2,7 @@
   #include <iostream>
   #include <unordered_set>
   #include <string>
+  #include <string.h>
   #include "bison.tab.h"
   #include "CodeGen.hpp"
 
@@ -149,7 +150,9 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     yylval.attr.is_array = false;
     yylval.attr.is_atomic = false;
     yylval.attr.datatype = strdup(yytext);
-    yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+    yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
+
+    // printf("In lex I am printing %s\n", yylval.attr.converted );
     // printf("%s %s\n", yylval.attr.datatype ,yylval.attr.converted);
 
     if(!strcmp(yytext, "number")){
@@ -184,33 +187,37 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     if(!strcmp(yytext, "atomic number")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
+      // printf("%s\n", yylval.attr.converted);
  return ANUM;
     }
     if(!strcmp(yytext, "atomic decimal")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
+      // printf("%s\n", yylval.attr.converted);
  return ADEC;
     }
     if(!strcmp(yytext, "atomic bool")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted =strdup(&changer(yylval.attr.datatype)[0]);
+      // printf("%s\n", yylval.attr.converted);
  return ABOOL;
     }
     if(!strcmp(yytext, "atomic letter")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return ALET;
     }
     if(!strcmp(yytext, "atomic text")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return ATEXT;
     }
+
 }
 
 
@@ -220,31 +227,31 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     if(!strcmp(yytext, "array number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return NARRNUM;
     }
     if(!strcmp(yytext, "array decimal")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return NARRDEC;
     }
     if(!strcmp(yytext, "array bool")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return NARRBOOL;
     }
     if(!strcmp(yytext, "array letter")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return NARRLET;
     }
     if(!strcmp(yytext, "array text")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return NARRTEXT;
     }
 }
@@ -255,31 +262,33 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     if(!strcmp(yytext, "atomic array number")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
+      // printf("%s\n", yylval.attr.converted);
  return AARRNUM;
     }
     if(!strcmp(yytext, "atomic array decimal")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
+      // printf("%s\n", yylval.attr.converted);
  return AARRDEC;
     }
     if(!strcmp(yytext, "atomic array bool")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return AARRBOOL;
     }
     if(!strcmp(yytext, "atomic array letter")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return AARRLET;
     }
     if(!strcmp(yytext, "atomic array text")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
-      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+      yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
  return AARRTEXT;
     }
 }
@@ -394,7 +403,7 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
     // Type name should be considered as a token, not a datatype as of now.
     // The ones declared in the scopes will be rendered as DATATYPE values.
     yylval.attr.token = strdup(yytext);
-    yylval.attr.converted = strdup(changer(yylval.attr.token));
+    yylval.attr.converted = strdup(&changer(yylval.attr.token)[0]);
     userdefined.insert(y);
     chkType = 0;
     return TYPENAME;
@@ -407,14 +416,14 @@ MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
 
     // This is an identifier, so will be copied to the ID attribute.
     yylval.attr.ID = strdup(yytext);
-    yylval.attr.converted = strdup(changer(yylval.attr.ID));
+    yylval.attr.converted = strdup(&changer(yylval.attr.ID)[0]);
     return IDENTIFIER;
   }
   else
   {
     // Below all will be rendered in datatype attributes
     yylval.attr.datatype = strdup(yytext);
-    yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+    yylval.attr.converted = strdup(&changer(yylval.attr.datatype)[0]);
 
     if(userdefined.find(y) != userdefined.end() && chkArray == 1 && chkAtomic == 1)
     {

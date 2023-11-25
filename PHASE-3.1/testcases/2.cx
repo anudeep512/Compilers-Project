@@ -19,7 +19,8 @@ func add: number a, number b: number
 
 func add: decimal a, array number b: number
 <<
-    decimal c = (a + b); 
+    decimal c = (a + b);
+     number hi = 10;
     return c;
 >>
 
@@ -43,7 +44,8 @@ number hi;
 
 
 start << 
-    number n = (a*b*c*d*e + 1);
+    $$ number n = (a*b*c*d*e + 1);
+    number n = 10;
     array number num[n];
 
     for [ number i = 0 | (i < n) | i += 1] 
@@ -53,7 +55,7 @@ start <<
 
     number thr = 5, runs = 4; 
 
-    runs[i] ^= 2;
+    runs = 2;
 
     make parallel parallelFact: thr : runs : invoke add:a,b: : ;
 

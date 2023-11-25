@@ -15,29 +15,30 @@ int mut = 0;
      
 int factorial(int b ) 
 {
-    int res =  1,  i; 
+     res =  1,  i; 
    
-    for (( i =  1 ) ; (i<=  b ); ( i +=  1)  )
+    for (( i =  1 ) ; (i<=   b); ( i +=  1)  )
     {
          res*=  i; 
-    }
+    
 
-    return  res;  
+     return resreturn  
 }
 
 
       
 int add(int a , int b )
 {
-    int c =  (a +  b); 
-    return  c;
+     c =  ( a+  b); 
+     return creturn
 }
 
       
 int add(float a , int b[] )
 {
-    float d =  (a +  b);  // RHS error
-    return  d;
+     c =  ( a+  b); 
+      hi =  10; 
+     return creturn
 }
 
 // function overloading
@@ -46,59 +47,52 @@ float add(float a[] , float b )
 {
 	mtx[mut].lock();
 
-    float c =  (a +  b); 
+     c =  ( a+  b); 
     {
-        int x =  (a -  b); 
-         c=  (x +  2* b);  // should update the c value in this scope, is it updating?
+         x =  ( a-  b); 
+         c=  ( x+  2* b); 
     }
-    mtx[mut].unlock();
+     mtx[mut].unlock();
 	mut++;
-return  c;
+return creturn
 }
 
   
-void parallelFact (int tid ) 
-{
-    int thr =  tid ; 
+
+     thr =  tid ; 
      factorial(thr) ;
 }
-int hi; 
+ hi; 
 
 
 int main()  { 
-    int n =  (a* b* c* d* e +  1); 
+    // number n = (a*b*c*d*e + 1);
+     n =  10; 
     int num[ n] ; 
 
-    for ( int i =  0 ; (i <  n) ; i +=  1) {
-        num[ i]  =  i ; 
-    }
+    for (  i =  0 ; ( i<  n) ; i +=  1) 
+    {
+        num[ i]  =   i; 
+    
 
-    int thr =  5,   runs=  4;  
+     thr =  5,   runs=  4;  
 
-    runs = pow(runs,  2); 
+     runs=  2; 
 
-         
-	for(int i = 0; i < runs; i++) {
+          
+	for(int i = 0; i < thr; i++) {
 		get.begin();
-		thread threads[thr];
+		thread threads[parallelFact];
 
-	for(int i = 0; i < thr; i++) {
-		threads[i] = thread(parallelFact, i+1 , add(a, b) );
+	for(int i = 0; i < parallelFact; i++) {
+		threads[i] = thread(parallelFact, i+1, add(a, b) );
 	}
-	for(int i = 0; i < thr; i++) {
+	for(int i = 0; i < parallelFact; i++) {
 		threads[i].join();
 	}
 		get.stop();
 	}
-	double t = get.time()/runs;
+	double t = get.time()/thr;
  
 
-    int res1 =   add(  add( 10.100000,  2.100000) ,  num[1]) ; 
-
-    float res2 =   add( 10.300000,  2.300000) ;  // function overloading
-    drawGraph( "a",b,x,y) ; 
-
-	return 0;
-
-}
- 
+     res1 =   add(  add( 10.100000,  2.100000)

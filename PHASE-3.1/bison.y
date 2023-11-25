@@ -59,6 +59,7 @@
   int io1 = 0;
   int atm = 0;
   int arr = 0;
+  char * forPowassign = NULL ;
 %}
 
 %union {
@@ -120,10 +121,12 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> subroutine_io  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analysis_arrays analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_pow subroutine_array subroutine_narray
-
-
-%type<attr> func_args subroutine_in_args
+%type<attr> subroutine_io  return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next 
+%type<attr> RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand 
+%type<attr> assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement analyze_label analyze_statement func_invoke2 func_invoke arguments 
+%type<attr> task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec 
+%type<attr> start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal 
+%type<attr> subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_array subroutine_narray func_args subroutine_in_args
 
 %start begin
 
@@ -143,7 +146,7 @@ subroutine_decVal: %empty {fprintf(fpcpp, "%f", yylval.attr.decVal);};
 subroutine_charVal: %empty {fprintf(fpcpp, "%c", yylval.attr.charVal);};
 subroutine_boolVal: %empty {fprintf(fpcpp, "%d", yylval.attr.boolVal);};
 subroutine_stringVal: %empty {fprintf(fpcpp, "%s", yylval.attr.stringVal);};
-subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin ");} else{fprintf(fpcpp,"cout ");}}
+subroutine_io: %empty {if(io==1){fprintf(fpcpp,"cin ");} else{fprintf(fpcpp,"// // cout ");}}
 subroutine_rs: %empty {if(io==1){fprintf(fpcpp," >> ");} else{fprintf(fpcpp,"<< ");}}
 subroutine_fileH: %empty {if(io==1){fprintf(fpcpp,"\n\tifstream fin(");} else{fprintf(fpcpp,"\n\tofstream fop(");}} 
 subroutine_fio: %empty {if(io==1){fprintf(fpcpp,"; fin");} else{fprintf(fpcpp,"; fop");}}
@@ -151,7 +154,6 @@ subroutine_fileC: %empty {if(io1 == 0){if(io==1){fprintf(fpcpp," fin.close();\n"
 subroutine_array: %empty {arr = 1;}
 subroutine_narray: %empty {arr = 0;}
 subr_init: %empty {io1 = 1;}
-//subroutine_pow : %empty {}
 subroutine: %empty {;};
 
 subroutine_roundopen: %empty {fprintf(fpcpp, "(");} ;
@@ -177,13 +179,12 @@ all_datatypes: NUDATATYPE subroutine_narray
                             $$.is_atomic = $1.is_atomic;
                      }
              | ARRAY NARRUDATATYPE 
-             | ARRAY NARRUDATATYPE 
                      {
-                            cout << "132 - Hereeee" << endl ;
+                            // cout << "132 - Hereeee" << endl ;
                             $$.datatype = $2.datatype;
                             $$.is_array = $2.is_array;
                             $$.is_atomic = $2.is_atomic;
-                            cout << "136, dtype: " << $$.datatype << ", is_array: " << $$.is_array << ", is_atomic: "<<$$.is_atomic << endl ;
+                            // cout << "136, dtype: " << $$.datatype << ", is_array: " << $$.is_array << ", is_atomic: "<<$$.is_atomic << endl ;
                      }
              | ATOMIC ARRAY AARRUDATATYPE
                      {
@@ -270,10 +271,6 @@ expression_op: ASSN_DIV subroutine_token
               {
                 $$.ID = $1.token;
               }
-              | ASSN_EXPONENT subroutine_token
-              {
-                $$.ID = $1.token;
-              } 
               | ASSN_MODULO subroutine_token
               {
                 $$.ID = $1.token;
@@ -328,7 +325,7 @@ begin : %empty {
 E      :    subroutine
        | SQUAREOPEN {curr_array_level = 0;fprintf(fpcpp, "%s", $1.token);} arr_access SQUARECLOSE { fprintf(fpcpp, "%s", $4.token); }
        {
-              cout << "273 - " << $1.ID << endl ;
+              // // cout << "273 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno, VARIABLE_NOT_FOUND);
@@ -338,7 +335,7 @@ E      :    subroutine
                      printError(yylineno,NOT_AN_ARRAY);
                      return 1;
               }
-              cout << "283-" << curr_array_level <<", ID level: "<<stoi(a[2]) << endl ;
+              // // cout << "283-" << curr_array_level <<", ID level: "<<stoi(a[2]) << endl ;
               if(stoi(a[3]) != curr_array_level + 1){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -349,21 +346,21 @@ E      :    subroutine
 T : IDENTIFIER {curr_array_level = -1;} subroutine_id E 
        {
               var_name = $1.ID ;
-              cout << "294-Search Variable is: " << var_name << endl ;    
+              // // cout << "294-Search Variable is: " << var_name << endl ;    
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno, VARIABLE_NOT_FOUND);
                      return 1;
               }
-              cout <<"300-Datatype of " << var_name << " is "<< a[0] << endl ;
+              // // cout <<"300-Datatype of " << var_name << " is "<< a[0] << endl ;
               return_dim_count = stoi(a[3]);
-              cout << "302-Return dim count: "<< return_dim_count << endl ;
+              // // cout << "302-Return dim count: "<< return_dim_count << endl ;
               var_name = "" ;
               $$.datatype =  cstr(a[0]);
               $$.is_atomic = stoi(a[2]);
-              cout << "304- Datatype is " << $$.datatype << endl ;
-              cout <<"306 - Current array level " << curr_array_level << endl ;
-              cout <<"311 - in call args " << in_call_args << endl ;
+              // // cout << "304- Datatype is " << $$.datatype << endl ;
+              // // cout <<"306 - Current array level " << curr_array_level << endl ;
+              // // cout <<"311 - in call args " << in_call_args << endl ;
               if(in_call_args){
                      if(return_dim_count == 1 && curr_array_level + 1 == 0){
                             $$.is_array = true ;
@@ -453,7 +450,7 @@ constants: INTEGERLITERAL subroutine_intVal
 next : RHS all_ops next 
        {
               string a = is_coercible_rhs($1.datatype,$3.datatype,$2.ID) ; 
-              cout << "383: "<<$1.datatype << " " << $3.datatype << " " << $2.ID << endl ;
+              // // cout << "383: "<<$1.datatype << " " << $3.datatype << " " << $2.ID << endl ;
               if( a == "" ){
                      printError(yylineno,TYPE_ERROR_RHS);
                      return 1 ;
@@ -513,7 +510,7 @@ RHS :	constants
     | ROUNDOPEN subroutine_roundopen RHS all_ops next subroutine_roundclose ROUNDCLOSE
     {
        string a = is_coercible_rhs(string($3.datatype),string($5.datatype),$4.ID);
-       cout << "443-"<<$3.datatype << " " << $5.datatype << " " << $4.ID << endl ;
+       // // cout << "443-"<<$3.datatype << " " << $5.datatype << " " << $4.ID << endl ;
        // cout << a << endl ;
        if( a == "" ){
               printError(yylineno,TYPE_ERROR_RHS);
@@ -531,12 +528,12 @@ RHS :	constants
     }
     | NEG ROUNDOPEN RHS ROUNDCLOSE
        {
-              cout << "468- " << $3.datatype << endl ;
+              // // cout << "468- " << $3.datatype << endl ;
               if(string($3.datatype) == "number" || string($3.datatype) == "decimal" || string($3.datatype) == "bool" || string($3.datatype) == "letter"){
                     $$.datatype = "bool" ;
                     $$.is_array = false ;
                     $$.is_atomic = false ; 
-                    cout << "473- " << $$.datatype << endl ;  
+                    // // cout << "473- " << $$.datatype << endl ;  
               }
        }
        ;
@@ -544,6 +541,7 @@ RHS :	constants
 /* DATATYPE SEGREGATION FOR DECL STATEMENTS */
 nonAtomicSimple : NNUM 
                      {
+                            // cout << "I must be here1\n";
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
@@ -555,6 +553,8 @@ nonAtomicSimple : NNUM
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
                             $$.converted = $1.converted;
+                            // printf("%s\n", $1.converted);
+                            // cout << "I must be here1 " << std::string($1.converted) << " Here\n";
                      }
                 | NBOOL 
                      {
@@ -665,35 +665,34 @@ atomicArray : AARRNUM
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            $$.converted = "int";
+                            $$.converted = $1.converted;
                      }
               | AARRDEC
                      {
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            $$.converted = "float";
+                            $$.converted = $1.converted;
                      }
               | AARRBOOL 
                      {
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            $$.converted ="bool";
-                     }
+                            $$.converted = $1.converted;                     }
               | AARRLET
                      {
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            $$.converted ="char";
+                            $$.converted = $1.converted;
                      }
               | AARRTEXT
                      {
                             $$.datatype = $1.datatype;
                             $$.is_array = $1.is_array;
                             $$.is_atomic = $1.is_atomic;
-                            $$.converted ="string";
+                            $$.converted = $1.converted;
                      }
               ;
 
@@ -703,7 +702,7 @@ errorDatatypes: IDENTIFIER | ATOMIC IDENTIFIER | ARRAY IDENTIFIER | ATOMIC ARRAY
 
 declaration : declarationStmt SEMICOLON subroutine_token 
             { 
-                     i_tb.print();
+                     // i_tb.print();
                      fprintf(yyout, " : declaration statement"); 
             }
             | errorDatatypes IDENTIFIER subroutine_token  
@@ -714,12 +713,15 @@ declaration : declarationStmt SEMICOLON subroutine_token
             ;
 
 
-simpleDatatype : nonAtomicSimple 
-                     {      fprintf(fpcpp, "%s", $1.converted);
+simpleDatatype : nonAtomicSimple
+                     {      
+                            // cout << "I came here " << std::string($1.converted) << " there"<< "\n";
+                            // fprintf(fpcpp, "%s", $1.converted);
                             $$.datatype = $1.datatype;
-                            cout << "627-Datatype is: " << $$.datatype << endl ;
+                            // cout << "627-Datatype is: " << $$.datatype << endl ;
                             $$.is_array = $1.is_array;
-                            $$.is_atomic = $1.is_atomic;    
+                            $$.is_atomic = $1.is_atomic;
+                            // $$.converted    
                      }
               | atomicSimple 
                      {
@@ -730,9 +732,10 @@ simpleDatatype : nonAtomicSimple
                      }
               | NUDATATYPE
                      {
-                            fprintf(fpcpp, "%s", $1.datatype);
+                            // // cout << "I am here, the user defined datatype!\n";
+                            // fprintf(fpcpp, "%s", $1.datatype);
                             $$.datatype = $1.datatype;
-                            cout << "640-Datatype is: " << $$.datatype << endl ;
+                            // // cout << "640-Datatype is: " << $$.datatype << endl ;
                             $$.is_array = false; 
                             $$.is_atomic = false;
                      }
@@ -780,10 +783,10 @@ arrayDatatype  : nonAtomicArray
 
 declarationStmt : simpleDatatype  
                 {
-                     // printf("%s\n",$1.datatype);
                      dt_state = $1.datatype;
                      array_state = $1.is_array;
                      atomic_state = $1.is_atomic;
+
                 } 
                 simpleList
                 | 
@@ -806,8 +809,7 @@ simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED 
                             return 1;
                      }
                      i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,0);
-                     // i_tb.print();
-
+                     //i_tb.print();
               }
           | simpleList COMMA subroutine_token IDENTIFIER //////////////////////////////// COMPLETED ///////////////////////////////
               {
@@ -819,11 +821,8 @@ simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED 
                             return 1;
                      }
                      i_tb.addVariable($4.ID, $4.datatype, $4.is_atomic, $4.is_array,0);
-                     // i_tb.print();
-
-                            
-                            fprintf(fpcpp, "%s", $4.ID);
-              
+                     //i_tb.print();
+                     fprintf(fpcpp, "%s", $4.ID);
               }
           | IDENTIFIER subroutine_id EQ subroutine_token RHS //////////////////////////////// COMPLETED ///////////////////////////////
               {
@@ -834,9 +833,9 @@ simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED 
                             printError(yylineno,VARIABLE_REDECLARATION_ERROR);
                             return 1;
                      }
-                     cout << $5.datatype  << endl ;      
-                     cout << $1.datatype << endl;
-                     cout << (string($1.datatype) == string($5.datatype)) << endl ;
+                     // cout << $5.datatype  << endl ;      
+                     // cout << $1.datatype << endl;
+                     // cout << (string($1.datatype) == string($5.datatype)) << endl ;
                      if(assignment($1.datatype, $5.datatype, 0)) {
                             i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,0);
                      }else {
@@ -864,7 +863,7 @@ simpleList: IDENTIFIER subroutine_id //////////////////////////////// COMPLETED 
                             printError(yylineno,TYPE_ERROR_RHS_LHS);
                             return 1;
                      }
-                     // i_tb.print();
+                     //i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $3.ID, dt_state, array_state, atomic_state,
                      Scope Level + TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -884,7 +883,7 @@ arrayList : IDENTIFIER subroutine_id SQUAREOPEN subroutine_token {array_dim = 0;
 
                      i_tb.addVariable($1.ID, $1.datatype, $1.is_atomic, $1.is_array,array_dim+1);
                      array_dim = 0;
-                     // i_tb.print();
+                     //i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state,
                      Scope Level
@@ -902,7 +901,7 @@ arrayList : IDENTIFIER subroutine_id SQUAREOPEN subroutine_token {array_dim = 0;
 
                      i_tb.addVariable($4.ID, $4.datatype, $4.is_atomic, $4.is_array,array_dim+1);
                      array_dim = 0;
-                     // i_tb.print();
+                     //i_tb.print();
                      /*
                      Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, 
                      atomic_state, Scope Level
@@ -928,10 +927,14 @@ dimlist : dimlist COMMA { fprintf(fpcpp, "][");array_dim++; } array_inValues
 
 LHS :  IDENTIFIER subroutine_id //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "826 - " << $1.ID << endl ;
+              // cout << "826 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno,VARIABLE_NOT_FOUND);
+                     return 1;
+              }
+              if(stoi(a[1]) == 1){
+                     printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
               }
               $$.datatype = cstr(a[0]);
@@ -944,7 +947,7 @@ LHS :  IDENTIFIER subroutine_id //////////////////////////////// COMPLETED /////
        }
        | IDENTIFIER subroutine_id {in_make_parallel_arrays = 2;curr_array_level = 0;} SQUAREOPEN subroutine_token arr_access SQUARECLOSE subroutine_token//////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "842 - " << $1.ID << endl ;
+              // cout << "842 - " << $1.ID << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno,VARIABLE_NOT_FOUND);
@@ -957,7 +960,7 @@ LHS :  IDENTIFIER subroutine_id //////////////////////////////// COMPLETED /////
               $$.datatype = cstr(a[0]);
               $$.is_array = stoi(a[1]) ;
               $$.is_atomic = stoi(a[2]) ;
-              cout << "855-" << curr_array_level << endl ;
+              // cout << "855-" << curr_array_level << endl ;
               if(curr_array_level + 1 != stoi(a[3])){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -993,7 +996,7 @@ LHS :  IDENTIFIER subroutine_id //////////////////////////////// COMPLETED /////
               $$.is_array = stoi(a[1]);
               $$.is_atomic = stoi(a[2]);
        }
-       | IN ARROW IDENTIFIER {in_make_parallel_arrays = 2;curr_array_level = 0;} SQUAREOPEN arr_access SQUARECLOSE{
+       | IN ARROW IDENTIFIER SQUAREOPEN {in_make_parallel_arrays = 2;curr_array_level = 0;} arr_access SQUARECLOSE{
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -1006,7 +1009,7 @@ LHS :  IDENTIFIER subroutine_id //////////////////////////////// COMPLETED /////
               $$.datatype = cstr(a[0]);
               $$.is_array = stoi(a[1]);
               $$.is_atomic = stoi(a[2]);
-              cout << "904-" << curr_array_level << endl ;
+              // cout << "904-" << curr_array_level << endl ;
               if(curr_array_level +1 != stoi(a[3])){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
@@ -1024,7 +1027,7 @@ exprlist: arith_expr
 arith_operand: IDENTIFIER 
               {
                      makeParallel = 0;
-                     cout <<"916-search identifier: "<<($1.ID) << endl ;
+                     // // cout <<"916-search identifier: "<<($1.ID) << endl ;
                      vector<string> a = i_tb.rhsSearchVariable($1.ID);
                      if(a.size() == 0){
                             printError(yylineno, VARIABLE_NOT_FOUND);
@@ -1062,7 +1065,7 @@ arith_expr: arith_expr arithmetic_op arith_operand
  /*ASSIGNMENT STATEMENT*/
 assignment_statement: LHS EQ subroutine_token RHS //////////////////////////////// COMPLETED ///////////////////////////////
                      {
-                            if(!assignment($1.datatype, $3.datatype, 0)) {
+                            if(!assignment($1.datatype, $4.datatype, 0)) {
                                    printError(yylineno,TYPE_ERROR_RHS_LHS);
                                    return 1;
                             }
@@ -1090,7 +1093,7 @@ expression_statement: LHS expression_op RHS //////////////////////////////// COM
                            /* 
                            In this no user defined datatypes only primitive 
                            */
-                     } | LHS ASSN_EXPONENT { fprintf(fpcpp, " = pow(%s, ", $1.ID); } RHS subroutine_roundclose 
+                     }
                     ;
 
 exprrr: expression_statement
@@ -1113,7 +1116,7 @@ g: IDENTIFIER subroutine_id EQ subroutine_token RHS ////////////////////////////
                      return 1;
               }
               i_tb.addVariable($1.ID, dt_state, atomic_state, array_state,0);
-              i_tb.print();
+              // i_tb.print();
               /*
               Insert in Normal IDENTIFIER TABLE $1.ID, dt_state, array_state, atomic_state, Scope Level + 
               TYPE CHECK FOR COERCIBILITY OF dt_state and RHS.datatype
@@ -1167,7 +1170,7 @@ loop: for_loop | while_loop ; //////////////////////////////// COMPLETED ///////
  /*FOR LOOP*/
 for_loop      : FOR {scopeLevel++;fprintf(fpcpp, "%s", $1.token);} SQUAREOPEN subroutine_roundopen both_assignment PIPE { fprintf(fpcpp, ";"); } RHS 
               {
-                     cout << "1068- Datatype: " << $8.datatype << endl ;
+                     // // cout << "1068- Datatype: " << $8.datatype << endl ;
                      if(!(string($8.datatype) == "number" || string($8.datatype) == "letter" || string($8.datatype) == "decimal" || string($8.datatype) == "bool") ){
                             printError(yylineno,PREDICATE_ERROR);
                             return 1;
@@ -1184,7 +1187,7 @@ for_loop      : FOR {scopeLevel++;fprintf(fpcpp, "%s", $1.token);} SQUAREOPEN su
  /*WHILE LOOP*/
 while_loop :  REPEAT { fprintf(fpcpp, "while"); }  SQUAREOPEN subroutine_roundopen  RHS 
               {
-                     cout << "1085 - Datatype: " << $5.datatype << endl ;
+                     // // cout << "1085 - Datatype: " << $5.datatype << endl ;
                      if(!(string($5.datatype) == "number" || string($5.datatype) == "letter" || string($5.datatype) == "decimal" || string($5.datatype) == "bool") ){
                      printError(yylineno,PREDICATE_ERROR);
                      return 1;
@@ -1205,7 +1208,7 @@ conditional: when_statement; //////////////////////////////// COMPLETED ////////
 /*WHEN STATEMENT*/
 when_statement: WHEN { fprintf(fpcpp, "if"); } SQUAREOPEN subroutine_roundopen RHS 
        {
-              cout << "1114- Datatype: " << $5.datatype << endl ;
+              // // cout << "1114- Datatype: " << $5.datatype << endl ;
               if(!(string($5.datatype) == "number" || string($5.datatype) == "letter" || string($5.datatype) == "decimal" || string($5.datatype) == "bool") ){
               printError(yylineno,PREDICATE_ERROR);
               return 1;
@@ -1219,7 +1222,7 @@ when_statement: WHEN { fprintf(fpcpp, "if"); } SQUAREOPEN subroutine_roundopen R
        ;
 extend : ELSE_WHEN { fprintf(fpcpp, "else if"); } SQUAREOPEN subroutine_roundopen RHS 
        {
-              cout << "1128- Datatype: " << $5.datatype << endl ;
+              // // cout << "1128- Datatype: " << $5.datatype << endl ;
               if(!(string($5.datatype) == "number" || string($5.datatype) == "letter" || string($5.datatype) == "decimal" || string($5.datatype) == "bool") ){
               printError(yylineno,PREDICATE_ERROR);
               return 1;
@@ -1315,8 +1318,8 @@ func_invoke: INVOKE IDENTIFIER subroutine_id subroutine_in_args COLON subroutine
 arguments : arguments COMMA subroutine_token  RHS 
           {
               arg_dat.push_back(($4.datatype));
-              arg_is_array.push_back($3.is_array);
-              arg_is_atomic.push_back($3.is_atomic);
+              arg_is_array.push_back($4.is_array);
+              arg_is_atomic.push_back($4.is_atomic);
           }
           | RHS 
           {
@@ -1327,13 +1330,13 @@ arguments : arguments COMMA subroutine_token  RHS
           ;
 
 task_invoke_args: {fprintf(fpcpp, ",");} arguments 
-                | NULL_ARGS {arg_dat.clear();}
+                /* | NULL_ARGS {arg_dat.clear();} */
                 ;
 
 /*Task call using Make Parallel*/
-task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  IDENTIFIER COLON IDENTIFIER COLON { 
+task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON IDENTIFIER COLON IDENTIFIER COLON {
                      
-                     fprintf(yyout, " : call statement");                       /*
+                                           /*
                      
                      By here list of arg_dat (list of arguement's datatypes) will be ready. For all functions with name
                      as $1.ID, type check arguements
@@ -1343,6 +1346,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  IDENTIFIER COLO
                             return 1;
                      }
                      printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+                     arg_dat.clear();
                      arg_is_array.clear();
                      arg_is_atomic.clear();
 
@@ -1351,7 +1355,6 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  IDENTIFIER COLO
                      fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
                      fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
                      fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
-                     
               } task_invoke_args {
 
                      fprintf(fpcpp, ");\n\t}");
@@ -1361,9 +1364,14 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  IDENTIFIER COLO
 
                      arg_dat.clear();
                      in_call_args = 0;
-              }
-              | MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON arith_expr COLON arith_expr COLON NULL_ARGS COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
-              {
+              } COLON SEMICOLON ;
+              | MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON IDENTIFIER COLON IDENTIFIER COLON {
+                     
+                                           /*
+                     
+                     By here list of arg_dat (list of arguement's datatypes) will be ready. For all functions with name
+                     as $1.ID, type check arguements
+                     */
                      if(!t_tb.searchTask($2.ID,to_string_vec(arg_dat),arg_is_array,arg_is_atomic)){
                             printError(yylineno, TASK_NOT_FOUND);
                             return 1;
@@ -1372,6 +1380,39 @@ task_invoke : MAKE_PARALLEL IDENTIFIER subroutine_in_args COLON  IDENTIFIER COLO
                      arg_dat.clear();
                      arg_is_array.clear();
                      arg_is_atomic.clear();
+
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $6.ID);
+                     fprintf(fpcpp, "\t\tget.begin();\n");
+                     fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
+                     fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
+              } NULL_ARGS {
+
+                     fprintf(fpcpp, ");\n\t}");
+
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n\t\tthreads[i].join();\n\t}\n", $4.ID);
+                     fprintf(fpcpp, "\t\tget.stop();\n\t}\n\tdouble t = get.time()/%s;\n", $6.ID);
+
+                     arg_dat.clear();
+                     in_call_args = 0;
+              } COLON SEMICOLON { fprintf(yyout, " : call statement");  } 
+              {      
+                     if(!t_tb.searchTask($2.ID,to_string_vec(arg_dat),arg_is_array,arg_is_atomic)){
+                            printError(yylineno, TASK_NOT_FOUND);
+                            return 1;
+                     }
+                     printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
+                     arg_dat.clear();
+                     arg_is_array.clear();
+                     arg_is_atomic.clear();
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $6.ID);
+                     fprintf(fpcpp, "\t\tget.begin();\n");
+                     fprintf(fpcpp, "\t\tthread threads[%s];\n", $4.ID);
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n", $4.ID);
+                     fprintf(fpcpp, "\t\tthreads[i] = thread(%s, i+1", $2.ID);
+                     fprintf(fpcpp, ");\n\t}");
+                     fprintf(fpcpp, "\n\tfor(int i = 0; i < %s; i++) {\n\t\tthreads[i].join();\n\t}\n", $4.ID);
+                     fprintf(fpcpp, "\t\tget.stop();\n\t}\n\tdouble t = get.time()/%s;\n", $6.ID);
               }
               ;
               
@@ -1404,7 +1445,10 @@ stringvalues : STRINGLITERAL subroutine_stringVal
             ;
 
 /* Return */
-return_statement : RETURN subroutine_token RHS SEMICOLON 
+return_statement : RETURN {if(atm ==1){
+              fprintf(fpcpp,"mtx[mut].unlock();\n");
+              fprintf(fpcpp,"\tmut++;\n");
+              }} subroutine_token RHS SEMICOLON 
                  { 
                      fprintf(fpcpp,"%s",$4.token); 
                      if(func_start == 0){
@@ -1466,7 +1510,7 @@ function: func_decl func_body
 
 func_args: all_datatypes {func_array.push_back(std::string($1.converted));  method_array.push_back(std::string($1.converted));} IDENTIFIER {if(arr==0){func_array.push_back(std::string($3.ID));} else{func_array.push_back(std::string($3.ID)+"[]");};  method_array.push_back(std::string($3.ID));}
        {
-              cout << "1351 - is_array: " << $1.is_array << endl ;
+              // cout << "1351 - is_array: " << $1.is_array << endl ;
               decl_arg_dat.push_back($1.datatype);
               decl_arg_is_array.push_back($1.is_array);
               decl_arg_is_atomic.push_back($1.is_atomic);
@@ -1480,7 +1524,7 @@ func_args: all_datatypes {func_array.push_back(std::string($1.converted));  meth
        } /*SHOULD COME BACK and see the order they are getting stored in*/
        | func_args COMMA {func_array.push_back(std::string($2.token)); method_array.push_back(std::string($2.token)); } all_datatypes {func_array.push_back(std::string($4.converted)); method_array.push_back(std::string($4.converted)); } IDENTIFIER {if(arr==0){func_array.push_back(std::string($6.ID));} else{func_array.push_back(std::string($6.ID)+"[]");};  method_array.push_back(std::string($6.ID)); } //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              cout << "1365 - is_array: " << $4.is_array << endl ;
+              // cout << "1365 - is_array: " << $4.is_array << endl ;
               decl_arg_dat.push_back(($4.datatype));
               decl_arg_is_array.push_back($4.is_array);
               decl_arg_is_atomic.push_back($4.is_atomic);
@@ -1534,7 +1578,7 @@ func_decl :  FUNC { scopeLevel++;func_start = 1;func_array.clear(); func_array.p
                      return_type = $10.datatype ;
                      is_array_ret = $10.is_array ; 
                      fprintf(yyout, " : function declaration statement");
-                     f_tb.print();
+                     // f_tb.print();
                     }else {
                      printError(yylineno, FUNCTION_REDECLARATION_ERROR);
                      decl_arg_dat.clear(); 
@@ -1544,7 +1588,7 @@ func_decl :  FUNC { scopeLevel++;func_start = 1;func_array.clear(); func_array.p
                      fprintf(yyout, " : function declaration statement");
                     }
                      atm = 0;
-                     cout<< FuncDeclGen(func_array);
+                     // // cout<< FuncDeclGen(func_array);
 
                      fprintf(fpcpp,"\n%s", FuncDeclGen(func_array).c_str());
 
@@ -1566,10 +1610,10 @@ atomic_func_decl :   ATOMIC FUNC {func_array.clear(); func_array.push_back(std::
                             
                      return_type = $11.datatype ;
                      is_array_ret = $11.is_array ; 
-                     cout << "1435 - return_type: "<<return_type << endl ;
-                     cout << "1436 - ret_is_array: "<<is_array_ret << endl ;
+                     // // cout << "1435 - return_type: "<<return_type << endl ;
+                     // // cout << "1436 - ret_is_array: "<<is_array_ret << endl ;
                             fprintf(yyout, " : function declaration statement");
-                            f_tb.print();
+                            // f_tb.print();
                      }
                      else {
                             printError(yylineno, FUNCTION_REDECLARATION_ERROR);
@@ -1579,7 +1623,7 @@ atomic_func_decl :   ATOMIC FUNC {func_array.clear(); func_array.push_back(std::
                             return 1 ;
                             fprintf(yyout, " : function declaration statement");
                             }
-                            cout<<"====================================="<<endl;
+                            // // cout<<"====================================="<<endl;
                             // fprintf
                             atm = 1;
                             fprintf(fpcpp, "\n%s", FuncDeclGen(func_array).c_str());
@@ -1610,10 +1654,7 @@ func_scope: declaration
           | task_invoke
           | func_invoke2 /*TYPE CHECK IF THE RETURN TYPE OF THIS FUNCTION IS VOID*/
           | loop
-          | {if(atm ==1){
-              fprintf(fpcpp,"mtx[mut].unlock();\n");
-              fprintf(fpcpp,"\tmut++;\n");
-              }}
+          | 
               return_statement
           | conditional
           | analyze_statement
@@ -1643,12 +1684,12 @@ task: TASK {
               scopeLevel++;in_task = 1;
               } args //////////////////////////////// COMPLETED ///////////////////////////////
        {
-              if(!t_tb.searchTask($2.ID, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic)){
-                     t_tb.addTask($2.ID, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic);
+              if(!t_tb.searchTask($3.ID, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic)){
+                     t_tb.addTask($3.ID, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic);
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     t_tb.print();
+                     // t_tb.print();
                     }else {
                      printError(yylineno, TASK_REDECLARATION_ERROR);
                      decl_arg_dat.clear(); 
@@ -1685,7 +1726,7 @@ taskscope: declaration taskscope
 /* Scope for Conditionals and Loop Statements */
 statement: declaration
           | log
-          | conditional | in_stmt EQ subroutine_token RHS SEMICOLON subroutine_token 
+          | conditional
           | loop
           | return_statement
           | func_invoke2
@@ -1710,7 +1751,7 @@ statements: statement statements
           
           
 access : IDENTIFIER subroutine_id {
-       cout << "1544 - " << $1.ID << endl ;
+       // cout << "1544 - " << $1.ID << endl ;
        vector<string> b = i_tb.rhsSearchVariable($1.ID);
        if(b.size() == 0){
               printError(yylineno,VARIABLE_NOT_FOUND);
@@ -1727,7 +1768,7 @@ access : IDENTIFIER subroutine_id {
               /*$1.datatype should be from an existing class*/ 
               // $$.datatype = ;
               // cout << "Datatype at end: "<<$4.datatype << endl ;
-              $$.datatype = $4.datatype ;
+              $$.datatype = $6.datatype ;
               dt_type = NULL ;
               tok = 0;
        }
@@ -1749,7 +1790,7 @@ id     : IDENTIFIER subroutine_id
                      $$.datatype = cstr(a[0]);
               }else {
                      // cout << "There" << endl ;
-                     cout << "1579 - " << $1.ID << endl ;
+                     // // cout << "1579 - " << $1.ID << endl ;
                      vector<string> b = i_tb.rhsSearchVariable($1.ID);
                      // cout << $1.ID << endl ;
                      if(b.size() == 0){
@@ -1773,7 +1814,7 @@ id     : IDENTIFIER subroutine_id
               */ 
               // cout << "OMG" << endl ;
               // cout << $3.ID <<" "<< $1.datatype << endl ;
-              vector<string> a = attr_tb.rhsSearchAttribute($3.ID,$1.datatype);
+              vector<string> a = attr_tb.rhsSearchAttribute($4.ID,$1.datatype);
               if(a.size() == 0){
                      printError(yylineno,TYPE_ATTR_NOT_FOUND);
                      return 1;
@@ -1831,14 +1872,14 @@ type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME///////////////////////
               { 
                      // types_set.insert($2.token); 
                      fprintf(fpcpp,"%s",$3.token);
-                     if(c_tb.searchType($3.ID)){
+                     if(c_tb.searchType($3.token)){
                             printError(yylineno,TYPE_REDECLARATION);
                             return 1;
                      }
-                     c_tb.addType($2.token);
-                     c_tb.print();
-                     curr_type = ($2.token);
-                     cout<< "1680 - current type: " << curr_type << endl ;
+                     c_tb.addType($3.token);
+                     // c_tb.print();
+                     curr_type = ($3.token);
+                     // cout<< "1680 - current type: " << curr_type << endl ;
                      fprintf(yyout, " : type declaration statement"); 
 
               } SCOPEOPEN subroutine_openscope { scopeLevel++;in_scope = 1;} subr_public type_scope methods 
@@ -1846,7 +1887,7 @@ type_declaration: TYPE {fprintf(fpcpp,"class");} TYPENAME///////////////////////
                      i_tb.deleteVariables();
                      scopeLevel--;
                      curr_type = NULL ;
-                     attr_tb.print();
+                     // attr_tb.print();
                      in_scope = 0;
 
               } {
@@ -1869,7 +1910,7 @@ declaration_t : declarationStmt_t SEMICOLON subroutine_token
 
 declarationStmt_t : simpleDatatype {
                             dt_state = $1.datatype;
-                            cout << "datatype: " << $1.datatype << endl ;
+                            // // cout << "datatype: " << $1.datatype << endl ;
                             array_state = $1.is_array;
                             atomic_state = $1.is_atomic;
                      } simpleList_t
@@ -1888,7 +1929,7 @@ simpleList_t: IDENTIFIER subroutine_id//////////////////////////////// COMPLETED
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,0);
-                                   // attr_tb.print();
+                                   //attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1904,7 +1945,7 @@ simpleList_t: IDENTIFIER subroutine_id//////////////////////////////// COMPLETED
                             $4.is_array = array_state;
                             $4.is_atomic = atomic_state;
                             if(attr_tb.searchAttribute($4.ID, curr_type) == ""){
-                                   attr_tb.addVariable($4.ID, curr_type, $4.datatype, $4.is_atomic, $4.is_array);
+                                   attr_tb.addVariable($4.ID, curr_type, $4.datatype, $4.is_atomic, $4.is_array,0);
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1922,7 +1963,7 @@ simpleList_t: IDENTIFIER subroutine_id//////////////////////////////// COMPLETED
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,0);
-                                   // attr_tb.print();
+                                   //attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1939,9 +1980,9 @@ simpleList_t: IDENTIFIER subroutine_id//////////////////////////////// COMPLETED
                             $4.is_array = array_state;
                             $4.is_atomic = atomic_state;
 
-                            if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
-                                   attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array,0);
-                                   // attr_tb.print();
+                            if(attr_tb.searchAttribute($4.ID, curr_type) == ""){
+                                   attr_tb.addVariable($4.ID, curr_type, $4.datatype, $4.is_atomic, $4.is_array,0);
+                                   //attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1963,7 +2004,7 @@ arrayList_t : IDENTIFIER subroutine_id SQUAREOPEN subroutine_token {array_dim = 
 
                             if(attr_tb.searchAttribute($1.ID, curr_type) == ""){
                                    attr_tb.addVariable($1.ID, curr_type, $1.datatype, $1.is_atomic, $1.is_array,array_dim +1);
-                                   // attr_tb.print();
+                                   //attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -1980,9 +2021,9 @@ arrayList_t : IDENTIFIER subroutine_id SQUAREOPEN subroutine_token {array_dim = 
                             $4.is_array = array_state;
                             $4.is_atomic = atomic_state;
 
-                            if(attr_tb.searchAttribute($3.ID, curr_type) == ""){
-                                   attr_tb.addVariable($3.ID, curr_type, $3.datatype, $3.is_atomic, $3.is_array,array_dim + 1);
-                                   // attr_tb.print();
+                            if(attr_tb.searchAttribute($4.ID, curr_type) == ""){
+                                   attr_tb.addVariable($4.ID, curr_type, $4.datatype, $4.is_atomic, $4.is_array,array_dim + 1);
+                                   //attr_tb.print();
                             }else {
                                    printError(yylineno,TYPE_ATTR_REDECLARATION);
                                    return 1;
@@ -2018,15 +2059,15 @@ func_decl_m : FUNC { method_array.clear(); method_array.push_back(std::string($1
               return_type is $6.datatype, $6.is_array class name will be the last element in the types_set
               */ 
 
-              if(m_tb.searchMethod($2.ID, curr_type, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic) == ""){
-                     m_tb.addMethod($2.ID, curr_type, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic,$7.datatype, $7.is_array);
+              if(m_tb.searchMethod($3.ID, curr_type, to_string_vec(decl_arg_dat),decl_arg_is_array,decl_arg_is_atomic) == ""){
+                     m_tb.addMethod($3.ID, curr_type, to_string_vec(decl_arg_dat), decl_arg_is_array,decl_arg_is_atomic,$10.datatype, $10.is_array);
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     return_type = $7.datatype ;
-                     is_array_ret = $7.is_array ; 
+                     return_type = $10.datatype ;
+                     is_array_ret = $10.is_array ; 
                      fprintf(yyout, " : function declaration statement");
-                     m_tb.print();
+                     // m_tb.print();
 
                     }
               else {
@@ -2073,7 +2114,7 @@ method_invoke : INVOKE id ARROW subroutine_token IDENTIFIER subroutine_id subrou
               
 in_stmt : IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id
        {
-              cout << "1909 - In the type: " << $5.ID << endl ;
+              // // cout << "1909 - In the type: " << $5.ID << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -2092,12 +2133,12 @@ in_stmt : IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id
        }
        | INVOKE IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id subroutine_in_args COLON subroutine_roundopen arguments COLON subroutine_roundclose
        {
-              cout << "1928 - Hereeeeeeeeee" << endl ;
+              // // cout << "1928 - Hereeeeeeeeee" << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
               }
-              cout << "1933 - Current type: " << curr_type << endl ; 
+              // // cout << "1933 - Current type: " << curr_type << endl ; 
 
               vector<string> a = m_tb.rhsSearchMethod($6.ID,curr_type,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(a.size() == 0){
@@ -2119,8 +2160,8 @@ in_stmt : IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id
        }
        | INVOKE IN subr_this ARROW subroutine_token IDENTIFIER subroutine_id subroutine_in_args COLON subroutine_roundopen NULL_ARGS COLON subroutine_roundclose
        {      
-              cout << "1954 - Theeeereeeee" << endl ;
-              cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() << endl;
+              // // cout << "1954 - Theeeereeeee" << endl ;
+              // // cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() << endl;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
@@ -2150,7 +2191,7 @@ method_statements: declaration
                  | func_invoke2
                  | loop 
                  | return_statement_m /*TYPE CHECK WITH MOST RECENT METHOD'S RETURN TYPE*/
-                 | conditional | in_stmt EQ subroutine_token RHS SEMICOLON subroutine_token
+                 | conditional
                  | analyze_statement
                  | input
                  | output
@@ -2163,8 +2204,8 @@ method_statements: declaration
                  | method_invoke2
                  | INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON NULL_ARGS COLON 
        {      
-              cout << "1998 - Theeeereeeee" << endl ;
-              cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() <<" "<<$4.ID  << endl;
+              // // cout << "1998 - Theeeereeeee" << endl ;
+              // // cout << arg_dat.size() << arg_is_array.size() << arg_is_atomic.size() <<" "<<$4.ID  << endl;
               printArgs(to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
@@ -2188,12 +2229,12 @@ method_statements: declaration
               arg_is_atomic.clear();
        }|            INVOKE IN ARROW IDENTIFIER subroutine_in_args COLON arguments COLON 
        {
-              cout << "2023 - Hereeeeeeeeee" << endl ;
+              // // cout << "2023 - Hereeeeeeeeee" << endl ;
               if(in_scope == 0){
                      printError(yylineno,IN_SCOPE_ERROR);
                      return 1;
               }
-              cout << "2028 - Current type: " << curr_type << endl ; 
+              // // cout << "2028 - Current type: " << curr_type << endl ; 
 
               vector<string> a = m_tb.rhsSearchMethod($4.ID,curr_type,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
               if(a.size() == 0){
@@ -2217,7 +2258,7 @@ method_statements: declaration
 /* Return */
 return_statement_m : RETURN subroutine_token RHS SEMICOLON subroutine_token
               { 
-                     cout << "2051 - Return is : " << $3.datatype << endl ;
+                     // // cout << "2051 - Return is : " << $3.datatype << endl ;
                      if(func_start ==0){
                             printError(yylineno,INVALID_USE_OF_RETURN);
                             return 1;
