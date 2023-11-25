@@ -3,8 +3,9 @@
   #include <unordered_set>
   #include <string>
   #include "bison.tab.h"
+  #include "CodeGen.hpp"
 
-  extern FILE* fp;
+  extern FILE* fp,* fpcpp;
 
   int chkType = 0; // to track if the encountered token is type or not
   int chkAtomic = 0;
@@ -20,7 +21,7 @@
 KEYWORD_1               "when"|"repeat"|"else when"|"default"|"for"|"break"|"continue"
 KEYWORD_2               "task"|"make parallel"|"null"|"tid"|"analyze"|"get"|"sleep"|"time"
 KEYWORD_3               "start"|"return"|"type"|"atomic"|"array"|"in"|"func"|"invoke"|"ip"|"op" 
-KEYWORD 			      {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
+KEYWORD 			          {KEYWORD_1}|{KEYWORD_2}|{KEYWORD_3}
 
 
 /*DATATYPES*/
@@ -73,7 +74,7 @@ UNDERSCORE "_"
 
 /*Identifier*/
 IDENTIFIER_ALPHABET        {ALPHABET}|{UNDERSCORE}
-ID                 {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
+ID                        {IDENTIFIER_ALPHABET}({IDENTIFIER_ALPHABET}|{DIGIT})*
 
 /* INVALID IDENTIFIERS */
 INVALIDID [a-zA-Z0-9_]*
@@ -93,8 +94,8 @@ NEWLINE [\n]
 
 /*Comments*/
 SINGLE_LINE_COMMENT        "$$".*
-MULTI_LINE_COMMENT         "$*"([^"*$"]|[\n])*"*$" 
-COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
+MULTI_LINE_COMMENT         "$*"([^*]|(\*+[^*$]))*\*+"$"
+/*COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})*/
 
 
 %%
@@ -148,6 +149,8 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
     yylval.attr.is_array = false;
     yylval.attr.is_atomic = false;
     yylval.attr.datatype = strdup(yytext);
+    yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+    // printf("%s %s\n", yylval.attr.datatype ,yylval.attr.converted);
 
     if(!strcmp(yytext, "number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext); fprintf(yyout, "%s", yytext);
@@ -181,29 +184,35 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
     if(!strcmp(yytext, "atomic number")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return ANUM;
     }
     if(!strcmp(yytext, "atomic decimal")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return ADEC;
     }
     if(!strcmp(yytext, "atomic bool")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return ABOOL;
     }
     if(!strcmp(yytext, "atomic letter")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return ALET;
     }
     if(!strcmp(yytext, "atomic text")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return ATEXT;
     }
 }
+
 
 {ARRAY} {
     yylval.attr.is_array = true;
@@ -211,26 +220,31 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
     if(!strcmp(yytext, "array number")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return NARRNUM;
     }
     if(!strcmp(yytext, "array decimal")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return NARRDEC;
     }
     if(!strcmp(yytext, "array bool")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return NARRBOOL;
     }
     if(!strcmp(yytext, "array letter")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return NARRLET;
     }
     if(!strcmp(yytext, "array text")){
       fprintf(fp,"inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return NARRTEXT;
     }
 }
@@ -241,40 +255,44 @@ COMMENTS                   ({SINGLE_LINE_COMMENT}|{MULTI_LINE_COMMENT})
     if(!strcmp(yytext, "atomic array number")){
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("number");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return AARRNUM;
     }
     if(!strcmp(yytext, "atomic array decimal")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("decimal");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return AARRDEC;
     }
     if(!strcmp(yytext, "atomic array bool")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("bool");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return AARRBOOL;
     }
     if(!strcmp(yytext, "atomic array letter")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("letter");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return AARRLET;
     }
     if(!strcmp(yytext, "atomic array text")) {
       fprintf(fp,"atomic inbuilt datatype: %s\n", yytext);fprintf(yyout, "%s", yytext);
       yylval.attr.datatype = strdup("text");
+      yylval.attr.converted = strdup(changer(yylval.attr.datatype));
  return AARRTEXT;
     }
 }
 
 
-
  /*PUNCTUATION*/
 {PUNCTUATIONS} {
-  yylval.attr.token = strdup(yytext);
-fprintf(fp,"PUNCTUATION: %s\n",yytext);fprintf(yyout, "%s", yytext);
+      yylval.attr.token = strdup(yytext);
+      fprintf(fp,"PUNCTUATION: %s\n",yytext);fprintf(yyout, "%s", yytext);
 
-if(strcmp(yytext,",") ==0){ return COMMA;}
-else if(strcmp(yytext,";") ==0){ return SEMICOLON;}
-else if(strcmp(yytext,":") ==0){ return COLON;}
+      if(strcmp(yytext,",") ==0){ return COMMA;}
+      else if(strcmp(yytext,";") ==0){  return SEMICOLON;}
+      else if(strcmp(yytext,":") ==0){ return COLON;}
 }
 
  /*CONSTANTS*/
@@ -376,6 +394,7 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
     // Type name should be considered as a token, not a datatype as of now.
     // The ones declared in the scopes will be rendered as DATATYPE values.
     yylval.attr.token = strdup(yytext);
+    yylval.attr.converted = strdup(changer(yylval.attr.token));
     userdefined.insert(y);
     chkType = 0;
     return TYPENAME;
@@ -388,12 +407,15 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
     // This is an identifier, so will be copied to the ID attribute.
     yylval.attr.ID = strdup(yytext);
+    yylval.attr.converted = strdup(changer(yylval.attr.ID));
     return IDENTIFIER;
   }
   else
   {
     // Below all will be rendered in datatype attributes
     yylval.attr.datatype = strdup(yytext);
+    yylval.attr.converted = strdup(changer(yylval.attr.datatype));
+
     if(userdefined.find(y) != userdefined.end() && chkArray == 1 && chkAtomic == 1)
     {
       yylval.attr.is_atomic = true;
@@ -445,8 +467,6 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
   return LEXERROR;
 }
 
-
- /*SPECIAL SYMBOLS*/
 {SPECIALSYMBOL} {
   yylval.attr.token = strdup(yytext);
   fprintf(fp,"Special Symbol: %s\n",yytext); fprintf(yyout, "%s", yytext);
@@ -481,16 +501,29 @@ else if(strcmp(yytext,":") ==0){ return COLON;}
 
  /*WHITESPACES*/
 {WHITESPACES} {
-    fprintf(yyout, "%s", yytext);
+    fprintf(yyout, "%s", yytext); fprintf(fpcpp, "%s", yytext);
 }
 
  /*NEWLINE*/
 {NEWLINE} {
-  fprintf(yyout, "%s", yytext);
+  fprintf(yyout, "%s", yytext); fprintf(fpcpp, "%s", yytext);
 }
 
  /*COMMENTS*/
-{COMMENTS} ;
+
+{SINGLE_LINE_COMMENT} {
+  yytext[0] = '/';
+  yytext[1] = '/';
+  fprintf(fpcpp,"%s",yytext);
+  }
+
+{MULTI_LINE_COMMENT} {
+  yytext[0] = '/';
+  yytext[1] = '*';
+  yytext[yyleng-1] = '/';
+  yytext[yyleng-2] = '*';
+  fprintf(fpcpp,"%s",yytext);
+}
 
  /*OTHER TOKENS*/
 . {

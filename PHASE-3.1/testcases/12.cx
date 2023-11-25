@@ -1,0 +1,77 @@
+$$ Global array
+
+array number arr[10];
+
+$$ Structure to hold thread parameters
+type ThreadParams 
+<<
+    number begin;
+    number end;
+    number result;
+>>
+
+$$ Function to calculate the sum of elements in a chunk of the array
+
+task adder : array ThreadParams params
+<<
+    params->result = 0;
+    number i;
+    number x;
+
+    for [i = (params->begin)| (i < params->end) | i += 1]
+    <<
+        params->result += arr[i];
+    >>
+        
+>>
+
+start
+<<
+
+    number j = 0;  array number arr[100];
+
+    arr[2*i + j] = 9;
+
+    repeat [(j < 10)]
+    <<
+        arr[j] = j;
+    >>
+
+    $$ Number of threads
+    number numThreads = 2;
+
+    $$ Size of each chunk
+    number chunkSize = (arraySize / numThreads);
+
+    $$ Thread parameters array
+    array ThreadParams params[numThreads];
+
+
+    $$ Defining thread data structure
+    for [number i = 0| (i < numThreads)| i += 1]
+    <<
+        ThreadParams y = params[i];
+        y->begin = (i * chunkSize);
+        y->end = ((y->begin) + chunkSize);
+
+        when [(i == numThreads - 1)]
+        <<
+            y->end = 10;
+        >>
+    >>
+
+    make parallel adder : numThreads : 1 : params :;
+
+    $$ Calculating the total sum
+
+    number totalSum = 0;
+
+    for [number i = 0| (i < numThreads)| i += 1]
+    <<
+        ThreadParams y = params[i];
+        totalSum += (y->result);
+    >>
+
+    $$ Displaying the result
+    op : totalSum;
+>>
