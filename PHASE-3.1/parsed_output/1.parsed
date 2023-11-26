@@ -1,3 +1,21 @@
+
+func temp : array number azz : text 
+<<
+    
+    array number a[100,200] ; : declaration statement
+    number b = a[100,300] ; : declaration statement
+    number c = (b * 4) ; : declaration statement
+    return "ok" ; : return statement
+
+>>
+
+func temp2 : null : number 
+<<
+    array number y[200] ; : declaration statement
+    invoke temp : y : ; : call statement
+    return 1; : return statement
+>>
+
 type pt : type declaration statement
 <<
     decimal x, y; : declaration statement

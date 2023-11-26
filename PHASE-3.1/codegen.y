@@ -1135,7 +1135,7 @@ func_return : nonAtomic_datatypes
               $$.is_array = $1.is_array; 
               /*Atomic is not needed*/
             }
-            | IDENTIFIER {printf("TYPE NOT DECLARED, %d\n", yylineno); return 1;}
+            | IDENTIFIER 
             ;
 
 func_decl :  FUNC { func_array.clear(); func_array.push_back(std::string($1.token)); } IDENTIFIER {func_array.push_back(std::string($3.ID));} COLON { func_array.push_back(std::string($5.token)); } args COLON { func_array.push_back(std::string($8.token)); } func_return 

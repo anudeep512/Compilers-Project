@@ -1,3 +1,21 @@
+
+func temp : array number azz : text 
+<<
+    
+    array number a[100,200] ;
+    number b = a[100,300] ;
+    number c = (b * 4) ;
+    return "ok" ;
+
+>>
+
+func temp2 : null : number 
+<<
+    array number y[200] ;
+    invoke temp : y : ;
+    return 1;
+>>
+
 type pt
 <<
     decimal x, y;

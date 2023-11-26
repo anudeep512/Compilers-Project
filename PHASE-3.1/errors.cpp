@@ -68,7 +68,9 @@ void printError(int lineNumber, int errorType){
     errorStr = "The array Level uncompitable for returnFretur, error at line: " ;
   } else if(errorType == NOT_STRING){
     errorStr = "Not string passed to input/ output, error at line: " ;
-  }  
+  }  else if(errorType == ARRAY_SHOULD_BE_ARGUMENT){
+    errorStr = "Array should be passed as argument, error at line: " ;
+  } 
 
   std::cout << errorStr << lineNumber << std::endl ;
 }

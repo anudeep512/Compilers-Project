@@ -1,3 +1,65 @@
+reserved keyword: func
+Identifier: temp
+PUNCTUATION: :
+inbuilt datatype: array number
+Identifier: azz
+PUNCTUATION: :
+inbuilt datatype: text
+Special Symbol: <<
+inbuilt datatype: array number
+Identifier: a
+Special Symbol: [
+Constant: 100
+PUNCTUATION: ,
+Constant: 200
+Special Symbol: ]
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: b
+operator: =
+Identifier: a
+Special Symbol: [
+Constant: 100
+PUNCTUATION: ,
+Constant: 300
+Special Symbol: ]
+PUNCTUATION: ;
+inbuilt datatype: number
+Identifier: c
+operator: =
+Special Symbol: (
+Identifier: b
+operator: *
+Constant: 4
+Special Symbol: )
+PUNCTUATION: ;
+reserved keyword: return
+Constant: "ok"
+PUNCTUATION: ;
+Special Symbol: >>
+reserved keyword: func
+Identifier: temp2
+PUNCTUATION: :
+reserved keyword: null
+PUNCTUATION: :
+inbuilt datatype: number
+Special Symbol: <<
+inbuilt datatype: array number
+Identifier: y
+Special Symbol: [
+Constant: 200
+Special Symbol: ]
+PUNCTUATION: ;
+reserved keyword: invoke
+Identifier: temp
+PUNCTUATION: :
+Identifier: y
+PUNCTUATION: :
+PUNCTUATION: ;
+reserved keyword: return
+Constant: 1
+PUNCTUATION: ;
+Special Symbol: >>
 reserved keyword: type
 Userdefined Datatype1: pt
 Special Symbol: <<

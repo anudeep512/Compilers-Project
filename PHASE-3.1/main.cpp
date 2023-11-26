@@ -11,7 +11,7 @@ FILE * fp, *fpcpp;
 int main(int argc, char ** argv) {
 
   // Test Case Reading
-  std::string inputPath = std::string("./testcases/")+argv[1]+".cx";
+  std::string inputPath = std::string("../testcases/")+argv[1]+".cx";
   yyin = fopen(inputPath.c_str(),"r");
 
   // Token Writing
@@ -25,11 +25,11 @@ int main(int argc, char ** argv) {
   // Code Output
   std::string outputCodePath = std::string("./code_output/")+argv[1]+".cpp";
   fpcpp = fopen(outputCodePath.c_str(),"w");
-  fprintf(fpcpp, "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <atomic>\n#include <fstream>\n#include <sstream>\n#include <chrono>\n#include \"codegen.h\"\n#include <random>\n#include <time.h>\n#include <unistd.h>\n#include <cstdlib>\n#include <ctime>\n#include <cmath>\n#include <vector>\n#include <map>\n#include \"matplotlibcpp.h\"\n\nusing namespace std;\nusing namespace chrono;\n\nTimer get; \nmutex mtx[100000];\nint mut = 0;\n\n");
+  fprintf(fpcpp, "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <atomic>\n#include <fstream>\n#include <sstream>\n#include <chrono>\n#include \"../codegen.h\"\n#include <random>\n#include <time.h>\n#include <unistd.h>\n#include <cstdlib>\n#include <ctime>\n#include <cmath>\n#include <vector>\n#include <map>\n#include \"../matplotlibcpp.h\"\n\nusing namespace std;\nusing namespace chrono;\n\nTimer get; \nmutex mtx[100000];\nint mut = 0;\n\n");
 
-  int i=yyparse();
+  int i = yyparse();
 
-  return 0 ;
+  return i ;
 
 }
 

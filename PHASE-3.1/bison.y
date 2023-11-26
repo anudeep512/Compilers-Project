@@ -260,7 +260,7 @@ nonAtomic_datatypes: nonAtomicArray
 begin_subroutine: %empty {
               if(startCount < 1){
                      printError(yylineno,START_ERROR_LESS);
-                     return 1 ;
+                     return 1;
               }
        }
        ;
@@ -301,6 +301,8 @@ T : IDENTIFIER {curr_array_level = -1;} E
        {
               var_name = $1.ID ;
               // cout << "294-Search Variable is: " << var_name << endl ;    
+              // i_tb.print();
+              // cout << "Searching: " << var_name << endl ;
               vector<string> a = i_tb.rhsSearchVariable($1.ID);
               if(a.size() == 0){
                      printError(yylineno, VARIABLE_NOT_FOUND);
@@ -326,10 +328,20 @@ T : IDENTIFIER {curr_array_level = -1;} E
               //        $$.is_array = false ;
               // }
               // }
-              if(curr_array_level + 1 != return_dim_count){
+              // cout << "calling: " << in_call_args << endl ; 
+              // cout << curr_array_level << " " << return_dim_count << endl ;
+              if(in_call_args == 1){
+                     if(return_dim_count == 1 && curr_array_level != -1)
+                     printError(yylineno, ARRAY_SHOULD_BE_ARGUMENT);
+              }
+              else {
+                     if(curr_array_level + 1 != return_dim_count){
                      printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
                      return 1;
               }
+              }
+              // cout << "The var is: " << $$.is_array << endl ;
+              $$.is_array = stoi(a[1]);
        }
   | func_invoke
   {
@@ -410,7 +422,7 @@ next : RHS all_ops next
               // cout << "383: "<<$1.datatype << " " << $3.datatype << " " << $2.ID << endl ;
               if( a == "" ){
                      printError(yylineno,TYPE_ERROR_RHS);
-                     return 1 ;
+                     return 1;
               }
               $$.datatype = cstr(a) ;
               $$.is_atomic = false ;
@@ -440,7 +452,7 @@ RHS :	constants
        {
               if(in_task == 0){
                      printError(yylineno,CANNOT_USE_TID);
-                     return 1 ;
+                     return 1;
               }
               $$.datatype = "number";
               $$.is_array = false ;
@@ -471,7 +483,7 @@ RHS :	constants
        // // cout << a << endl ;
        if( a == "" ){
               printError(yylineno,TYPE_ERROR_RHS);
-              return 1 ;
+              return 1;
        }
        $$.datatype = cstr(a) ;
        $$.is_atomic = false ;
@@ -1229,7 +1241,7 @@ func_invoke: INVOKE IDENTIFIER subroutine_in_args COLON arguments COLON
           vector<string> a = f_tb.rhsSearchFunction($2.ID,to_string_vec(arg_dat),arg_is_array,arg_is_atomic);
           if(a.size() == 0){
                  printError(yylineno, FUNCTION_NOT_FOUND);
-                 return 1;
+              //    return 1;
           }
           $$.datatype = cstr(a[0]);
           $$.is_array = stoi(a[1]);
@@ -1449,7 +1461,11 @@ func_return : nonAtomic_datatypes
               $$.is_array = $1.is_array; 
               /*Atomic is not needed*/
             }
-            | IDENTIFIER {{printError(yylineno,TYPE_NOT_FOUND); return 1;};}
+            | IDENTIFIER 
+            {
+              printError(yylineno,TYPE_NOT_FOUND) ;
+            }
+            /* | IDENTIFIER {{printError(yylineno,TYPE_NOT_FOUND); return 1;};} */
             ;
 
 func_decl :   FUNC {scopeLevel++;func_start = 1;} IDENTIFIER COLON args COLON func_return //////////////////////////////// COMPLETED ///////////////////////////////
@@ -1472,7 +1488,7 @@ func_decl :   FUNC {scopeLevel++;func_start = 1;} IDENTIFIER COLON args COLON fu
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     return 1 ;
+                     return 1;
                      fprintf(yyout, " : function declaration statement");
                     }
               } 
@@ -1501,7 +1517,7 @@ atomic_func_decl :   ATOMIC FUNC {scopeLevel++;func_start = 1;chkAtomic = 0;} ID
                             decl_arg_dat.clear(); 
                             decl_arg_is_array.clear();
                             decl_arg_is_atomic.clear();
-                            return 1 ;
+                            return 1;
                             fprintf(yyout, " : function declaration statement");
                             }
                      }
@@ -1557,7 +1573,7 @@ task: TASK IDENTIFIER COLON {scopeLevel++;in_task = 1;} args ///////////////////
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     return 1 ;
+                     return 1;
                     }
               fprintf(yyout, " : task declaration statement");
        }
@@ -1755,7 +1771,7 @@ declaration_t : declarationStmt_t SEMICOLON
               { 
                      fprintf(yyout, " : declaration statement"); 
               }
-              | errorDatatypes IDENTIFIER {printError(yylineno,TYPE_NOT_FOUND); return 1;};
+              /* | errorDatatypes IDENTIFIER {printError(yylineno,TYPE_NOT_FOUND); return 1;}; */
               ;
 
 declarationStmt_t : simpleDatatype {
@@ -1928,7 +1944,7 @@ func_decl_m : FUNC IDENTIFIER COLON {scopeLevel++;func_start = 1;} args COLON fu
                      decl_arg_dat.clear(); 
                      decl_arg_is_array.clear();
                      decl_arg_is_atomic.clear();
-                     return 1 ;
+                     return 1;
                      fprintf(yyout, " : function declaration statement");
               }
                      decl_arg_dat.clear(); fprintf(yyout, " : function declaration statement"); 
@@ -2138,7 +2154,7 @@ return_statement_m : RETURN RHS SEMICOLON
               { 
                      if(func_start ==0){
                            printError(yylineno,INVALID_USE_OF_RETURN);
-                           return 1;
+                     //       return 1;
                      }
                      if(!(string($2.datatype) == "void" && is_array_ret == 0)){
                             printError(yylineno, RETURN_TYPE_ERROR);

@@ -3,26 +3,37 @@
 #include <vector>
 #include <string>
 #include <iostream>
-// #include "CodeGen.hpp"
+#include "codegen.hpp"
 #include "codegen.hpp">
-// #include "matplotlibcpp.h" 
+#include "matplotlibcpp.h" 
 #include <chrono>
 
 
 using namespace std;
 using namespace chrono;
 
-// namespace plt = matplotlibcpp;
-// void drawGraph(string xlabel, string ylabel, double *x, double *y1)
-// {
-//     plt::figure_size(1200, 780); // Set this size once
-//     plt::plot(x,y1);
-//     // plt::plot(x,y2);
-//     plt::xlabel(xlabel);
-//     plt::ylabel(ylabel);
-//     plt::title("Graph");
-//     plt::show();
-// }
+namespace plt = matplotlibcpp;
+void drawGraph(string xlabel, string ylabel, double *x, double *y)
+{
+    int xx = sizeof(x)/sizeof(x[0]);
+    int yy = sizeof(y)/sizeof(y[0]);
+    vector<double> X ;
+    for(int i = 0;i<xx;i++){
+        X.push_back(x[i]);
+    }
+    vector<double> Y ;
+    for(int i = 0; i < yy  ;i++){
+        Y.push_back(y[i]);
+    }
+
+    plt::figure_size(1200, 780); // Set this size once
+    plt::plot(X,Y);
+    // plt::plot(x,y2);
+    plt::xlabel(xlabel);
+    plt::ylabel(ylabel);
+    plt::title("Graph");
+    plt::show();
+}
 
 
 std::string changer(char *variable)

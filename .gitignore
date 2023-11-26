@@ -38,3 +38,5 @@ PHASE-3.1/codegen.output
 PHASE-3.1/codegen.o
 PHASE-3.1/codegen.tab.c
 PHASE-3.1/codegen.tab.h
+PHASE-3.1/parsed_output/
+PHASE-3.1/token_output/

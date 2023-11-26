@@ -37,6 +37,7 @@
 #define THE_ARRAY_SHOULD_BE_ACCESSED_FULLY 31
 #define INCOMPITABLE_ARRAY_DIMS 32
 #define NOT_STRING 33
+#define ARRAY_SHOULD_BE_ARGUMENT 34
 /*
   start error -> > 1 starts or 0 start
 */
