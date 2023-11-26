@@ -1339,20 +1339,7 @@ nextip : COMMA IDENTIFIER nextip
      }
     ;
 
-stringvalues : STRINGLITERAL 
-             | IDENTIFIER 
-             {
-              vector<string> a = i_tb.rhsSearchVariable($1.ID);
-              if(a.size() == 0){
-                     printError(yylineno, VARIABLE_NOT_FOUND);
-                     return 1;
-              }
-              // cout << a[0] << " "<<a[1]<< endl ;
-              if(stoi(a[1]) && stoi(a[3]) != curr_array_level + 1){
-                     printError(yylineno,THE_ARRAY_SHOULD_BE_ACCESSED_FULLY);
-                     return 1;
-              }
-             }
+stringvalues : RHS
             ;
 
 /* Return */

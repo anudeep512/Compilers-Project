@@ -101,7 +101,7 @@
 %right EQ ASSN_MUL ASSN_DIV ASSN_EXPONENT ASSN_MODULO INCR DECR
 %left COMMA
 
-%type<attr> subroutine_io return_routine return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip stringvalues return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_array subroutine_narray subroutine_dim
+%type<attr> subroutine_io return_routine return_statement_m func_decl_m declaration_t func_return all_datatypes expression_op comparison_op arithmetic_op logical_op nonAtomic_datatypes E T all_ops constants next RHS nonAtomicSimple atomicSimple nonAtomicArray atomicArray declaration simpleDatatype arrayDatatype declarationStmt simpleList arrayList array_inValues dimlist LHS arr_access exprlist arith_expr arith_operand assignment_statement expression_statement exprrr log g both_assignment loop for_loop while_loop conditional when_statement /* when_default */ analyze_label analyze_statement func_invoke2 func_invoke arguments task_invoke get_invoke sleep file_name input nextip /*stringvalues*/ return_statement output opstring nextop func_decl atomic_func_decl func_body func_scope func_statements statement statements access id startdec start type_declaration type_scope methods method method_invoke2 method_args method_invoke in_stmt method_statements method_body subroutine_token subroutine_id  subroutine_intVal subroutine_decVal subroutine_charVal subroutine_boolVal subroutine_stringVal subroutine subroutine_rs subroutine_array subroutine_narray subroutine_dim
 
 
 
@@ -1034,7 +1034,7 @@ task_invoke : MAKE_PARALLEL IDENTIFIER COLON IDENTIFIER COLON IDENTIFIER COLON {
               }  COLON SEMICOLON ;
 
 /*get statement*/
-get_invoke : GET ARROW TIME ;
+get_invoke : GET ARROW TIME {fprintf(fpcpp,"gett.time()");};
 
 /*SLEEP STATEMENT*/
 sleep : SLEEP subr_sleep ROUNDOPEN subroutine_token FLOATLITERAL subroutine_decVal ROUNDCLOSE subroutine_roundclose SEMICOLON subroutine_token { fprintf(yyout, " : sleep statement");  };
@@ -1058,10 +1058,10 @@ nextip : COMMA subroutine_rs IDENTIFIER subroutine_id nextip
       fprintf(yyout, " : scan statement");
      }
     ;
-
+/* 
 stringvalues : STRINGLITERAL subroutine_stringVal
              | IDENTIFIER subroutine_id
-            ;
+            ; */
 
 /* Return */
 return_statement : RETURN subroutine_token RHS SEMICOLON {
@@ -1077,10 +1077,10 @@ output : OP {io = 0;} file_name COLON opstring SEMICOLON subroutine_token subrou
        }
       ;
 
-opstring : subroutine_rs stringvalues nextop 
+opstring : subroutine_rs RHS nextop 
          ;
 
-nextop : HASH /*subr_outputOP*/ subroutine_rs stringvalues nextop
+nextop : HASH /*subr_outputOP*/ subroutine_rs RHS nextop
        | subroutine
        ;
 

@@ -81,7 +81,7 @@ start
     testt-> x = 1;
     testt->y = 2;
 
-    op: dist(testt, crctType) # "\n";
+    op : (7 + 5) # "\n";
 
     array pt i[100] ;
     $$ -------------------------------------------------------- Task not found error below
