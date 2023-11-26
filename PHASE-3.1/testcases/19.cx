@@ -1,0 +1,47 @@
+type adders
+<<
+    number a;
+    number b;
+    decimal c;
+    decimal d;
+
+    func addMsg : number a, number b : number
+    << 
+        return (a+b);
+    >>
+
+    func addMsg : decimal a, decimal b: decimal
+    <<
+        decimal c1 = (a + b);
+        return c1;
+    >>    
+>>
+
+type caller
+<<
+    adders x;
+
+    func printMsg : number a : void
+    <<
+        op : a # "\n";
+        return void;
+    >>
+
+    func printMsg : decimal a : void
+    <<
+        op : a # "\n";
+        return void;
+    >>
+>>
+
+start
+<<
+    caller called;
+    called->x->a = 10;
+    called->x->b = 20;
+    called->x->c = 30.1;
+    called->x->d = 40.2;
+
+    invoke called->printMsg : invoke called->x->addMsg : called->x->a , called->x->b ::;
+    invoke called->printMsg : invoke called->x->addMsg : called->x->c , called->x->d ::;
+>>

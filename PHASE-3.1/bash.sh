@@ -20,6 +20,7 @@ if [ $exit_status -eq 0 ]; then
     echo "CODE GENERATION COMPLETED" 
 elif [ $exit_status -eq 1 ]; then
     echo "SEMANTICS FAILURE"
+    rm bison.output bison.tab.c bison.tab.h semantic.o main.o lex.yy.c
 fi
 
 

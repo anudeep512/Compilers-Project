@@ -23,7 +23,7 @@ type pt
 
 func dist : pt ab, pt b: decimal 
 <<
-    decimal d = ((ab->x - b->x)*(ab->x - b->x)) ;
+    decimal d = ((ab->x - b->x)*(ab->x - b->x) + (ab->y - b->y)*(ab->y - b->y )) ;
     
     bool check = true ;
     atomic number a = 0;
@@ -74,10 +74,14 @@ start
     $$  -------------------------------------------------------- Type not found error below
     $$ pty testt;
     pt crctType;
-    
+    crctType->x = 5;
+    crctType->y = 5;
+
     pt testt ;
     testt-> x = 1;
     testt->y = 2;
+
+    op: dist(testt, crctType) # "\n";
 
     array pt i[100] ;
     $$ -------------------------------------------------------- Task not found error below
